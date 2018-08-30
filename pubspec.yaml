@@ -1,0 +1,15 @@
+name: universal_io
+version: 0.0.1
+description: Supports a subset of 'dart:io' in all platforms (browser, VM, and Flutter).
+homepage: https://github.com/terrier989/dart-universal_io
+author: terrier989 <terrier989@gmail.com>
+
+environment:
+  sdk: '>=2.0.0 <3.0.0'
+
+dependencies:
+  convert: ^2.0.2
+  http: ^0.11.3+17
+
+dev_dependencies:
+  test: ^1.3.0
