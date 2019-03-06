@@ -21,7 +21,7 @@ class _CryptoUtils {
   // -1 : '\r' or '\n'
   //  0 : = (Padding character).
   // >0 : Base 64 alphabet index of given byte.
-  static const List<int> _decodeTable = const [
+  static const List<int> _decodeTable = [
     -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -1, -2, -2, -1, -2, -2, //
     -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, //
     -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, 62, -2, 62, -2, 63, //
@@ -40,10 +40,10 @@ class _CryptoUtils {
     -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2
   ];
 
-  static Random _rng = new Random.secure();
+  static Random _rng = Random.secure();
 
   static Uint8List getRandomBytes(int count) {
-    final Uint8List result = new Uint8List(count);
+    final Uint8List result = Uint8List(count);
     for (int i = 0; i < count; i++) {
       result[i] = _rng.nextInt(0xff);
     }
@@ -51,7 +51,7 @@ class _CryptoUtils {
   }
 
   static String bytesToHex(List<int> bytes) {
-    var result = new StringBuffer();
+    var result = StringBuffer();
     for (var part in bytes) {
       result.write('${part < 16 ? '0' : ''}${part.toRadixString(16)}');
     }
@@ -74,7 +74,7 @@ class _CryptoUtils {
     if (addLineSeparator) {
       outputLen += ((outputLen - 1) ~/ LINE_LENGTH) << 1;
     }
-    List<int> out = new List<int>(outputLen);
+    List<int> out = List<int>(outputLen);
 
     // Encode 24 bit chunks.
     int j = 0, i = 0, c = 0;
@@ -111,14 +111,14 @@ class _CryptoUtils {
       out[j++] = PAD;
     }
 
-    return new String.fromCharCodes(out);
+    return String.fromCharCodes(out);
   }
 
   static List<int> base64StringToBytes(String input,
       [bool ignoreInvalidCharacters = true]) {
     int len = input.length;
     if (len == 0) {
-      return new List<int>(0);
+      return List<int>(0);
     }
 
     // Count '\r', '\n' and illegal characters, For illegal characters,
@@ -129,13 +129,13 @@ class _CryptoUtils {
       if (c < 0) {
         extrasLen++;
         if (c == -2 && !ignoreInvalidCharacters) {
-          throw new FormatException('Invalid character: ${input[i]}');
+          throw FormatException('Invalid character: ${input[i]}');
         }
       }
     }
 
     if ((len - extrasLen) % 4 != 0) {
-      throw new FormatException('''Size of Base 64 characters in Input
+      throw FormatException('''Size of Base 64 characters in Input
           must be a multiple of 4. Input: $input''');
     }
 
@@ -147,7 +147,7 @@ class _CryptoUtils {
       if (currentCodeUnit == PAD) padLength++;
     }
     int outputLen = (((len - extrasLen) * 6) >> 3) - padLength;
-    List<int> out = new List<int>(outputLen);
+    List<int> out = List<int>(outputLen);
 
     for (int i = 0, o = 0; o < outputLen;) {
       // Accumulate 4 valid 6 bit Base 64 characters into an int.
@@ -191,15 +191,14 @@ abstract class _HashBase {
   _HashBase(
       this._chunkSizeInWords, this._digestSizeInWords, this._bigEndianWords)
       : _pendingData = [] {
-    _currentChunk = new List(_chunkSizeInWords);
-    _h = new List(_digestSizeInWords);
+    _currentChunk = List(_chunkSizeInWords);
+    _h = List(_digestSizeInWords);
   }
 
   // Update the hasher with more data.
   add(List<int> data) {
     if (_digestCalled) {
-      throw new StateError(
-          'Hash update method called after digest was retrieved');
+      throw StateError('Hash update method called after digest was retrieved');
     }
     _lengthInBytes += data.length;
     _pendingData.addAll(data);
@@ -214,7 +213,7 @@ abstract class _HashBase {
     _digestCalled = true;
     _finalizeData();
     _iterate();
-    assert(_pendingData.length == 0);
+    assert(_pendingData.isEmpty);
     return _resultAsBytes();
   }
 
@@ -231,6 +230,7 @@ abstract class _HashBase {
 
   // Helper methods.
   _add32(x, y) => (x + y) & _MASK_32;
+
   _roundUp(val, n) => (val + n - 1) & -n;
 
   // Rotate left limiting to unsigned 32-bit values.
@@ -269,7 +269,7 @@ abstract class _HashBase {
 
   // Convert a 32-bit word to four bytes.
   List<int> _wordToBytes(int word) {
-    List<int> bytes = new List(_BYTES_PER_WORD);
+    List<int> bytes = List(_BYTES_PER_WORD);
     bytes[0] = (word >> (_bigEndianWords ? 24 : 0)) & _MASK_8;
     bytes[1] = (word >> (_bigEndianWords ? 16 : 8)) & _MASK_8;
     bytes[2] = (word >> (_bigEndianWords ? 8 : 16)) & _MASK_8;
@@ -326,10 +326,10 @@ class _MD5 extends _HashBase {
 
   // Returns a new instance of this Hash.
   _MD5 newInstance() {
-    return new _MD5();
+    return _MD5();
   }
 
-  static const _k = const [
+  static const _k = [
     0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee, 0xf57c0faf, 0x4787c62a, //
     0xa8304613, 0xfd469501, 0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be, //
     0x6b901122, 0xfd987193, 0xa679438e, 0x49b40821, 0xf61e2562, 0xc040b340, //
@@ -343,7 +343,7 @@ class _MD5 extends _HashBase {
     0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391
   ];
 
-  static const _r = const [
+  static const _r = [
     7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 5, 9, 14, //
     20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 4, 11, 16, 23, 4, 11, //
     16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 6, 10, 15, 21, 6, 10, 15, 21, 6, //

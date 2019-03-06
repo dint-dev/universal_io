@@ -20,8 +20,39 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-library universal_io.driver;
+import 'dart:async';
 
-export 'src/vm/common.dart' if (dart.library.html) 'src/browser/common.dart';
-export 'src/vm/chrome.dart' if (dart.library.html) 'src/browser/chrome.dart';
-export 'src/vm/browser.dart' if (dart.library.html) 'src/browser/browser.dart';
+/// Enables zone-scoped values.
+class ZoneLocal<T> {
+  /// Default value.
+  T defaultValue;
+
+  bool _hasForked = false;
+
+  /// Key used with [Zone.fork].
+  final Object zoneValueKey = Object();
+
+  ZoneLocal({this.defaultValue});
+
+  /// Returns current value.
+  ///
+  /// If values of [Zone.current] or its ancestor is not a return value of
+  /// [forkWithValue], [defaultValue] will be returned.
+  T get current {
+    if (_hasForked) {
+      final value = Zone.current[zoneValueKey];
+      if (value != null) {
+        return value;
+      }
+    }
+    return defaultValue;
+  }
+
+  /// Creates a new zone with [Zone.fork].
+  Zone forkWithValue(T value) {
+    _hasForked = true;
+    return Zone.current.fork(zoneValues: {
+      zoneValueKey: value,
+    });
+  }
+}

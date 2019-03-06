@@ -1,8 +1,9 @@
 @TestOn("chrome")
+import 'dart:async';
+
+import 'package:async/async.dart';
 import 'package:test/test.dart';
 import 'package:universal_io/io.dart';
-import 'package:async/async.dart';
-import 'dart:async';
 
 void main() {
   commonTests();
@@ -14,6 +15,23 @@ int testPort = 54321;
 Uri testUrl = Uri.parse("http://$testHost:$testPort/path?q");
 
 void commonTests() {
+  group("InternetAddress", () {
+    test("address", () {
+      expect(InternetAddress("10.0.0.1").address, "10.0.0.1");
+    });
+    test("host", () {
+      expect(InternetAddress("10.0.0.1").host, "10.0.0.1");
+    });
+    test("isLoopback", () {
+      expect(InternetAddress("10.0.0.1").isLoopback, isFalse);
+      expect(InternetAddress("127.0.0.1").isLoopback, isTrue);
+      expect(InternetAddress("::").isLoopback, isFalse);
+      expect(InternetAddress("::1").isLoopback, isTrue);
+    });
+    test("rawAddress", () {
+      expect(InternetAddress("10.0.0.1").rawAddress, [10, 0, 0, 1]);
+    });
+  });
   group("HttpClient tests for all platforms:", () {
     test("GET failure", () async {
       final client = HttpClient();
@@ -35,7 +53,7 @@ void commonTests() {
         final url = Uri.parse("http://localhost:$port/path?q");
 
         // Send HTTP request
-        final client = new HttpClient();
+        final client = HttpClient();
         final request = await client.getUrl(url);
         final response = await request.close();
 
@@ -43,7 +61,7 @@ void commonTests() {
         expect(response, isNotNull);
         expect(response.headers["Content-Type"], isNotEmpty);
         final bytes = await collectBytes(response);
-        expect(new String.fromCharCodes(bytes), equals("Hello!"));
+        expect(String.fromCharCodes(bytes), equals("Hello!"));
       });
     });
   });
@@ -52,9 +70,9 @@ void commonTests() {
 void browserTests() {
   group("HttpClient tests for browser:", () {
     test("methods: ", () async {
-      final client = new HttpClient();
+      final client = HttpClient();
       Future testMethod(String method, Future<HttpClientRequest> f(),
-          {String scheme: "http"}) async {
+          {String scheme = "http"}) async {
         final request = await f();
         final reason =
             "expected request: '${method.toUpperCase()} ${testUrl.toString()}'\nactual request: ${request.method} ${request.uri}";
@@ -69,7 +87,7 @@ void browserTests() {
       await testMethod(
           "delete", () => client.delete(testHost, testPort, "/path?q"),
           scheme: "https");
-      await testMethod("get", () => client.get(testHost, testPort, "/path?q"),
+      awaiigt testMethod("get", () => client.get(testHost, testPort, "/path?q"),
           scheme: "https");
       await testMethod("head", () => client.head(testHost, testPort, "/path?q"),
           scheme: "https");

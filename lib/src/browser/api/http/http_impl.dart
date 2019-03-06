@@ -3,9 +3,9 @@ part of universal_io.http;
 class _AuthenticationScheme {
   final String _scheme;
 
-  static const UNKNOWN = const _AuthenticationScheme("Unknown");
-  static const BASIC = const _AuthenticationScheme("Basic");
-  static const DIGEST = const _AuthenticationScheme("Digest");
+  static const UNKNOWN = _AuthenticationScheme("Unknown");
+  static const BASIC = _AuthenticationScheme("Basic");
+  static const DIGEST = _AuthenticationScheme("Digest");
 
   const _AuthenticationScheme(this._scheme);
 
@@ -39,7 +39,7 @@ abstract class _Credentials {
       // http://tools.ietf.org/html/draft-reschke-basicauth-enc-06. For
       // now always use UTF-8 encoding.
       _HttpClientDigestCredentials creds = credentials;
-      var hasher = new _MD5()
+      var hasher = _MD5()
         ..add(utf8.encode(creds.username))
         ..add([_CharCode.COLON])
         ..add(realm.codeUnits)
@@ -56,6 +56,7 @@ abstract class _Credentials {
 
 abstract class _HttpClientCredentials implements HttpClientCredentials {
   _AuthenticationScheme get scheme;
+
   void authorize(_Credentials credentials, HttpClientRequest request);
 }
 
@@ -96,7 +97,7 @@ class _HttpClientDigestCredentials extends _HttpClientCredentials
 
   String authorization(_Credentials credentials, _HttpClientRequest request) {
     String requestUri = request.uri.toString();
-    _MD5 hasher = new _MD5()
+    _MD5 hasher = _MD5()
       ..add(request.method.codeUnits)
       ..add([_CharCode.COLON])
       ..add(requestUri.codeUnits);
@@ -105,7 +106,7 @@ class _HttpClientDigestCredentials extends _HttpClientCredentials
     String qop;
     String cnonce;
     String nc;
-    hasher = new _MD5()..add(credentials.ha1.codeUnits)..add([_CharCode.COLON]);
+    hasher = _MD5()..add(credentials.ha1.codeUnits)..add([_CharCode.COLON]);
     if (credentials.qop == "auth") {
       qop = credentials.qop;
       cnonce = _CryptoUtils.bytesToHex(_CryptoUtils.getRandomBytes(4));
@@ -130,7 +131,7 @@ class _HttpClientDigestCredentials extends _HttpClientCredentials
     }
     var response = _CryptoUtils.bytesToHex(hasher.close());
 
-    StringBuffer buffer = new StringBuffer()
+    StringBuffer buffer = StringBuffer()
       ..write('Digest ')
       ..write('username="$username"')
       ..write(', realm="${credentials.realm}"')

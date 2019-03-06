@@ -20,9 +20,9 @@ class _HttpHeaders implements HttpHeaders {
   final int _defaultPortForScheme;
 
   _HttpHeaders(this.protocolVersion,
-      {int defaultPortForScheme: HttpClient.defaultHttpPort,
+      {int defaultPortForScheme = HttpClient.defaultHttpPort,
       _HttpHeaders initialHeaders})
-      : _headers = new HashMap<String, List<String>>(),
+      : _headers = HashMap<String, List<String>>(),
         _defaultPortForScheme = defaultPortForScheme {
     if (initialHeaders != null) {
       initialHeaders._headers.forEach((name, value) => _headers[name] = value);
@@ -45,7 +45,7 @@ class _HttpHeaders implements HttpHeaders {
     List<String> values = _headers[name];
     if (values == null) return null;
     if (values.length > 1) {
-      throw new HttpException("More than one value for header $name");
+      throw HttpException("More than one value for header $name");
     }
     return values[0];
   }
@@ -86,7 +86,7 @@ class _HttpHeaders implements HttpHeaders {
       if (index != -1) {
         values.removeRange(index, index + 1);
       }
-      if (values.length == 0) _headers.remove(name);
+      if (values.isEmpty) _headers.remove(name);
     }
     if (name == HttpHeaders.transferEncodingHeader && value == "chunked") {
       _chunkedTransferEncoding = false;
@@ -104,13 +104,13 @@ class _HttpHeaders implements HttpHeaders {
   }
 
   void noFolding(String name) {
-    if (_noFoldingHeaders == null) _noFoldingHeaders = new List<String>();
+    if (_noFoldingHeaders == null) _noFoldingHeaders = List<String>();
     _noFoldingHeaders.add(name);
   }
 
   bool get persistentConnection => _persistentConnection;
 
-  void set persistentConnection(bool persistentConnection) {
+  set persistentConnection(bool persistentConnection) {
     _checkMutable();
     if (persistentConnection == _persistentConnection) return;
     if (persistentConnection) {
@@ -118,7 +118,7 @@ class _HttpHeaders implements HttpHeaders {
         remove(HttpHeaders.connectionHeader, "close");
       } else {
         if (_contentLength == -1) {
-          throw new HttpException(
+          throw HttpException(
               "Trying to set 'Connection: Keep-Alive' on HTTP 1.0 headers with "
               "no ContentLength");
         }
@@ -136,12 +136,12 @@ class _HttpHeaders implements HttpHeaders {
 
   int get contentLength => _contentLength;
 
-  void set contentLength(int contentLength) {
+  set contentLength(int contentLength) {
     _checkMutable();
     if (protocolVersion == "1.0" &&
         persistentConnection &&
         contentLength == -1) {
-      throw new HttpException(
+      throw HttpException(
           "Trying to clear ContentLength on HTTP 1.0 headers with "
           "'Connection: Keep-Alive' set");
     }
@@ -160,10 +160,10 @@ class _HttpHeaders implements HttpHeaders {
 
   bool get chunkedTransferEncoding => _chunkedTransferEncoding;
 
-  void set chunkedTransferEncoding(bool chunkedTransferEncoding) {
+  set chunkedTransferEncoding(bool chunkedTransferEncoding) {
     _checkMutable();
     if (chunkedTransferEncoding && protocolVersion == "1.0") {
-      throw new HttpException(
+      throw HttpException(
           "Trying to set 'Transfer-Encoding: Chunked' on HTTP 1.0 headers");
     }
     if (chunkedTransferEncoding == _chunkedTransferEncoding) return;
@@ -183,7 +183,7 @@ class _HttpHeaders implements HttpHeaders {
 
   String get host => _host;
 
-  void set host(String host) {
+  set host(String host) {
     _checkMutable();
     _host = host;
     _updateHostHeader();
@@ -191,7 +191,7 @@ class _HttpHeaders implements HttpHeaders {
 
   int get port => _port;
 
-  void set port(int port) {
+  set port(int port) {
     _checkMutable();
     _port = port;
     _updateHostHeader();
@@ -209,7 +209,7 @@ class _HttpHeaders implements HttpHeaders {
     return null;
   }
 
-  void set ifModifiedSince(DateTime ifModifiedSince) {
+  set ifModifiedSince(DateTime ifModifiedSince) {
     _checkMutable();
     // Format "ifModifiedSince" header with date in Greenwich Mean Time (GMT).
     String formatted = HttpDate.format(ifModifiedSince.toUtc());
@@ -228,7 +228,7 @@ class _HttpHeaders implements HttpHeaders {
     return null;
   }
 
-  void set date(DateTime date) {
+  set date(DateTime date) {
     _checkMutable();
     // Format "DateTime" header with date in Greenwich Mean Time (GMT).
     String formatted = HttpDate.format(date.toUtc());
@@ -247,7 +247,7 @@ class _HttpHeaders implements HttpHeaders {
     return null;
   }
 
-  void set expires(DateTime expires) {
+  set expires(DateTime expires) {
     _checkMutable();
     // Format "Expires" header with date in Greenwich Mean Time (GMT).
     String formatted = HttpDate.format(expires.toUtc());
@@ -263,7 +263,7 @@ class _HttpHeaders implements HttpHeaders {
     }
   }
 
-  void set contentType(ContentType contentType) {
+  set contentType(ContentType contentType) {
     _checkMutable();
     _set(HttpHeaders.contentTypeHeader, contentType.toString());
   }
@@ -337,7 +337,7 @@ class _HttpHeaders implements HttpHeaders {
     } else if (value is String) {
       contentLength = int.parse(value);
     } else {
-      throw new HttpException("Unexpected type for header named $name");
+      throw HttpException("Unexpected type for header named $name");
     }
   }
 
@@ -355,7 +355,7 @@ class _HttpHeaders implements HttpHeaders {
     } else if (value is String) {
       _set(HttpHeaders.dateHeader, value);
     } else {
-      throw new HttpException("Unexpected type for header named $name");
+      throw HttpException("Unexpected type for header named $name");
     }
   }
 
@@ -365,7 +365,7 @@ class _HttpHeaders implements HttpHeaders {
     } else if (value is String) {
       _set(HttpHeaders.expiresHeader, value);
     } else {
-      throw new HttpException("Unexpected type for header named $name");
+      throw HttpException("Unexpected type for header named $name");
     }
   }
 
@@ -375,7 +375,7 @@ class _HttpHeaders implements HttpHeaders {
     } else if (value is String) {
       _set(HttpHeaders.ifModifiedSinceHeader, value);
     } else {
-      throw new HttpException("Unexpected type for header named $name");
+      throw HttpException("Unexpected type for header named $name");
     }
   }
 
@@ -403,7 +403,7 @@ class _HttpHeaders implements HttpHeaders {
       }
       _set(HttpHeaders.hostHeader, value);
     } else {
-      throw new HttpException("Unexpected type for header named $name");
+      throw HttpException("Unexpected type for header named $name");
     }
   }
 
@@ -424,7 +424,7 @@ class _HttpHeaders implements HttpHeaders {
   void _addValue(String name, Object value) {
     List<String> values = _headers[name];
     if (values == null) {
-      values = new List<String>();
+      values = List<String>();
       _headers[name] = values;
     }
     if (value is DateTime) {
@@ -438,13 +438,13 @@ class _HttpHeaders implements HttpHeaders {
 
   void _set(String name, String value) {
     assert(name == _validateField(name));
-    List<String> values = new List<String>();
+    List<String> values = List<String>();
     _headers[name] = values;
     values.add(value);
   }
 
   _checkMutable() {
-    if (!_mutable) throw new HttpException("HTTP headers are not mutable");
+    if (!_mutable) throw HttpException("HTTP headers are not mutable");
   }
 
   _updateHostHeader() {
@@ -454,14 +454,14 @@ class _HttpHeaders implements HttpHeaders {
 
   _foldHeader(String name) {
     if (name == HttpHeaders.setCookieHeader ||
-        (_noFoldingHeaders != null && _noFoldingHeaders.indexOf(name) != -1)) {
+        (_noFoldingHeaders != null && _noFoldingHeaders.contains(name))) {
       return false;
     }
     return true;
   }
 
   String toString() {
-    StringBuffer sb = new StringBuffer();
+    StringBuffer sb = StringBuffer();
     _headers.forEach((String name, List<String> values) {
       sb..write(name)..write(": ");
       bool fold = _foldHeader(name);
@@ -483,7 +483,7 @@ class _HttpHeaders implements HttpHeaders {
   static String _validateField(String field) {
     for (var i = 0; i < field.length; i++) {
       if (!_isTokenChar(field.codeUnitAt(i))) {
-        throw new FormatException(
+        throw FormatException(
             "Invalid HTTP header field name: ${json.encode(field)}");
       }
     }
@@ -494,7 +494,7 @@ class _HttpHeaders implements HttpHeaders {
     if (value is! String) return value;
     for (var i = 0; i < value.length; i++) {
       if (!_isValueChar(value.codeUnitAt(i))) {
-        throw new FormatException(
+        throw FormatException(
             "Invalid HTTP header field value: ${json.encode(value)}");
       }
     }
@@ -528,16 +528,14 @@ class _HeaderValue implements HeaderValue {
 
   _HeaderValue([this._value = "", Map<String, String> parameters]) {
     if (parameters != null) {
-      _parameters = new HashMap<String, String>.from(parameters);
+      _parameters = HashMap<String, String>.from(parameters);
     }
   }
 
   static _HeaderValue parse(String value,
-      {parameterSeparator: ";",
-      valueSeparator: null,
-      preserveBackslash: false}) {
+      {parameterSeparator = ";", valueSeparator, preserveBackslash = false}) {
     // Parse the string.
-    var result = new _HeaderValue();
+    var result = _HeaderValue();
     result._parse(value, parameterSeparator, valueSeparator, preserveBackslash);
     return result;
   }
@@ -546,22 +544,22 @@ class _HeaderValue implements HeaderValue {
 
   void _ensureParameters() {
     if (_parameters == null) {
-      _parameters = new HashMap<String, String>();
+      _parameters = HashMap<String, String>();
     }
   }
 
   Map<String, String> get parameters {
     _ensureParameters();
     if (_unmodifiableParameters == null) {
-      _unmodifiableParameters = new UnmodifiableMapView(_parameters);
+      _unmodifiableParameters = UnmodifiableMapView(_parameters);
     }
     return _unmodifiableParameters;
   }
 
   String toString() {
-    StringBuffer sb = new StringBuffer();
+    StringBuffer sb = StringBuffer();
     sb.write(_value);
-    if (parameters != null && parameters.length > 0) {
+    if (parameters != null && parameters.isNotEmpty) {
       _parameters.forEach((String name, String value) {
         sb..write("; ")..write(name)..write("=")..write(value);
       });
@@ -596,7 +594,7 @@ class _HeaderValue implements HeaderValue {
 
     void expect(String expected) {
       if (done() || s[index] != expected) {
-        throw new HttpException("Failed to parse header value");
+        throw HttpException("Failed to parse header value");
       }
       index++;
     }
@@ -606,8 +604,8 @@ class _HeaderValue implements HeaderValue {
     }
 
     void parseParameters() {
-      var parameters = new HashMap<String, String>();
-      _parameters = new UnmodifiableMapView(parameters);
+      var parameters = HashMap<String, String>();
+      _parameters = UnmodifiableMapView(parameters);
 
       String parseParameterName() {
         int start = index;
@@ -625,12 +623,12 @@ class _HeaderValue implements HeaderValue {
       String parseParameterValue() {
         if (!done() && s[index] == "\"") {
           // Parse quoted value.
-          StringBuffer sb = new StringBuffer();
+          StringBuffer sb = StringBuffer();
           index++;
           while (!done()) {
             if (s[index] == "\\") {
               if (index + 1 == s.length) {
-                throw new HttpException("Failed to parse header value");
+                throw HttpException("Failed to parse header value");
               }
               if (preserveBackslash && s[index + 1] != "\"") {
                 sb.write(s[index]);
@@ -720,7 +718,7 @@ class _ContentType extends _HeaderValue implements ContentType {
   _ContentType._();
 
   static _ContentType parse(String value) {
-    var result = new _ContentType._();
+    var result = _ContentType._();
     result._parse(value, ";", null, false);
     int index = result._value.indexOf("/");
     if (index == -1 || index == (result._value.length - 1)) {
@@ -832,8 +830,8 @@ class _Cookie implements Cookie {
     }
 
     name = parseName();
-    if (done() || name.length == 0) {
-      throw new HttpException("Failed to parse header value [$s]");
+    if (done() || name.isEmpty) {
+      throw HttpException("Failed to parse header value [$s]");
     }
     index++; // Skip the = character.
     value = parseValue();
@@ -844,7 +842,7 @@ class _Cookie implements Cookie {
   }
 
   String toString() {
-    StringBuffer sb = new StringBuffer();
+    StringBuffer sb = StringBuffer();
     sb..write(name)..write("=")..write(value);
     if (expires != null) {
       sb..write("; Expires=")..write(HttpDate.format(expires));
@@ -864,7 +862,7 @@ class _Cookie implements Cookie {
   }
 
   void _validate() {
-    const separators = const [
+    const separators = [
       "(",
       ")",
       "<",
@@ -885,10 +883,8 @@ class _Cookie implements Cookie {
     ];
     for (int i = 0; i < name.length; i++) {
       int codeUnit = name.codeUnits[i];
-      if (codeUnit <= 32 ||
-          codeUnit >= 127 ||
-          separators.indexOf(name[i]) >= 0) {
-        throw new FormatException(
+      if (codeUnit <= 32 || codeUnit >= 127 || separators.contains(name[i])) {
+        throw FormatException(
             "Invalid character in cookie name, code unit: '$codeUnit'");
       }
     }
@@ -903,7 +899,7 @@ class _Cookie implements Cookie {
           (codeUnit >= 0x2D && codeUnit <= 0x3A) ||
           (codeUnit >= 0x3C && codeUnit <= 0x5B) ||
           (codeUnit >= 0x5D && codeUnit <= 0x7E))) {
-        throw new FormatException(
+        throw FormatException(
             "Invalid character in cookie value, code unit: '$codeUnit'");
       }
     }

@@ -1,6 +1,7 @@
-import "package:stream_channel/stream_channel.dart";
-import 'dart:io';
 import 'dart:async';
+import 'dart:io';
+
+import "package:stream_channel/stream_channel.dart";
 
 Future<void> hybridMain(StreamChannel channel, Object message) async {
   // Start server
@@ -19,6 +20,7 @@ Future<void> hybridMain(StreamChannel channel, Object message) async {
 class _ServerAndPort {
   final HttpServer server;
   final int port;
+
   _ServerAndPort(this.server, this.port);
 }
 
@@ -31,7 +33,7 @@ Future<_ServerAndPort> _bindServer() async {
         InternetAddress.loopbackIPv4,
         port,
       );
-      return new _ServerAndPort(server, port);
+      return _ServerAndPort(server, port);
     } catch (e) {
       // Do nothing
     }

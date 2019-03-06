@@ -20,8 +20,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-library universal_io.driver;
+import 'common.dart';
+import 'browser.dart';
 
-export 'src/vm/common.dart' if (dart.library.html) 'src/browser/common.dart';
-export 'src/vm/chrome.dart' if (dart.library.html) 'src/browser/chrome.dart';
-export 'src/vm/browser.dart' if (dart.library.html) 'src/browser/browser.dart';
+class ChromeIODriver extends BrowserIODriver {
+  ChromeIODriver({PlatformInfo platformInfo = const PlatformInfo()})
+      : super(platformInfo: platformInfo);
+}

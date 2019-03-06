@@ -4,7 +4,7 @@
 
 part of universal_io.http;
 
-final _httpOverridesToken = new Object();
+final _httpOverridesToken = Object();
 
 const _asyncRunZoned = runZoned;
 
@@ -53,7 +53,7 @@ abstract class HttpOverrides {
       ZoneSpecification zoneSpecification,
       Function onError}) {
     HttpOverrides overrides =
-        new _HttpOverridesScope(createHttpClient, findProxyFromEnvironment);
+        _HttpOverridesScope(createHttpClient, findProxyFromEnvironment);
     return _asyncRunZoned<R>(body,
         zoneValues: {_httpOverridesToken: overrides},
         zoneSpecification: zoneSpecification,
@@ -77,7 +77,7 @@ abstract class HttpOverrides {
   /// When this override is installed, this function overrides the behavior of
   /// `new HttpClient`.
   HttpClient createHttpClient(SecurityContext context) {
-    return new _HttpClient(context);
+    return _HttpClient(context);
   }
 }
 

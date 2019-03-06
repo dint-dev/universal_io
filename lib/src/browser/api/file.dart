@@ -1,4 +1,8 @@
-part of universal_io;
+import 'dart:async';
+import 'dart:convert';
+
+import 'all.dart';
+import '../common.dart';
 
 abstract class Directory extends FileSystemEntity {
   static Directory get systemTemp => IODriver.current.systemTemp;
@@ -10,7 +14,22 @@ abstract class Directory extends FileSystemEntity {
   Future<Directory> createTemp([String prefix]);
 
   Stream<FileSystemEntity> list(
-      {bool recursive: false, bool followLinks: true});
+      {bool recursive = false, bool followLinks = true});
+
+  Future<Directory> create({bool recursive = false});
+
+  List<FileSystemEntity> listSync(
+      {bool recursive = false, bool followLinks = true});
+
+  Directory get absolute;
+
+  Directory renameSync(String newPath);
+
+  String resolveSymbolicLinksSync();
+
+  Directory createTempSync([String prefix]);
+
+  void createSync({bool recursive = false});
 }
 
 abstract class File extends FileSystemEntity {
@@ -22,25 +41,25 @@ abstract class File extends FileSystemEntity {
 
   Future<int> length();
 
-  Future<RandomAccessFile> open({FileMode mode: FileMode.read});
+  Future<RandomAccessFile> open({FileMode mode = FileMode.read});
 
   Stream<List<int>> openRead([int start, int end]);
 
-  IOSink openWrite({FileMode mode: FileMode.write, Encoding encoding: utf8});
+  IOSink openWrite({FileMode mode = FileMode.write, Encoding encoding = utf8});
 
   Future<List<int>> readAsBytes();
 
-  Future<List<String>> readAsLines({Encoding encoding: utf8});
+  Future<List<String>> readAsLines({Encoding encoding = utf8});
 
-  Future<String> readAsString();
+  Future<String> readAsString({Encoding encoding = utf8});
 
   Future<File> writeAsBytes(List<int> bytes,
-      {FileMode mode: FileMode.write, bool flush: false});
+      {FileMode mode = FileMode.write, bool flush = false});
 
   Future<File> writeAsString(String contents,
-      {FileMode mode: FileMode.write,
-      Encoding encoding: utf8,
-      bool flush: false});
+      {FileMode mode = FileMode.write,
+      Encoding encoding = utf8,
+      bool flush = false});
 }
 
 enum FileLock {
@@ -74,20 +93,22 @@ class FileStat {
       this.size,
       this.type});
 
-  String modeString() => throw new UnimplementedError();
+  String modeString() => throw UnimplementedError();
 
   Future<FileStat> stat(String path) {
-    return new FileSystemEntity(path).stat();
+    return FileSystemEntity(path).stat();
   }
 }
 
 class FileSystemCreateEvent extends FileSystemEvent {
   FileSystemCreateEvent() : super._();
+
   int get type => FileSystemEvent.create;
 }
 
 class FileSystemDeleteEvent extends FileSystemEvent {
   FileSystemDeleteEvent() : super._();
+
   int get type => FileSystemEvent.delete;
 }
 
@@ -98,13 +119,13 @@ abstract class FileSystemEntity {
     return IODriver.current.newFileSystemEntity(path);
   }
 
-  Directory get parent => new Directory(parentOf(path));
+  Directory get parent => Directory(parentOf(path));
 
   String get path;
 
-  Uri get uri => new Uri.file(path);
+  Uri get uri => Uri.file(path);
 
-  Future<FileSystemEntity> delete({bool recursive: false});
+  Future<FileSystemEntity> delete({bool recursive = false});
 
   Future<bool> exists();
 
@@ -115,14 +136,14 @@ abstract class FileSystemEntity {
   Future<FileStat> stat();
 
   Stream<FileSystemEvent> watch(
-      {int events: FileSystemEvent.all, bool recursive: false});
+      {int events = FileSystemEvent.all, bool recursive = false});
 
   static Future<bool> isDirectory(String path) {
-    throw new UnimplementedError();
+    return IODriver.current.isDirectory(path);
   }
 
   static Future<bool> isFile(String path) {
-    throw new UnimplementedError();
+    return IODriver.current.isFile(path);
   }
 
   static String parentOf(String path) {
@@ -132,6 +153,18 @@ abstract class FileSystemEntity {
     }
     return path.substring(0, i);
   }
+
+  bool existsSync();
+
+  FileSystemEntity get absolute;
+
+  void deleteSync({bool recursive = false});
+
+  FileStat statSync();
+
+  String resolveSymbolicLinksSync();
+
+  FileSystemEntity renameSync(String newPath);
 }
 
 enum FileSystemEntityType {
@@ -157,11 +190,13 @@ abstract class FileSystemEvent {
 
 class FileSystemModifyEvent extends FileSystemEvent {
   FileSystemModifyEvent() : super._();
+
   int get type => FileSystemEvent.modify;
 }
 
 class FileSystemMoveEvent extends FileSystemEvent {
   FileSystemMoveEvent() : super._();
+
   int get type => FileSystemEvent.move;
 }
 
@@ -197,5 +232,14 @@ abstract class RandomAccessFile {
       [int start = 0, int end]);
 
   Future<RandomAccessFile> writeString(String string,
-      {Encoding encoding: utf8});
+      {Encoding encoding = utf8});
+}
+
+class FileSystemException extends IOException {
+  final String message;
+  final String path;
+  final OSError osError;
+  FileSystemException([this.message = "", this.path = "", this.osError]);
+  @override
+  String toString() => "FileSystemException('$message', '$path')";
 }

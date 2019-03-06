@@ -14,7 +14,3 @@ doc/api/
 
 .idea/
 .VSCode/
-
-# Flutter directories
-android/
-ios/

@@ -20,41 +20,41 @@ class _HttpClient implements HttpClient {
 
   @override
   set authenticate(Future<bool> f(Uri url, String scheme, String realm)) {
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   @override
   set authenticateProxy(
       Future<bool> f(String host, int port, String scheme, String realm)) {
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   @override
   set badCertificateCallback(
       bool callback(X509Certificate cert, String host, int port)) {
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   @override
   set findProxy(String f(Uri url)) {
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   @override
   void addCredentials(
       Uri url, String realm, HttpClientCredentials credentials) {
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   @override
   void addProxyCredentials(
       String host, int port, String realm, HttpClientCredentials credentials) {
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   @override
-  void close({bool force: false}) {
-    throw new UnimplementedError();
+  void close({bool force = false}) {
+    throw UnimplementedError();
   }
 
   @override
@@ -98,7 +98,7 @@ class _HttpClient implements HttpClient {
     }
     return openUrl(
         method,
-        new Uri(
+        Uri(
           scheme: "https",
           host: host,
           port: port,
@@ -111,7 +111,7 @@ class _HttpClient implements HttpClient {
   @override
   Future<HttpClientRequest> openUrl(String method, Uri url) {
     if (url.host == null) {
-      throw new ArgumentError.value(url, "url", "Host can't be null");
+      throw ArgumentError.value(url, "url", "Host can't be null");
     }
     var scheme = url.scheme;
     var needsNewUrl = false;
@@ -129,11 +129,11 @@ class _HttpClient implements HttpClient {
         case "https":
           break;
         default:
-          throw new ArgumentError.value("Unsupported scheme '$scheme'");
+          throw ArgumentError.value("Unsupported scheme '$scheme'");
       }
     }
     if (needsNewUrl) {
-      url = new Uri(
+      url = Uri(
         scheme: scheme,
         userInfo: url.userInfo,
         host: url.host,
@@ -142,8 +142,8 @@ class _HttpClient implements HttpClient {
         fragment: url.fragment,
       );
     }
-    return new Future<HttpClientRequest>.value(
-        new _HttpClientRequest._(this, method, url));
+    return Future<HttpClientRequest>.value(
+        _HttpClientRequest._(this, method, url));
   }
 
   @override
@@ -187,12 +187,12 @@ class _HttpClientRequest extends HttpClientRequest implements IOSink {
   final Uri uri;
 
   @override
-  final HttpHeaders headers = new _HttpHeaders("1.0");
+  final HttpHeaders headers = _HttpHeaders("1.0");
 
-  final Int8Buffer _buffer = new Int8Buffer();
+  final Int8Buffer _buffer = Int8Buffer();
 
   final Completer<HttpClientResponse> _completer =
-      new Completer<HttpClientResponse>();
+      Completer<HttpClientResponse>();
   bool _closed = false;
   Future _requestBodyFuture;
 
@@ -213,17 +213,17 @@ class _HttpClientRequest extends HttpClientRequest implements IOSink {
   Encoding get encoding => utf8;
 
   @override
-  void set encoding(Encoding value) {
-    throw new StateError("IOSink encoding is not mutable");
+  set encoding(Encoding value) {
+    throw StateError("IOSink encoding is not mutable");
   }
 
   @override
   void add(List<int> event) {
     if (_requestBodyFuture != null) {
-      throw new StateError("StreamSink is bound to a stream");
+      throw StateError("StreamSink is bound to a stream");
     }
     if (_closed) {
-      throw new StateError("StreamSink is closed");
+      throw StateError("StreamSink is closed");
     }
     _buffer.addAll(event);
   }
@@ -231,7 +231,7 @@ class _HttpClientRequest extends HttpClientRequest implements IOSink {
   @override
   void addError(Object error, [StackTrace stackTrace]) {
     if (_closed) {
-      throw new StateError("HTTP request is closed already");
+      throw StateError("HTTP request is closed already");
     }
     _completer.completeError(error, stackTrace);
   }
@@ -239,10 +239,10 @@ class _HttpClientRequest extends HttpClientRequest implements IOSink {
   @override
   Future<void> addStream(Stream<List<int>> stream) {
     if (_requestBodyFuture != null) {
-      throw new StateError("StreamSink is bound to a stream");
+      throw StateError("StreamSink is bound to a stream");
     }
     if (_closed) {
-      throw new StateError("StreamSink is closed");
+      throw StateError("StreamSink is closed");
     }
     _requestBodyFuture = stream.listen((item) {
       _buffer.addAll(item);
@@ -255,7 +255,7 @@ class _HttpClientRequest extends HttpClientRequest implements IOSink {
   @override
   Future<HttpClientResponse> close() {
     if (_closed) {
-      throw new StateError("StreamSink is closed");
+      throw StateError("StreamSink is closed");
     }
     if (!_completer.isCompleted) {
       if (_requestBodyFuture != null) {
@@ -271,7 +271,7 @@ class _HttpClientRequest extends HttpClientRequest implements IOSink {
 
   void _send() {
     try {
-      final xhr = new html.HttpRequest();
+      final xhr = html.HttpRequest();
       xhr.open(method, uri.toString(), async: true);
       xhr.responseType = 'blob';
       xhr.withCredentials = true;
@@ -285,12 +285,12 @@ class _HttpClientRequest extends HttpClientRequest implements IOSink {
       xhr.onLoad.first.then((_) {
         // TODO(nweiz): Set the response type to "arraybuffer" when issue 18542
         // is fixed.
-        var blob = xhr.response == null ? new html.Blob([]) : xhr.response;
-        var reader = new html.FileReader();
+        var blob = xhr.response == null ? html.Blob([]) : xhr.response;
+        var reader = html.FileReader();
 
         reader.onLoad.first.then((_) {
           var body = reader.result as Uint8List;
-          completer.complete(new _HttpClientResponse._(
+          completer.complete(_HttpClientResponse._(
             _client,
             method,
             uri,
@@ -302,8 +302,7 @@ class _HttpClientRequest extends HttpClientRequest implements IOSink {
 
         reader.onError.first.then((error) {
           completer.completeError(
-              new SocketException(
-                  "${error.toString()}. Request: '$method $uri'"),
+              SocketException("${error.toString()}. Request: '$method $uri'"),
               StackTrace.current);
         });
 
@@ -314,11 +313,10 @@ class _HttpClientRequest extends HttpClientRequest implements IOSink {
         // Unfortunately, the underlying XMLHttpRequest API doesn't expose any
         // specific information about the error itself.
         completer.completeError(
-            new SocketException(
-                "XMLHttpRequest error. Request: '$method $uri'"),
+            SocketException("XMLHttpRequest error. Request: '$method $uri'"),
             StackTrace.current);
       });
-      xhr.send(new Uint8List.fromList(_buffer));
+      xhr.send(Uint8List.fromList(_buffer));
     } catch (e) {
       _completer.completeError(e);
     }
@@ -326,7 +324,7 @@ class _HttpClientRequest extends HttpClientRequest implements IOSink {
 
   @override
   Future<void> flush() {
-    return new Future<void>.value();
+    return Future<void>.value();
   }
 
   @override
@@ -355,7 +353,7 @@ class _HttpClientRequest extends HttpClientRequest implements IOSink {
 
   @override
   void writeCharCode(int charCode) {
-    write(new String.fromCharCode(charCode));
+    write(String.fromCharCode(charCode));
   }
 
   @override
@@ -386,16 +384,16 @@ class _HttpClientResponse extends Stream<List<int>>
   }
 
   @override
-  X509Certificate get certificate => throw new UnimplementedError();
+  X509Certificate get certificate => throw UnimplementedError();
 
   @override
   HttpConnectionInfo get connectionInfo {
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   @override
   int get contentLength {
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   @override
@@ -414,7 +412,7 @@ class _HttpClientResponse extends Stream<List<int>>
 
   @override
   bool get persistentConnection {
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   @override
@@ -424,20 +422,20 @@ class _HttpClientResponse extends Stream<List<int>>
 
   @override
   List<RedirectInfo> get redirects {
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   int get statusCode => _response.status;
 
   @override
   Future<Socket> detachSocket() {
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   @override
   StreamSubscription<List<int>> listen(void onData(List<int> event),
       {Function onError, void onDone(), bool cancelOnError}) {
-    return new Stream.fromIterable([this._responseData]).listen(onData,
+    return Stream.fromIterable([this._responseData]).listen(onData,
         onError: onError, onDone: onDone, cancelOnError: cancelOnError);
   }
 
