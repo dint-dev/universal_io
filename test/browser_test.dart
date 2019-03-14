@@ -87,7 +87,7 @@ void browserTests() {
       await testMethod(
           "delete", () => client.delete(testHost, testPort, "/path?q"),
           scheme: "https");
-      awaiigt testMethod("get", () => client.get(testHost, testPort, "/path?q"),
+      await testMethod("get", () => client.get(testHost, testPort, "/path?q"),
           scheme: "https");
       await testMethod("head", () => client.head(testHost, testPort, "/path?q"),
           scheme: "https");

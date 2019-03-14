@@ -10,4 +10,5 @@ pub run webdev build
 ```
 
 ## 2.Open in Chrome OS
-Open [chrome:extensions](chrome:extensions).
+  * Open [chrome:extensions](chrome:extensions).
+  * Click "Load unpacked"

@@ -5,16 +5,17 @@
 
   "app": {
     "background": {
-      "scripts": ["main.js"]
+      "scripts": ["background.js"]
     }
   },
 
   "sockets": {
     "tcp": {
-      "connect": "*"
+      "connect": ["*"]
     },
     "udp": {
-      "send": "*"
+      "send": ["*"],
+      "bind": ["*"]
     }
   }
 }

@@ -33,15 +33,30 @@ import 'chrome/chrome_common.dart';
 import 'chrome/chrome_sockets.dart';
 
 class ChromeIODriver extends BrowserIODriver {
+  static Future<InternetAddress> _resolve(Object value) async {
+    if (value is String) {
+      final all = await InternetAddress.lookup(value);
+      if (all.length == 0) {
+        throw ArgumentError("host '$value' does not exist");
+      }
+      return all.first;
+    }
+    if (value is InternetAddress) {
+      return value;
+    }
+    throw ArgumentError.value("value", value);
+  }
+
   @override
-  Future<RawDatagramSocket> bindRawDatagramSocket(host, int port,
+  Future<RawDatagramSocket> bindRawDatagramSocket(Object host, int port,
       {bool reuseAddress = true, bool reusePort = false, int ttl = 1}) async {
+    final address = await _resolve(host);
     final createInfo = await sockets.udp.create();
     final socketId = createInfo.socketId;
     try {
       final resultValue = await sockets.udp.bind(
         socketId,
-        host.toString(),
+        address.address,
         port,
       );
       if (resultValue < 0) {
@@ -51,7 +66,7 @@ class ChromeIODriver extends BrowserIODriver {
       }
       return ChromeRawDatagramSocket(
         socketId,
-        address: InternetAddress(host),
+        address: address,
         port: port,
       );
     } catch (e) {
@@ -61,29 +76,33 @@ class ChromeIODriver extends BrowserIODriver {
   }
 
   @override
-  Future<RawServerSocket> bindRawServerSocket(address, int port,
-      {int backlog = 0, bool v6Only = false, bool shared = false}) {
+  Future<RawServerSocket> bindRawServerSocket(Object host, int port,
+      {int backlog = 0, bool v6Only = false, bool shared = false}) async {
+    final address = await _resolve(host);
     return ChromeRawServerSocket.bind(address, port);
   }
 
   @override
-  Future<RawSocket> connectRawSocket(host, int port,
-      {sourceAddress, Duration timeout}) async {
+  Future<RawSocket> connectRawSocket(Object host, int port,
+      {Object sourceAddress, Duration timeout}) async {
+    final address = await _resolve(host);
+    final sourceInternetAddress =
+        sourceAddress == null ? null : await _resolve(sourceAddress);
     final createInfo = await sockets.tcp.create();
     final socketId = createInfo.socketId;
     try {
       final resultValue = await sockets.tcp.connect(
         socketId,
-        host.toString(),
+        address.address,
         port,
       );
       if (resultValue < 0) {
         throw StateError(
-            "Creating TCP connection from '$sourceAddress' to '$host:$port' failed with error code $resultValue");
+            "Creating TCP connection from '$sourceInternetAddress' to '$host:$port' failed with error code $resultValue");
       }
       return ChromeRawSocket(
         socketId,
-        remoteAddress: InternetAddress(host),
+        remoteAddress: address,
         remotePort: port,
       );
     } catch (e) {

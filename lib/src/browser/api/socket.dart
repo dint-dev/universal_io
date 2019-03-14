@@ -507,8 +507,12 @@ abstract class RawSocket implements Stream<RawSocketEvent> {
   /// connection attempts to [host] are cancelled.
   static Future<RawSocket> connect(host, int port,
       {sourceAddress, Duration timeout}) {
-    return IODriver.current.connectRawSocket(host, port,
-        sourceAddress: sourceAddress, timeout: timeout);
+    return IODriver.current.connectRawSocket(
+      host,
+      port,
+      sourceAddress: sourceAddress,
+      timeout: timeout,
+    );
   }
 
   /// Like [connect], but returns a [Future] that completes with a
@@ -613,14 +617,22 @@ abstract class Socket implements Stream<List<int>>, IOSink {
   /// [timeout]. On timeout, a [SocketException] is thrown and all ongoing
   /// connection attempts to [host] are cancelled.
   static Future<Socket> connect(host, int port,
-      {sourceAddress, Duration timeout}) {
+      {sourceAddress, Duration timeout}) async {
     final IOOverrides overrides = IOOverrides.current;
     if (overrides == null) {
-      return IODriver.current.connectSocket(host, port,
-          sourceAddress: sourceAddress, timeout: timeout);
+      return IODriver.current.connectSocket(
+        host,
+        port,
+        sourceAddress: sourceAddress,
+        timeout: timeout,
+      );
     }
-    return overrides.socketConnect(host, port,
-        sourceAddress: sourceAddress, timeout: timeout);
+    return overrides.socketConnect(
+      host,
+      port,
+      sourceAddress: sourceAddress,
+      timeout: timeout,
+    );
   }
 
   /// Like [connect], but returns a [Future] that completes with a
@@ -630,11 +642,17 @@ abstract class Socket implements Stream<List<int>>, IOSink {
       {sourceAddress}) {
     final IOOverrides overrides = IOOverrides.current;
     if (overrides == null) {
-      return IODriver.current
-          .startConnectSocket(host, port, sourceAddress: sourceAddress);
+      return IODriver.current.startConnectSocket(
+        host,
+        port,
+        sourceAddress: sourceAddress,
+      );
     }
-    return overrides.socketStartConnect(host, port,
-        sourceAddress: sourceAddress);
+    return overrides.socketStartConnect(
+      host,
+      port,
+      sourceAddress: sourceAddress,
+    );
   }
 
   /// Destroy the socket in both directions. Calling [destroy] will make the
@@ -746,9 +764,14 @@ abstract class RawDatagramSocket extends Stream<RawSocketEvent> {
   /// Creates a new raw datagram socket binding it to an address and
   /// port.
   static Future<RawDatagramSocket> bind(host, int port,
-      {bool reuseAddress = true, bool reusePort = false, int ttl = 1}) {
-    return IODriver.current.bindRawDatagramSocket(host, port,
-        reuseAddress: reuseAddress, reusePort: reusePort, ttl: ttl);
+      {bool reuseAddress = true, bool reusePort = false, int ttl = 1}) async {
+    return IODriver.current.bindRawDatagramSocket(
+      host,
+      port,
+      reuseAddress: reuseAddress,
+      reusePort: reusePort,
+      ttl: ttl,
+    );
   }
 
   /// Returns the port used by this socket.
