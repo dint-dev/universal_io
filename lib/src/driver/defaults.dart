@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// Cross-platform implementation of 'dart:io'.
-library universal_io;
-
-export 'dart:io' if (dart.library.js) 'src/io/io.dart';
+export 'defaults_in_vm.dart'
+    if (dart.library.html) 'defaults_in_browser.dart'
+    if (dart.library.js) 'defaults_in_js.dart';

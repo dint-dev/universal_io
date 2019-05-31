@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// Cross-platform implementation of 'dart:io'.
-library universal_io;
+import 'dart:async';
 
-export 'dart:io' if (dart.library.js) 'src/io/io.dart';
+import 'package:universal_io/io.dart';
+
+abstract class BaseRawServerSocket extends Stream<RawSocket>
+    implements RawServerSocket {
+  BaseRawServerSocket();
+}

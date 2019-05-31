@@ -12,7 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// Cross-platform implementation of 'dart:io'.
-library universal_io;
+@TestOn("node")
+@Timeout(Duration(seconds: 5))
+import 'package:test/test.dart';
 
-export 'dart:io' if (dart.library.js) 'src/io/io.dart';
+import 'src/test_suite/internet_address.dart';
+
+void main() {
+  group("Test suite in Node.JS:", () {
+    testInternetAddress();
+  });
+}

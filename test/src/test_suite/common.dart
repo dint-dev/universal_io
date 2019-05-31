@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// Cross-platform implementation of 'dart:io'.
-library universal_io;
+import 'http_client.dart';
+import 'internet_address.dart';
 
-export 'dart:io' if (dart.library.js) 'src/io/io.dart';
+void testCommon({bool isBrowser = false}) {
+  testInternetAddress();
+  testHttpClient(isBrowser: isBrowser);
+}

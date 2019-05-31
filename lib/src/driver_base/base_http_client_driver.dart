@@ -1,0 +1,313 @@
+// Copyright 'dart-universal_io' project authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:meta/meta.dart';
+import 'package:universal_io/io.dart';
+
+import 'http_headers_impl.dart';
+import 'base_io_sink.dart';
+
+abstract class BaseHttpClient implements HttpClient {
+  @override
+  Duration idleTimeout;
+
+  @override
+  Duration connectionTimeout;
+
+  @override
+  int maxConnectionsPerHost;
+
+  @override
+  bool autoUncompress;
+
+  @override
+  String userAgent;
+
+  @override
+  set authenticate(Future<bool> f(Uri url, String scheme, String realm)) {}
+
+  @override
+  set authenticateProxy(
+      Future<bool> f(String host, int port, String scheme, String realm)) {}
+
+  @override
+  set badCertificateCallback(
+      bool callback(X509Certificate cert, String host, int port)) {}
+
+  @override
+  set findProxy(String f(Uri url)) {}
+
+  @override
+  void addCredentials(
+      Uri url, String realm, HttpClientCredentials credentials) {}
+
+  @override
+  void addProxyCredentials(
+      String host, int port, String realm, HttpClientCredentials credentials) {}
+
+  @override
+  void close({bool force = false}) {}
+
+  @override
+  Future<HttpClientRequest> delete(String host, int port, String path) {
+    return open("DELETE", host, port, path);
+  }
+
+  @override
+  Future<HttpClientRequest> deleteUrl(Uri url) {
+    return openUrl("DELETE", url);
+  }
+
+  @override
+  Future<HttpClientRequest> get(String host, int port, String path) {
+    return open("GET", host, port, path);
+  }
+
+  @override
+  Future<HttpClientRequest> getUrl(Uri url) {
+    return openUrl("GET", url);
+  }
+
+  @override
+  Future<HttpClientRequest> head(String host, int port, String path) {
+    return open("HEAD", host, port, path);
+  }
+
+  @override
+  Future<HttpClientRequest> headUrl(Uri url) {
+    return openUrl("HEAD", url);
+  }
+
+  @override
+  Future<HttpClientRequest> open(
+      String method, String host, int port, String path) {
+    String query;
+    final i = path.indexOf("?");
+    if (i >= 0) {
+      query = path.substring(i + 1);
+      path = path.substring(0, i);
+    }
+    return openUrl(
+        method,
+        Uri(
+          scheme: "http",
+          host: host,
+          port: port,
+          path: path,
+          query: query,
+          fragment: null,
+        ));
+  }
+
+  @override
+  Future<HttpClientRequest> patch(String host, int port, String path) {
+    return open("PATCH", host, port, path);
+  }
+
+  @override
+  Future<HttpClientRequest> patchUrl(Uri url) {
+    return openUrl("PATCH", url);
+  }
+
+  @override
+  Future<HttpClientRequest> post(String host, int port, String path) {
+    return open("POST", host, port, path);
+  }
+
+  @override
+  Future<HttpClientRequest> postUrl(Uri url) {
+    return openUrl("POST", url);
+  }
+
+  @override
+  Future<HttpClientRequest> put(String host, int port, String path) {
+    return open("PUT", host, port, path);
+  }
+
+  @override
+  Future<HttpClientRequest> putUrl(Uri url) {
+    return openUrl("PUT", url);
+  }
+}
+
+abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
+  @override
+  final HttpHeaders headers = HttpHeadersImpl("1.0");
+
+  final Completer<HttpClientResponse> _completer =
+      Completer<HttpClientResponse>();
+
+  Future _addStreamFuture;
+
+  @override
+  final List<Cookie> cookies = <Cookie>[];
+
+  @override
+  HttpConnectionInfo get connectionInfo => null;
+
+  @override
+  Future<HttpClientResponse> get done {
+    return _completer.future;
+  }
+
+  @override
+  Encoding get encoding => utf8;
+
+  @override
+  set encoding(Encoding value) {
+    throw StateError("IOSink encoding is not mutable");
+  }
+
+  @override
+  void add(List<int> event) {
+    if (_completer.isCompleted) {
+      throw StateError("StreamSink is closed");
+    }
+    if (_addStreamFuture != null) {
+      throw StateError("StreamSink is bound to a stream");
+    }
+    internallyAdd(event);
+  }
+
+  @override
+  void addError(Object error, [StackTrace stackTrace]) {
+    if (_completer.isCompleted) {
+      throw StateError("HTTP request is closed already");
+    }
+    _completer.completeError(error, stackTrace);
+  }
+
+  @override
+  Future<void> addStream(Stream<List<int>> stream) async {
+    if (_completer.isCompleted) {
+      throw StateError("StreamSink is closed");
+    }
+    if (_addStreamFuture != null) {
+      throw StateError("StreamSink is bound to a stream");
+    }
+    final future = stream.listen((item) {
+      internallyAdd(item);
+    }, onError: (error) {
+      addError(error);
+    }, cancelOnError: true).asFuture(null);
+    _addStreamFuture = future;
+    await future;
+    _addStreamFuture = null;
+    return null;
+  }
+
+  @override
+  Future<HttpClientResponse> close() async {
+    if (_completer.isCompleted) {
+      return _completer.future;
+    }
+    try {
+      // Wait for added stream
+      if (_addStreamFuture != null) {
+        await _addStreamFuture;
+        _addStreamFuture = null;
+      }
+
+      // Close
+      final result = await internallyClose();
+
+      // Complete future
+      _completer.complete(result);
+      return _completer.future;
+    } catch (error, stackTrace) {
+      // Something failed
+      // Complete with an error
+      _completer.completeError(error, stackTrace);
+      return _completer.future;
+    }
+  }
+
+  @protected
+  void internallyAdd(List<int> data);
+
+  @protected
+  Future<HttpClientResponse> internallyClose();
+}
+
+abstract class BaseHttpClientResponse extends Stream<List<int>>
+    implements HttpClientResponse {
+  @override
+  final HttpHeaders headers = HttpHeadersImpl("1.0");
+
+  @override
+  X509Certificate get certificate => null;
+
+  HttpClient get client;
+
+  @override
+  HttpConnectionInfo get connectionInfo => null;
+
+  @override
+  int get contentLength => -1;
+
+  @override
+  List<Cookie> get cookies {
+    final cookies = <Cookie>[];
+    for (String value in this.headers[HttpHeaders.setCookieHeader]) {
+      cookies.add(Cookie.fromSetCookieValue(value));
+    }
+    return cookies;
+  }
+
+  @override
+  bool get isRedirect =>
+      HttpStatus.temporaryRedirect == statusCode ||
+      HttpStatus.movedPermanently == statusCode;
+
+  @override
+  bool get persistentConnection => false;
+
+  @override
+  String get reasonPhrase => null;
+
+  @override
+  List<RedirectInfo> get redirects => const <RedirectInfo>[];
+
+  HttpClientRequest get request;
+
+  int get statusCode;
+
+  @override
+  Future<Socket> detachSocket() {
+    return null;
+  }
+
+  @override
+  StreamSubscription<List<int>> listen(void onData(List<int> event),
+      {Function onError, void onDone(), bool cancelOnError});
+
+  @override
+  Future<HttpClientResponse> redirect(
+      [String method, Uri url, bool followLoops]) {
+    final newUrl =
+        url ?? Uri.parse(this.headers.value(HttpHeaders.locationHeader));
+    return client
+        .openUrl(method ?? request.method, newUrl ?? request.uri)
+        .then((newRequest) {
+      request.headers.forEach((name, value) {
+        newRequest.headers.add(name, value);
+      });
+      newRequest.followRedirects = true;
+      return newRequest.close();
+    });
+  }
+}

@@ -1,85 +1,132 @@
 # Introduction
-A [Dart](https://dartlang.org) package that supports a subset of [dart:io](https://api.dartlang.org/stable/2.1.1/dart-io/dart-io-library.html)
-in all platforms, including the browser (where _dart:io_ normally doesn't work).
+A cross-platform version of [dart:io](https://api.dartlang.org/stable/2.1.1/dart-io/dart-io-library.html).
 
-Typically you just import "package:universal_io/io.dart" (instead of "dart:io").
-In browser, the library exports its own implementation of 'dart:io'.
-In the Dart VM and Flutter, the library exports the standard _dart:io_.
+You can just replace usages of "dart:io" with "package:universal_io/io.dart". This is what happens:
+  * __In browser (and other Javascript targets)__:
+    * Exports our (only slightly modified) copy "dart:io" APIs.
+    * Some features work by default in browsers. Others features need a plugin (see below).
+  * __In Flutter and Dart VM__:
+    * Exports the standard _"dart:io"_.
+    * This is accomplished with conditional imports, which is an undocumented feature of Dart.
 
-Licensed under the MIT License.
+## License
+Licensed under the [Apache License 2.0](LICENSE).
 Much of the source code was adopted from the original 'dart:io' in [Dart SDK](https://github.com/dart-lang/sdk),
-which was licensed under a BSD-style license. See [LICENSE](LICENSE) for all licenses.
+which was licensed under a BSD-style license.
 
-## Development
-  * Participate in the development at: [github.com/terrier989/dart-universal_io](https://github.com/terrier989/dart-universal_io)
+## Issues
+  * Found issues? Report them at the [Github issue tracker](https://github.com/gohilla/dart-universal_io/issues).
+  * Have a fix? [Create a pull request](https://github.com/gohilla/dart-universal_io/pull/new/master)!
 
-## Implemented features of 'dart:io'
-  * __Platform__
-    * Information such as operating system and locale.
-  * __HttpClient__
-    * Implemented using _dart:html_ _HttpRequest_.
-    * Due to limitations of the browser platform, the connection to the server is established only
-      after `HttpClientRequest` method `close()` has been called.
-  * __Files__
-    * By default, access to all directories and files is denied.
-  * __InternetAddress__
-    * Implemented using [package:ip](https://pub.dartlang.org/packages/ip).
-  * __Sockets__
-    * By default, binding/connecting throws _UnimplementedError_.
-    * _ChromeIODriver_
-      * Implements sockets using [chrome.sockets.tcp](https://developer.chrome.com/apps/sockets_tcp)
-        and [chrome.sockets.udp](https://developer.chrome.com/apps/sockets_udp).
-        These APIs are only available to Chrome OS Apps.
-      * The following socket classes are implemented:
-        * RawDatagramSocket
-        * RawServerSocket
-        * RawSocket
-        * ServerSocket
-        * Socket
-      
 # Getting started
-## Add dependency
+## 1.Add a dependency
 In `pubspec.yaml`:
 ```yaml
 dependencies:
-  universal_io: ^0.1.2
+  universal_io: ^0.3.0
 ```
 
-## Override behavior
-```dart
-import 'dart:async';
+## 2. Choose a plugin (optional)
+  * VM/Flutter?
+    * Library "package:universal_io/io.dart" will automatically export _dart:io_ for you.
+  * Browser?
+    * _BrowserIODriver_ is automatically used when compiling with _Dart2js_ / _devc_. Most
+      importantly, it implements  _HttpClient_ (with restrictions imposed by browsers).
+    * If you need things like sockets or unrestricted _HttpClient_, choose one of the options below.
+  * Chrome OS App?
+    * [universal_io_plugin_chrome_os](https://github.com/terrier989/dart-universal_io_plugin_chrome_os)
+  * Node.JS? Google Cloud Functions?
+    * [universal_io_plugin_node](https://github.com/terrier989/dart-universal_io_plugin_node)
+  * A backend + GRPC messaging?
+    * [universal_io_plugin_grpc](https://github.com/terrier989/dart-universal_io_plugin_grpc)
 
+## 3. Use
+
+```dart
 import 'package:universal_io/io.dart';
-import 'package:universal_io/io_driver.dart';
 
 void main() async {
-  // Set IO driver
-  IODriver.zoneLocal.defaultValue = new MyDriver();
-
-  // Do something
-  final socket = await Socket.connect("google.com", 80);
-  socket.close();
+  // Use 'dart:io' HttpClient API
+  //
+  // This works automatically in:
+  //   * Browser (where using standard 'dart:io' would not even compile)
+  //   * Flutter and VM
+  final httpClient = new HttpClient();
+  final request = await httpClient.getUrl(Uri.parse("http://google.com"));
+  final response = await request.close();
 }
 
-class MyDriver extends BrowserIODriver {
+```
+
+# Manual
+## Default driver behavior
+### HTTP client
+In browser, HTTP client is implemented using _dart:html_ _HttpRequest_, which uses 
+[XmlHttpRequest](https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest).
+
+If a cross-origin request fails, error message contains a detailed description how to fix
+possible issues like missing cross-origin headers.
+
+For example:
+```
+BrowserHttpClient received an error from XMLHttpRequest (which doesn't tell
+reason for the error).
+
+HTTP method:   PUT
+URL:           http://destination.com
+Origin:        http://source.com
+
+Cross-origin request!
+CORS credentials mode' is disabled (cookies will NOT be supported).
+
+If the URL is correct and the server actually responded, did the response
+include the following required CORS headers?
+  * Access-Control-Allow-Origin: http://source.com
+    * Wildcard '*' is also acceptable.
+  * Access-Control-Allow-Methods: PUT
+```
+
+### InternetAddress
+  * Implemented using [package:ip](https://github.com/gohilla/dart-ip).
+
+### Platform
+  * In browser, variables are determined by browser APIs such as _navigator.userAgent_.
+  * Elsewhere (e.g. Node.JS), appears like Linux environment.
+
+### Files
+  * Any attempt to use these APIs will throw _UnimplementedError_.
+
+### Socket classes and HttpServer
+  * Any attempt to use these APIs will throw _UnimplementedError_.
+
+## Writing your own plugin?
+```dart
+import 'package:universal_io/io.dart';
+import 'package:universal_io/driver.dart';
+import 'package:universal_io/driver_base.dart';
+
+void main() {
+  IODriver.zoneLocal.freezeDefault(const ExampleDriver());
+  
+  // Now the APIs will use your driver.
+  final file = new File();
+  print(file is ExampleFile);
+}
+
+class ExampleDriver extends BaseDriver {
+  const ExampleDriver() : super(fileSystemDriver:const MyFileSystemDriver());
+}
+
+class ExampleFileSystemDriver extends BaseFileSystemPlugin {
+  const ExampleFileSystemDriver();
+
   @override
-  Future<Socket> connectSocket(host, int port,
-      {sourceAddress, Duration timeout}) {
-    print("Attempting to connect to '$host:$port'");
-    return super.connectSocket(host, port);
+  File newFile(String path) {
+    return new ExampleFile();
   }
 }
-```
 
-## Use Chrome OS driver
-```dart
-import 'package:universal_io/io.dart';
-import 'package:universal_io/io_driver.dart';
-
-void main() async {
-  // Use Chrome OS driver for IO
-  IODriver.zoneLocal.defaultValue = new ChromeIODriver();
-  
+class ExampleFile extends BaseFile {
   // ...
 }
 ```

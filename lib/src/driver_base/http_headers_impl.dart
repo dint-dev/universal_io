@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// Cross-platform implementation of 'dart:io'.
-library universal_io;
-
-export 'dart:io' if (dart.library.js) 'src/io/io.dart';
+/// Solves the problem that 'dart:io' does not provide implementation of
+/// [HttpHeaders].
+export 'http_headers_impl_vm.dart' if (dart.library.js) '../io/http/http.dart'
+    show HttpHeadersImpl;

@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// Cross-platform implementation of 'dart:io'.
-library universal_io;
+/// This library contains _universal_io_ API for drivers.
+library universal_io.driver;
 
-export 'dart:io' if (dart.library.js) 'src/io/io.dart';
+export 'src/driver/defaults.dart';
+export 'src/driver/drivers.dart';

@@ -12,7 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// Cross-platform implementation of 'dart:io'.
-library universal_io;
+import 'dart:async';
 
-export 'dart:io' if (dart.library.js) 'src/io/io.dart';
+import 'package:universal_io/driver.dart';
+import 'package:universal_io/io.dart';
+
+class BaseInternetAddressDriver extends InternetAddressDriver {
+  const BaseInternetAddressDriver();
+
+  @override
+  Future<List<InternetAddress>> lookupInternetAddress(String host,
+      {InternetAddressType type = InternetAddressType.any}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<InternetAddress> reverseLookupInternetAddress(
+      InternetAddress address) {
+    throw UnimplementedError();
+  }
+}

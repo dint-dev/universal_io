@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// Cross-platform implementation of 'dart:io'.
-library universal_io;
+import 'drivers_in_vm.dart'; // <--- IMPORTANT
 
-export 'dart:io' if (dart.library.js) 'src/io/io.dart';
+/// Determines the default IODriver:
+///   1.) BrowserIODriver when 'dart:html' is available.
+///   2.) IODriver in 'drivers_in_js.dart' when when 'dart:js' is available.
+///   3.) IODriver in "drivers_in_vm.dart' otherwise.
+final IODriver defaultIODriver = null;
