@@ -323,17 +323,23 @@ class HttpDate {
 
     int toInt(String s) {
       int index = 0;
-      for (; index < s.length && isDigit(s[index]); index++);
+      for (; index < s.length && isDigit(s[index]); index++) {}
       return int.parse(s.substring(0, index));
     }
 
     var tokens = [];
     while (!isEnd()) {
-      while (!isEnd() && isDelimiter(date[position])) position++;
+      while (!isEnd() && isDelimiter(date[position])) {
+        position++;
+      }
       int start = position;
-      while (!isEnd() && isNonDelimiter(date[position])) position++;
+      while (!isEnd() && isNonDelimiter(date[position])) {
+        position++;
+      }
       tokens.add(date.substring(start, position).toLowerCase());
-      while (!isEnd() && isDelimiter(date[position])) position++;
+      while (!isEnd() && isDelimiter(date[position])) {
+        position++;
+      }
     }
 
     String timeStr;

@@ -12,4 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export 'drivers_in_vm.dart' if (dart.library.js) 'drivers_in_js.dart';
+export 'drivers_in_js.dart' if (dart.library.io) 'drivers_in_vm.dart';

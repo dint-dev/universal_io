@@ -1,58 +1,68 @@
-// Copyright 'dart-universal_io' project authors.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 import 'dart:typed_data';
 
-import 'package:raw/raw.dart';
-
-/// Buffer is a helper for buffering data.
 class Buffer {
-  RawWriter _receivingBuffer = RawWriter.withCapacity(128);
+  int _start = 0;
+  int _length = 0;
+  Uint8List _buffer;
 
-  /// Returns the number of bytes available for reading.
-  int get length => _receivingBuffer.length;
+  int get length => _length;
 
-  /// Removes the buffer from memory.
-  void close() {
-    _receivingBuffer = null;
-  }
-
-  /// Reads the specified amount of bytes from the buffer.
-  /// If the length is `null`, reads all bytes.
-  List<int> read([int len]) {
-    final writer = this._receivingBuffer;
-    final bytes = writer.toUint8ListView();
-    if (len == null || len == writer.length) {
-      this._receivingBuffer = RawWriter.withCapacity(64);
-      return bytes;
+  Uint8List read([int len]) {
+    final availableLength = this._length;
+    if (len == null) {
+      len = this._length;
+    } else if (len > availableLength) {
+      len = availableLength;
     }
+    final data = this._buffer;
     final result = Uint8List.view(
-      bytes.buffer,
-      bytes.offsetInBytes,
+      data.buffer,
+      data.offsetInBytes + _start,
       len,
     );
-    final remaining = Uint8List.view(
-      bytes.buffer,
-      bytes.offsetInBytes + len,
-    );
-    this._receivingBuffer = RawWriter.withUint8List(remaining);
+    this._start += len;
+    this._length = availableLength - len;
     return result;
   }
 
-  /// Writes bytes to the buffer.
-  int write(List<int> data, [int index = 0, int length]) {
-    _receivingBuffer.writeBytes(data, index, length);
-    return length ?? data.length;
+  void write(List<int> written) {
+    final writtenLength = written.length;
+    if (writtenLength == 0) {
+      return;
+    }
+
+    // Increment length
+    final oldLength = this._length;
+    final newLength = oldLength + writtenLength;
+    this._length = newLength;
+
+    //
+    final oldBuffer = this._buffer;
+    var newBuffer = oldBuffer;
+    var start = this._start;
+    if (oldBuffer == null) {
+      // Allocate list for exactly N bytes
+      this._buffer = Uint8List.fromList(written);
+      this._length = writtenLength;
+      return;
+    } else if (oldBuffer.lengthInBytes - start < newLength) {
+      // Find a big enough power of two
+      var newCapacity = 32;
+      while (newCapacity < newLength) {
+        newCapacity *= 2;
+      }
+
+      // Move bytes
+      newBuffer = Uint8List(newCapacity);
+      for (var i = 0; i < oldLength; i++) {
+        newBuffer[i] = oldBuffer[start + i];
+      }
+      start = 0;
+      this._buffer = newBuffer;
+      this._start = 0;
+    }
+    for (var i = 0; i < writtenLength; i++) {
+      newBuffer[start + i] = written[i];
+    }
   }
 }

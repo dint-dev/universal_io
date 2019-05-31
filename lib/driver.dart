@@ -15,5 +15,4 @@
 /// This library contains _universal_io_ API for drivers.
 library universal_io.driver;
 
-export 'src/driver/defaults.dart';
 export 'src/driver/drivers.dart';

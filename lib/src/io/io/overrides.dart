@@ -46,11 +46,13 @@
 
 import 'dart:async';
 
+import 'package:universal_io/src/driver/drivers_in_js.dart';
+
 import '../io.dart';
 
-const _asyncRunZoned = runZoned;
-
 final _ioOverridesToken = Object();
+
+const _asyncRunZoned = runZoned;
 
 /// This class facilitates overriding various APIs of dart:io with mock
 /// implementations.
@@ -89,153 +91,6 @@ abstract class IOOverrides {
   /// Zone do not set [IOOverrides].
   static set global(IOOverrides overrides) {
     _global = overrides;
-  }
-
-  /// Creates a new [Directory] object for the given [path].
-  ///
-  /// When this override is installed, this function overrides the behavior of
-  /// `new Directory()` and `new Directory.fromUri()`.
-  Directory createDirectory(String path) => throw UnimplementedError();
-
-  /// Creates a new [File] object for the given [path].
-  ///
-  /// When this override is installed, this function overrides the behavior of
-  /// `new File()` and `new File.fromUri()`.
-  File createFile(String path) => throw UnimplementedError();
-
-  // Directory
-
-  /// Returns a new [Link] object for the given [path].
-  ///
-  /// When this override is installed, this function overrides the behavior of
-  /// `new Link()` and `new Link.fromUri()`.
-  Link createLink(String path) => throw UnimplementedError();
-
-  /// Asynchronously returns the [FileSystemEntityType] for [path].
-  ///
-  /// When this override is installed, this function overrides the behavior of
-  /// `FileSystemEntity.type`.
-  Future<FileSystemEntityType> fseGetType(String path, bool followLinks) {
-    throw UnimplementedError();
-  }
-
-  /// Returns the [FileSystemEntityType] for [path].
-  ///
-  /// When this override is installed, this function overrides the behavior of
-  /// `FileSystemEntity.typeSync`.
-  FileSystemEntityType fseGetTypeSync(String path, bool followLinks) {
-    throw UnimplementedError();
-  }
-
-  /// Asynchronously returns `true` if [path1] and [path2] are paths to the
-  /// same file system object.
-  ///
-  /// When this override is installed, this function overrides the behavior of
-  /// `FileSystemEntity.identical`.
-  Future<bool> fseIdentical(String path1, String path2) {
-    throw UnimplementedError();
-  }
-
-  // File
-
-  /// Returns `true` if [path1] and [path2] are paths to the
-  /// same file system object.
-  ///
-  /// When this override is installed, this function overrides the behavior of
-  /// `FileSystemEntity.identicalSync`.
-  bool fseIdenticalSync(String path1, String path2) {
-    throw UnimplementedError();
-  }
-
-  // FileStat
-
-  /// Returns a [Stream] of [FileSystemEvent]s.
-  ///
-  /// When this override is installed, this function overrides the behavior of
-  /// `FileSystemEntity.watch()`.
-  Stream<FileSystemEvent> fsWatch(String path, int events, bool recursive) {
-    throw UnimplementedError();
-  }
-
-  /// Returns `true` when [FileSystemEntity.watch] is supported.
-  ///
-  /// When this override is installed, this function overrides the behavior of
-  /// `FileSystemEntity.isWatchSupported`.
-  bool fsWatchIsSupported() => throw UnimplementedError();
-
-  // FileSystemEntity
-
-  /// Returns the current working directory.
-  ///
-  /// When this override is installed, this function overrides the behavior of
-  /// the static getter `Directory.current`
-  Directory getCurrentDirectory() => throw UnimplementedError();
-
-  /// Returns the system temporary directory.
-  ///
-  /// When this override is installed, this function overrides the behavior of
-  /// `Directory.systemTemp`.
-  Directory getSystemTempDirectory() => throw UnimplementedError();
-
-  /// Sets the current working directory to be [path].
-  ///
-  /// When this override is installed, this function overrides the behavior of
-  /// the setter `Directory.current`.
-  void setCurrentDirectory(String path) {
-    throw UnimplementedError();
-  }
-
-  /// Asynchronously returns a [Socket] connected to the given host and port.
-  ///
-  /// When this override is installed, this functions overrides the behavior of
-  /// `Socket.connect(...)`.
-  Future<Socket> socketConnect(host, int port,
-      {sourceAddress, Duration timeout}) {
-    throw UnimplementedError();
-  }
-
-  // _FileSystemWatcher
-
-  /// Asynchronously returns a [ConnectionTask] that connects to the given host
-  /// and port when successful.
-  ///
-  /// When this override is installed, this functions overrides the behavior of
-  /// `Socket.startConnect(...)`.
-  Future<ConnectionTask<Socket>> socketStartConnect(host, int port,
-      {sourceAddress}) {
-    throw UnimplementedError();
-  }
-
-  /// Asynchronously returns [FileStat] information for [path].
-  ///
-  /// When this override is installed, this function overrides the behavior of
-  /// `FileStat.stat()`.
-  Future<FileStat> stat(String path) {
-    throw UnimplementedError();
-  }
-
-  // Link
-
-  /// Returns [FileStat] information for [path].
-  ///
-  /// When this override is installed, this function overrides the behavior of
-  /// `FileStat.statSync()`.
-  FileStat statSync(String path) {
-    throw UnimplementedError();
-  }
-
-  // Socket
-
-  /// Runs [body] in a fresh [Zone] using the overrides found in [overrides].
-  ///
-  /// Note that [overrides] should be an instance of a class that extends
-  /// [IOOverrides].
-  static R runWithIOOverrides<R>(R body(), IOOverrides overrides,
-      {ZoneSpecification zoneSpecification, Function onError}) {
-    return _asyncRunZoned<R>(body,
-        zoneValues: {_ioOverridesToken: overrides},
-        zoneSpecification: zoneSpecification,
-        onError: onError);
   }
 
   /// Runs [body] in a fresh [Zone] using the provided overrides.
@@ -317,6 +172,171 @@ abstract class IOOverrides {
         zoneSpecification: zoneSpecification,
         onError: onError);
   }
+
+  /// Runs [body] in a fresh [Zone] using the overrides found in [overrides].
+  ///
+  /// Note that [overrides] should be an instance of a class that extends
+  /// [IOOverrides].
+  static R runWithIOOverrides<R>(R body(), IOOverrides overrides,
+      {ZoneSpecification zoneSpecification, Function onError}) {
+    return _asyncRunZoned<R>(body,
+        zoneValues: {_ioOverridesToken: overrides},
+        zoneSpecification: zoneSpecification,
+        onError: onError);
+  }
+
+  // Directory
+
+  /// Creates a new [Directory] object for the given [path].
+  ///
+  /// When this override is installed, this function overrides the behavior of
+  /// `new Directory()` and `new Directory.fromUri()`.
+  Directory createDirectory(String path) {
+    return IODriver.current.fileSystemDriver.createDirectory(path);
+  }
+
+  /// Returns the current working directory.
+  ///
+  /// When this override is installed, this function overrides the behavior of
+  /// the static getter `Directory.current`
+  Directory getCurrentDirectory() {
+    return IODriver.current.fileSystemDriver.getCurrentDirectory();
+  }
+
+  /// Sets the current working directory to be [path].
+  ///
+  /// When this override is installed, this function overrides the behavior of
+  /// the setter `Directory.current`.
+  void setCurrentDirectory(String path) {
+    return IODriver.current.fileSystemDriver.setCurrentDirectory(path);
+  }
+
+  /// Returns the system temporary directory.
+  ///
+  /// When this override is installed, this function overrides the behavior of
+  /// `Directory.systemTemp`.
+  Directory getSystemTempDirectory() {
+    return IODriver.current.fileSystemDriver.getSystemTempDirectory();
+  }
+
+  // File
+
+  /// Creates a new [File] object for the given [path].
+  ///
+  /// When this override is installed, this function overrides the behavior of
+  /// `new File()` and `new File.fromUri()`.
+  File createFile(String path) {
+    return IODriver.current.fileSystemDriver.createFile(path);
+  }
+
+  // FileStat
+
+  /// Asynchronously returns [FileStat] information for [path].
+  ///
+  /// When this override is installed, this function overrides the behavior of
+  /// `FileStat.stat()`.
+  Future<FileStat> stat(String path) {
+    return IODriver.current.fileSystemDriver.stat(path);
+  }
+
+  /// Returns [FileStat] information for [path].
+  ///
+  /// When this override is installed, this function overrides the behavior of
+  /// `FileStat.statSync()`.
+  FileStat statSync(String path) {
+    return IODriver.current.fileSystemDriver.statSync(path);
+  }
+
+  // FileSystemEntity
+
+  /// Asynchronously returns `true` if [path1] and [path2] are paths to the
+  /// same file system object.
+  ///
+  /// When this override is installed, this function overrides the behavior of
+  /// `FileSystemEntity.identical`.
+  Future<bool> fseIdentical(String path1, String path2) {
+    return IODriver.current.fileSystemDriver.identicalPaths(path1, path2);
+  }
+
+  /// Returns `true` if [path1] and [path2] are paths to the
+  /// same file system object.
+  ///
+  /// When this override is installed, this function overrides the behavior of
+  /// `FileSystemEntity.identicalSync`.
+  bool fseIdenticalSync(String path1, String path2) {
+    return IODriver.current.fileSystemDriver.identicalPathsSync(path1, path2);
+  }
+
+  /// Asynchronously returns the [FileSystemEntityType] for [path].
+  ///
+  /// When this override is installed, this function overrides the behavior of
+  /// `FileSystemEntity.type`.
+  Future<FileSystemEntityType> fseGetType(String path, bool followLinks) {
+    return IODriver.current.fileSystemDriver.getType(path, followLinks);
+  }
+
+  /// Returns the [FileSystemEntityType] for [path].
+  ///
+  /// When this override is installed, this function overrides the behavior of
+  /// `FileSystemEntity.typeSync`.
+  FileSystemEntityType fseGetTypeSync(String path, bool followLinks) {
+    return IODriver.current.fileSystemDriver.getTypeSync(path, followLinks);
+  }
+
+  // _FileSystemWatcher
+
+  /// Returns a [Stream] of [FileSystemEvent]s.
+  ///
+  /// When this override is installed, this function overrides the behavior of
+  /// `FileSystemEntity.watch()`.
+  Stream<FileSystemEvent> fsWatch(String path, int events, bool recursive) {
+    return IODriver.current.fileSystemDriver.watch(path, events, recursive);
+  }
+
+  /// Returns `true` when [FileSystemEntity.watch] is supported.
+  ///
+  /// When this override is installed, this function overrides the behavior of
+  /// `FileSystemEntity.isWatchSupported`.
+  bool fsWatchIsSupported() {
+    return IODriver.current.fileSystemDriver.isWatchSupported;
+  }
+
+  // Link
+
+  /// Returns a new [Link] object for the given [path].
+  ///
+  /// When this override is installed, this function overrides the behavior of
+  /// `new Link()` and `new Link.fromUri()`.
+  Link createLink(String path) {
+    return IODriver.current.fileSystemDriver.newLink(path);
+  }
+
+  // Socket
+
+  /// Asynchronously returns a [Socket] connected to the given host and port.
+  ///
+  /// When this override is installed, this functions overrides the behavior of
+  /// `Socket.connect(...)`.
+  Future<Socket> socketConnect(host, int port,
+      {sourceAddress, Duration timeout}) {
+    return IODriver.current.socketsDriver.connectSocket(
+      host,
+      port,
+      sourceAddress: sourceAddress,
+      timeout: timeout,
+    );
+  }
+
+  /// Asynchronously returns a [ConnectionTask] that connects to the given host
+  /// and port when successful.
+  ///
+  /// When this override is installed, this functions overrides the behavior of
+  /// `Socket.startConnect(...)`.
+  Future<ConnectionTask<Socket>> socketStartConnect(host, int port,
+      {sourceAddress}) {
+    return IODriver.current.socketsDriver
+        .startConnectSocket(host, port, sourceAddress: sourceAddress);
+  }
 }
 
 class _IOOverridesScope extends IOOverrides {
@@ -395,35 +415,54 @@ class _IOOverridesScope extends IOOverrides {
   }
 
   @override
+  Directory getCurrentDirectory() {
+    if (_getCurrentDirectory != null) return _getCurrentDirectory();
+    if (_previous != null) return _previous.getCurrentDirectory();
+    return super.getCurrentDirectory();
+  }
+
+  @override
+  void setCurrentDirectory(String path) {
+    if (_setCurrentDirectory != null)
+      _setCurrentDirectory(path);
+    else if (_previous != null) {
+      _previous.setCurrentDirectory(path);
+    } else {
+      super.setCurrentDirectory(path);
+    }
+  }
+
+  @override
+  Directory getSystemTempDirectory() {
+    if (_getSystemTempDirectory != null) return _getSystemTempDirectory();
+    if (_previous != null) return _previous.getSystemTempDirectory();
+    return super.getSystemTempDirectory();
+  }
+
+  // File
+  @override
   File createFile(String path) {
     if (_createFile != null) return _createFile(path);
     if (_previous != null) return _previous.createFile(path);
     return super.createFile(path);
   }
 
-  @override
-  Link createLink(String path) {
-    if (_createLink != null) return _createLink(path);
-    if (_previous != null) return _previous.createLink(path);
-    return super.createLink(path);
-  }
-
-  @override
-  Future<FileSystemEntityType> fseGetType(String path, bool followLinks) {
-    if (_fseGetType != null) return _fseGetType(path, followLinks);
-    if (_previous != null) return _previous.fseGetType(path, followLinks);
-    return super.fseGetType(path, followLinks);
-  }
-
-  // File
-  @override
-  FileSystemEntityType fseGetTypeSync(String path, bool followLinks) {
-    if (_fseGetTypeSync != null) return _fseGetTypeSync(path, followLinks);
-    if (_previous != null) return _previous.fseGetTypeSync(path, followLinks);
-    return super.fseGetTypeSync(path, followLinks);
-  }
-
   // FileStat
+  @override
+  Future<FileStat> stat(String path) {
+    if (_stat != null) return _stat(path);
+    if (_previous != null) return _previous.stat(path);
+    return super.stat(path);
+  }
+
+  @override
+  FileStat statSync(String path) {
+    if (_stat != null) return _statSync(path);
+    if (_previous != null) return _previous.statSync(path);
+    return super.statSync(path);
+  }
+
+  // FileSystemEntity
   @override
   Future<bool> fseIdentical(String path1, String path2) {
     if (_fseIdentical != null) return _fseIdentical(path1, path2);
@@ -438,7 +477,21 @@ class _IOOverridesScope extends IOOverrides {
     return super.fseIdenticalSync(path1, path2);
   }
 
-  // FileSystemEntity
+  @override
+  Future<FileSystemEntityType> fseGetType(String path, bool followLinks) {
+    if (_fseGetType != null) return _fseGetType(path, followLinks);
+    if (_previous != null) return _previous.fseGetType(path, followLinks);
+    return super.fseGetType(path, followLinks);
+  }
+
+  @override
+  FileSystemEntityType fseGetTypeSync(String path, bool followLinks) {
+    if (_fseGetTypeSync != null) return _fseGetTypeSync(path, followLinks);
+    if (_previous != null) return _previous.fseGetTypeSync(path, followLinks);
+    return super.fseGetTypeSync(path, followLinks);
+  }
+
+  // _FileSystemWatcher
   @override
   Stream<FileSystemEvent> fsWatch(String path, int events, bool recursive) {
     if (_fsWatch != null) return _fsWatch(path, events, recursive);
@@ -453,31 +506,15 @@ class _IOOverridesScope extends IOOverrides {
     return super.fsWatchIsSupported();
   }
 
+  // Link
   @override
-  Directory getCurrentDirectory() {
-    if (_getCurrentDirectory != null) return _getCurrentDirectory();
-    if (_previous != null) return _previous.getCurrentDirectory();
-    return super.getCurrentDirectory();
+  Link createLink(String path) {
+    if (_createLink != null) return _createLink(path);
+    if (_previous != null) return _previous.createLink(path);
+    return super.createLink(path);
   }
 
-  @override
-  Directory getSystemTempDirectory() {
-    if (_getSystemTempDirectory != null) return _getSystemTempDirectory();
-    if (_previous != null) return _previous.getSystemTempDirectory();
-    return super.getSystemTempDirectory();
-  }
-
-  // _FileSystemWatcher
-  @override
-  void setCurrentDirectory(String path) {
-    if (_setCurrentDirectory != null)
-      _setCurrentDirectory(path);
-    else if (_previous != null)
-      _previous.setCurrentDirectory(path);
-    else
-      super.setCurrentDirectory(path);
-  }
-
+  // Socket
   @override
   Future<Socket> socketConnect(host, int port,
       {sourceAddress, Duration timeout}) {
@@ -493,7 +530,6 @@ class _IOOverridesScope extends IOOverrides {
         sourceAddress: sourceAddress, timeout: timeout);
   }
 
-  // Link
   @override
   Future<ConnectionTask<Socket>> socketStartConnect(host, int port,
       {sourceAddress}) {
@@ -505,20 +541,5 @@ class _IOOverridesScope extends IOOverrides {
           sourceAddress: sourceAddress);
     }
     return super.socketStartConnect(host, port, sourceAddress: sourceAddress);
-  }
-
-  // Socket
-  @override
-  Future<FileStat> stat(String path) {
-    if (_stat != null) return _stat(path);
-    if (_previous != null) return _previous.stat(path);
-    return super.stat(path);
-  }
-
-  @override
-  FileStat statSync(String path) {
-    if (_stat != null) return _statSync(path);
-    if (_previous != null) return _previous.statSync(path);
-    return super.statSync(path);
   }
 }

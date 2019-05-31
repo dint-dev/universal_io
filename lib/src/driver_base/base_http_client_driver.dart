@@ -18,8 +18,8 @@ import 'dart:convert';
 import 'package:meta/meta.dart';
 import 'package:universal_io/io.dart';
 
-import 'http_headers_impl.dart';
 import 'base_io_sink.dart';
+import 'http_headers_impl.dart';
 
 abstract class BaseHttpClient implements HttpClient {
   @override
@@ -146,6 +146,12 @@ abstract class BaseHttpClient implements HttpClient {
 
 abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
   @override
+  final String method;
+
+  @override
+  final Uri uri;
+
+  @override
   final HttpHeaders headers = HttpHeadersImpl("1.0");
 
   final Completer<HttpClientResponse> _completer =
@@ -155,6 +161,18 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
 
   @override
   final List<Cookie> cookies = <Cookie>[];
+
+  final bool _supportsBody;
+
+  BaseHttpClientRequest(this.method, this.uri)
+      : this._supportsBody = _httpMethodSupportsBody(method) {
+    if (method == null) {
+      throw ArgumentError.notNull("method");
+    }
+    if (uri == null) {
+      throw ArgumentError.notNull("uri");
+    }
+  }
 
   @override
   HttpConnectionInfo get connectionInfo => null;
@@ -174,6 +192,9 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
 
   @override
   void add(List<int> event) {
+    if (!_supportsBody) {
+      throw StateError("HTTP method $method does not support body");
+    }
     if (_completer.isCompleted) {
       throw StateError("StreamSink is closed");
     }
@@ -241,6 +262,19 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
 
   @protected
   Future<HttpClientResponse> internallyClose();
+
+  static bool _httpMethodSupportsBody(String method) {
+    switch (method) {
+      case "GET":
+        return false;
+      case "HEAD":
+        return false;
+      case "OPTIONS":
+        return false;
+      default:
+        return true;
+    }
+  }
 }
 
 abstract class BaseHttpClientResponse extends Stream<List<int>>

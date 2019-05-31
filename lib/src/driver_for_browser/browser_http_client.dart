@@ -13,15 +13,11 @@
 // limitations under the License.
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:html' as html;
-import 'dart:typed_data';
 
-import 'package:meta/meta.dart';
-import 'package:typed_data/typed_buffers.dart';
 import 'package:universal_io/driver_base.dart';
 import 'package:universal_io/io.dart';
-import 'browser_http_client_exception.dart';
+
 import 'browser_http_client_request.dart';
 
 /// Browser implementation of _dart:io_ [HttpClient].
@@ -62,7 +58,7 @@ class BrowserHttpClient extends BaseHttpClient {
         fragment: url.fragment,
       );
     }
-    final request = BrowserHttpClientRequest(method, url, client:this);
+    final request = BrowserHttpClientRequest(method, url, client: this);
     if (userAgent != null) {
       request.headers.add("User-Agent", userAgent);
     }

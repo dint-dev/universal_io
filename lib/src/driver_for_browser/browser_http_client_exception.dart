@@ -43,9 +43,9 @@ class BrowserHttpClientException implements SocketException {
 
   BrowserHttpClientException(
       {@required this.method,
-        @required this.url,
-        @required this.origin,
-        @required this.corsCredentialsMode});
+      @required this.url,
+      @required this.origin,
+      @required this.corsCredentialsMode});
 
   @override
   String toString() {

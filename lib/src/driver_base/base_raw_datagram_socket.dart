@@ -31,15 +31,6 @@ abstract class BaseRawDatagramSocket extends Stream<RawSocketEvent>
   bool writeEventsEnabled = true;
 
   @override
-  bool multicastLoopback = false;
-
-  @override
-  int multicastHops = 1;
-
-  @override
-  NetworkInterface multicastInterface;
-
-  @override
   bool broadcastEnabled = false;
 
   BaseRawDatagramSocket() {

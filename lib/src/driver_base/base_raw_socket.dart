@@ -17,7 +17,6 @@ import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
 import 'package:universal_io/io.dart';
-
 import 'buffer.dart';
 
 abstract class BaseRawSocket extends Stream<RawSocketEvent>

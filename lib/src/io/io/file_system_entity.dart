@@ -51,6 +51,128 @@ import 'package:universal_io/src/driver/drivers_in_js.dart';
 import '../io.dart';
 import 'file.dart';
 
+/// The type of an entity on the file system, such as a file, directory, or link.
+///
+/// These constants are used by the [FileSystemEntity] class
+/// to indicate the object's type.
+///
+class FileSystemEntityType {
+  static const file = FileSystemEntityType._internal(0);
+  @Deprecated("Use file instead")
+  static const FILE = file;
+
+  static const directory = FileSystemEntityType._internal(1);
+  @Deprecated("Use directory instead")
+  static const DIRECTORY = directory;
+
+  static const link = FileSystemEntityType._internal(2);
+  @Deprecated("Use link instead")
+  static const LINK = link;
+
+  static const notFound = FileSystemEntityType._internal(3);
+  @Deprecated("Use notFound instead")
+  static const NOT_FOUND = notFound;
+
+  final int _type;
+
+  const FileSystemEntityType._internal(this._type);
+
+  String toString() => const ['file', 'directory', 'link', 'notFound'][_type];
+}
+
+/// A FileStat object represents the result of calling the POSIX stat() function
+/// on a file system object.  It is an immutable object, representing the
+/// snapshotted values returned by the stat() call.
+class FileStat {
+  /// The time of the last change to the data or metadata of the file system
+  /// object.
+  ///
+  /// On Windows platforms, this is instead the file creation time.
+  final DateTime changed;
+
+  /// The time of the last change to the data of the file system object.
+  final DateTime modified;
+
+  /// The time of the last access to the data of the file system object.
+  ///
+  /// On Windows platforms, this may have 1 day granularity, and be
+  /// out of date by an hour.
+  final DateTime accessed;
+
+  /// The type of the object (file, directory, or link).
+  ///
+  /// If the call to stat() fails, the type of the returned object is notFound.
+  final FileSystemEntityType type;
+
+  /// The mode of the file system object.
+  ///
+  /// Permissions are encoded in the lower 16 bits of this number, and can be
+  /// decoded using the [modeString] getter.
+  final int mode;
+
+  /// The size of the file system object.
+  final int size;
+
+  FileStat._internal(this.changed, this.modified, this.accessed, this.type,
+      this.mode, this.size);
+
+  const FileStat._internalNotFound()
+      : changed = null,
+        modified = null,
+        accessed = null,
+        type = FileSystemEntityType.notFound,
+        mode = 0,
+        size = -1;
+
+  /// Calls the operating system's stat() function on [path].
+  ///
+  /// Returns a [FileStat] object containing the data returned by stat().
+  /// If the call fails, returns a [FileStat] object with .type set to
+  /// FileSystemEntityType.notFound and the other fields invalid.
+  static FileStat statSync(String path) {
+    return IODriver.current.fileSystemDriver.statSync(path);
+  }
+
+  /// Asynchronously calls the operating system's stat() function on [path].
+  ///
+  /// Returns a Future which completes with a [FileStat] object containing
+  /// the data returned by stat(). If the call fails, completes the future with a
+  /// [FileStat] object with `.type` set to FileSystemEntityType.notFound and
+  /// the other fields invalid.
+  static Future<FileStat> stat(String path) {
+    return IODriver.current.fileSystemDriver.stat(path);
+  }
+
+  String toString() => """
+FileStat: type $type
+          changed $changed
+          modified $modified
+          accessed $accessed
+          mode ${modeString()}
+          size $size""";
+
+  /// Returns the mode value as a human-readable string.
+  ///
+  /// The string is in the format "rwxrwxrwx", reflecting the user, group, and
+  /// world permissions to read, write, and execute the file system object, with
+  /// "-" replacing the letter for missing permissions.  Extra permission bits
+  /// may be represented by prepending "(suid)", "(guid)", and/or "(sticky)" to
+  /// the mode string.
+  String modeString() {
+    var permissions = mode & 0xFFF;
+    var codes = const ['---', '--x', '-w-', '-wx', 'r--', 'r-x', 'rw-', 'rwx'];
+    var result = [];
+    if ((permissions & 0x800) != 0) result.add("(suid) ");
+    if ((permissions & 0x400) != 0) result.add("(guid) ");
+    if ((permissions & 0x200) != 0) result.add("(sticky) ");
+    result
+      ..add(codes[(permissions >> 6) & 0x7])
+      ..add(codes[(permissions >> 3) & 0x7])
+      ..add(codes[permissions & 0x7]);
+    return result.join();
+  }
+}
+
 /// The common super class for [File], [Directory], and [Link] objects.
 ///
 /// [FileSystemEntity] objects are returned from directory listing
@@ -90,49 +212,6 @@ import 'file.dart';
 ///   a tutorial about writing command-line apps, includes information about
 ///   files and directories.
 abstract class FileSystemEntity {
-  static final RegExp _absoluteWindowsPathPattern =
-      RegExp(r'^(\\\\|[a-zA-Z]:[/\\])');
-
-  static final RegExp _parentRegExp = Platform.isWindows
-      ? RegExp(r'[^/\\][/\\]+[^/\\]')
-      : RegExp(r'[^/]/+[^/]');
-
-  /// Test if [watch] is supported on the current system.
-  ///
-  /// OS X 10.6 and below is not supported.
-  static bool get isWatchSupported {
-    final IOOverrides overrides = IOOverrides.current;
-    if (overrides == null) {
-      return false;
-    }
-    return overrides.fsWatchIsSupported();
-  }
-
-  /// Returns a [FileSystemEntity] whose path is the absolute path to [this].
-  ///
-  /// The type of the returned instance is the type of [this].
-  ///
-  /// The absolute path is computed by prefixing
-  /// a relative path with the current working directory, and returning
-  /// an absolute path unchanged.
-  FileSystemEntity get absolute;
-
-  /// Returns a [bool] indicating whether this object's path is absolute.
-  ///
-  /// On Windows, a path is absolute if it starts with \\\\ or a drive letter
-  /// between a and z (upper or lower case) followed by :\\ or :/.
-  /// On non-Windows, a path is absolute if it starts with /.
-  bool get isAbsolute {
-    if (Platform.isWindows) {
-      return path.startsWith(_absoluteWindowsPathPattern);
-    } else {
-      return path.startsWith('/');
-    }
-  }
-
-  /// The directory containing [this].
-  Directory get parent => Directory(parentOf(path));
-
   String get path;
 
   /// Returns a [Uri] representing the file system entity's location.
@@ -140,42 +219,6 @@ abstract class FileSystemEntity {
   /// The returned URI's scheme is always "file" if the entity's [path] is
   /// absolute, otherwise the scheme will be empty.
   Uri get uri => Uri.file(path);
-
-  /// Deletes this [FileSystemEntity].
-  ///
-  /// If the [FileSystemEntity] is a directory, and if [recursive] is false,
-  /// the directory must be empty. Otherwise, if [recursive] is true, the
-  /// directory and all sub-directories and files in the directories are
-  /// deleted. Links are not followed when deleting recursively. Only the link
-  /// is deleted, not its target.
-  ///
-  /// If [recursive] is true, the [FileSystemEntity] is deleted even if the type
-  /// of the [FileSystemEntity] doesn't match the content of the file system.
-  /// This behavior allows [delete] to be used to unconditionally delete any file
-  /// system object.
-  ///
-  /// Returns a [:Future<FileSystemEntity>:] that completes with this
-  /// [FileSystemEntity] when the deletion is done. If the [FileSystemEntity]
-  /// cannot be deleted, the future completes with an exception.
-  Future<FileSystemEntity> delete({bool recursive = false});
-
-  /// Synchronously deletes this [FileSystemEntity].
-  ///
-  /// If the [FileSystemEntity] is a directory, and if [recursive] is false,
-  /// the directory must be empty. Otherwise, if [recursive] is true, the
-  /// directory and all sub-directories and files in the directories are
-  /// deleted. Links are not followed when deleting recursively. Only the link
-  /// is deleted, not its target.
-  ///
-  /// If [recursive] is true, the [FileSystemEntity] is deleted even if the type
-  /// of the [FileSystemEntity] doesn't match the content of the file system.
-  /// This behavior allows [deleteSync] to be used to unconditionally delete any
-  /// file system object.
-  ///
-  /// Throws an exception if the [FileSystemEntity] cannot be deleted.
-  void deleteSync({bool recursive = false}) {
-    throw UnimplementedError();
-  }
 
   /// Checks whether the file system entity with this path exists. Returns
   /// a [:Future<bool>:] that completes with the result.
@@ -251,9 +294,7 @@ abstract class FileSystemEntity {
   ///
   /// since `Uri.resolve` removes `..` segments. This will result in the Windows
   /// behavior.
-  Future<String> resolveSymbolicLinks() {
-    throw UnimplementedError();
-  }
+  Future<String> resolveSymbolicLinks();
 
   /// Resolves the path of a file system object relative to the
   /// current working directory.
@@ -282,9 +323,7 @@ abstract class FileSystemEntity {
   ///
   /// since `Uri.resolve` removes `..` segments. This will result in the Windows
   /// behavior.
-  String resolveSymbolicLinksSync() {
-    throw UnimplementedError();
-  }
+  String resolveSymbolicLinksSync();
 
   /// Calls the operating system's stat() function on the [path] of this
   /// [FileSystemEntity].
@@ -297,9 +336,7 @@ abstract class FileSystemEntity {
   /// If the call fails, completes the future with a [FileStat] object
   /// with .type set to
   /// FileSystemEntityType.notFound and the other fields invalid.
-  Future<FileStat> stat() {
-    throw UnimplementedError();
-  }
+  Future<FileStat> stat() => FileStat.stat(path);
 
   /// Synchronously calls the operating system's stat() function on the
   /// [path] of this [FileSystemEntity].
@@ -310,9 +347,41 @@ abstract class FileSystemEntity {
   ///
   /// If the call fails, returns a [FileStat] object with .type set to
   /// FileSystemEntityType.notFound and the other fields invalid.
-  FileStat statSync() {
-    throw UnimplementedError();
-  }
+  FileStat statSync() => FileStat.statSync(path);
+
+  /// Deletes this [FileSystemEntity].
+  ///
+  /// If the [FileSystemEntity] is a directory, and if [recursive] is false,
+  /// the directory must be empty. Otherwise, if [recursive] is true, the
+  /// directory and all sub-directories and files in the directories are
+  /// deleted. Links are not followed when deleting recursively. Only the link
+  /// is deleted, not its target.
+  ///
+  /// If [recursive] is true, the [FileSystemEntity] is deleted even if the type
+  /// of the [FileSystemEntity] doesn't match the content of the file system.
+  /// This behavior allows [delete] to be used to unconditionally delete any file
+  /// system object.
+  ///
+  /// Returns a [:Future<FileSystemEntity>:] that completes with this
+  /// [FileSystemEntity] when the deletion is done. If the [FileSystemEntity]
+  /// cannot be deleted, the future completes with an exception.
+  Future<FileSystemEntity> delete({bool recursive = false});
+
+  /// Synchronously deletes this [FileSystemEntity].
+  ///
+  /// If the [FileSystemEntity] is a directory, and if [recursive] is false,
+  /// the directory must be empty. Otherwise, if [recursive] is true, the
+  /// directory and all sub-directories and files in the directories are
+  /// deleted. Links are not followed when deleting recursively. Only the link
+  /// is deleted, not its target.
+  ///
+  /// If [recursive] is true, the [FileSystemEntity] is deleted even if the type
+  /// of the [FileSystemEntity] doesn't match the content of the file system.
+  /// This behavior allows [deleteSync] to be used to unconditionally delete any
+  /// file system object.
+  ///
+  /// Throws an exception if the [FileSystemEntity] cannot be deleted.
+  void deleteSync({bool recursive = false});
 
   /// Start watching the [FileSystemEntity] for changes.
   ///
@@ -340,12 +409,18 @@ abstract class FileSystemEntity {
   ///
   /// Use `events` to specify what events to listen for. The constants in
   /// [FileSystemEvent] can be or'ed together to mix events. Default is
-  /// [FileSystemEvent.ALL].
+  /// [FileSystemEvent.all].
   ///
   /// A move event may be reported as seperate delete and create events.
   Stream<FileSystemEvent> watch(
       {int events = FileSystemEvent.all, bool recursive = false}) {
-    throw UnimplementedError();
+    // FIXME(bkonyi): find a way to do this using the raw path.
+    final String trimmedPath = _trimTrailingPathSeparators(path);
+    final IOOverrides overrides = IOOverrides.current;
+    if (overrides == null) {
+      return IODriver.current.fileSystemDriver.watch(path, events, recursive);
+    }
+    return overrides.fsWatch(trimmedPath, events, recursive);
   }
 
   /// Checks whether two paths refer to the same object in the
@@ -360,13 +435,38 @@ abstract class FileSystemEntity {
   ///
   /// Completes the returned Future with an error if one of the paths points
   /// to an object that does not exist.
-  static Future<bool> identical(String path1, String path2) async {
+  static Future<bool> identical(String path1, String path2) {
     IOOverrides overrides = IOOverrides.current;
     if (overrides == null) {
-      return path1 == path2;
+      return IODriver.current.fileSystemDriver.identicalPaths(path1, path2);
     }
     return overrides.fseIdentical(path1, path2);
   }
+
+  static final RegExp _absoluteWindowsPathPattern =
+      RegExp(r'^(\\\\|[a-zA-Z]:[/\\])');
+
+  /// Returns a [bool] indicating whether this object's path is absolute.
+  ///
+  /// On Windows, a path is absolute if it starts with \\\\ or a drive letter
+  /// between a and z (upper or lower case) followed by :\\ or :/.
+  /// On non-Windows, a path is absolute if it starts with /.
+  bool get isAbsolute {
+    if (Platform.isWindows) {
+      return path.startsWith(_absoluteWindowsPathPattern);
+    } else {
+      return path.startsWith('/');
+    }
+  }
+
+  /// Returns a [FileSystemEntity] whose path is the absolute path to [this].
+  ///
+  /// The type of the returned instance is the type of [this].
+  ///
+  /// The absolute path is computed by prefixing
+  /// a relative path with the current working directory, and returning
+  /// an absolute path unchanged.
+  FileSystemEntity get absolute;
 
   /// Synchronously checks whether two paths refer to the same object in the
   /// file system.
@@ -381,40 +481,91 @@ abstract class FileSystemEntity {
   static bool identicalSync(String path1, String path2) {
     IOOverrides overrides = IOOverrides.current;
     if (overrides == null) {
-      return path1 == path2;
+      return IODriver.current.fileSystemDriver.identicalPathsSync(path1, path2);
     }
     return overrides.fseIdenticalSync(path1, path2);
   }
 
-  /// Checks if type(path) returns FileSystemEntityType.directory.
-  static Future<bool> isDirectory(String path) {
-    return FileSystemDriver.current.isDirectory(path);
+  /// Test if [watch] is supported on the current system.
+  ///
+  /// OS X 10.6 and below is not supported.
+  static bool get isWatchSupported {
+    final IOOverrides overrides = IOOverrides.current;
+    if (overrides == null) {
+      return IODriver.current.fileSystemDriver.isWatchSupported;
+    }
+    return overrides.fsWatchIsSupported();
   }
 
-  /// Synchronously checks if typeSync(path) returns
-  /// FileSystemEntityType.directory.
-  static bool isDirectorySync(String path) {
-    throw UnimplementedError();
+  /// Finds the type of file system object that a path points to.
+  ///
+  /// Returns a [:Future<FileSystemEntityType>:] that completes with the result.
+  ///
+  /// [FileSystemEntityType] has the constant instances file, directory,
+  /// link, and notFound.  [type] will return link only if the optional
+  /// named argument [followLinks] is false, and [path] points to a link.
+  /// If the path does not point to a file system object, or any other error
+  /// occurs in looking up the path, notFound is returned.  The only
+  /// error or exception that may be put on the returned future is ArgumentError,
+  /// caused by passing the wrong type of arguments to the function.
+  static Future<FileSystemEntityType> type(String path,
+      {bool followLinks = true}) {
+    return IODriver.current.fileSystemDriver.getType(path, followLinks);
+  }
+
+  /// Synchronously finds the type of file system object that a path points to.
+  ///
+  /// Returns a [FileSystemEntityType].
+  ///
+  /// [FileSystemEntityType] has the constant instances file, directory,
+  /// link, and notFound.  [type] will return link only if the optional
+  /// named argument [followLinks] is false, and [path] points to a link.
+  /// If the path does not point to a file system object, or any other error
+  /// occurs in looking up the path, notFound is returned.  The only
+  /// error or exception that may be thrown is ArgumentError,
+  /// caused by passing the wrong type of arguments to the function.
+  static FileSystemEntityType typeSync(String path, {bool followLinks = true}) {
+    return IODriver.current.fileSystemDriver.getTypeSync(path, followLinks);
+  }
+
+  /// Checks if type(path, followLinks: false) returns FileSystemEntityType.link.
+  static Future<bool> isLink(String path) {
+    return IODriver.current.fileSystemDriver.isLink(path);
   }
 
   /// Checks if type(path) returns FileSystemEntityType.file.
   static Future<bool> isFile(String path) {
-    return FileSystemDriver.current.isFile(path);
+    return IODriver.current.fileSystemDriver.isFile(path);
   }
 
-  /// Synchronously checks if typeSync(path) returns
-  /// FileSystemEntityType.file.
-  static bool isFileSync(String path) {
-    throw UnimplementedError();
+  /// Checks if type(path) returns FileSystemEntityType.directory.
+  static Future<bool> isDirectory(String path) {
+    return IODriver.current.fileSystemDriver.isDirectory(path);
   }
 
   /// Synchronously checks if typeSync(path, followLinks: false) returns
   /// FileSystemEntityType.link.
   static bool isLinkSync(String path) {
-    throw UnimplementedError();
+    return IODriver.current.fileSystemDriver.isLinkSync(path);
+  }
+
+  /// Synchronously checks if typeSync(path) returns
+  /// FileSystemEntityType.file.
+  static bool isFileSync(String path) {
+    return IODriver.current.fileSystemDriver.isFileSync(path);
+  }
+
+  /// Synchronously checks if typeSync(path) returns
+  /// FileSystemEntityType.directory.
+  static bool isDirectorySync(String path) {
+    return IODriver.current.fileSystemDriver.isDirectorySync(path);
   }
 
   // Finds the next-to-last component when dividing at path separators.
+  static final RegExp _parentRegExp = Platform.isWindows
+      ? RegExp(r'[^/\\][/\\]+[^/\\]')
+      : RegExp(r'[^/]/+[^/]');
+
   /// Removes the final path component of a path, using the platform's
   /// path separator to split the path.
   ///
@@ -446,34 +597,117 @@ abstract class FileSystemEntity {
     }
   }
 
-  /// Finds the type of file system object that a path points to.
-  ///
-  /// Returns a [:Future<FileSystemEntityType>:] that completes with the result.
-  ///
-  /// [FileSystemEntityType] has the constant instances file, directory,
-  /// link, and notFound.  [type] will return link only if the optional
-  /// named argument [followLinks] is false, and [path] points to a link.
-  /// If the path does not point to a file system object, or any other error
-  /// occurs in looking up the path, notFound is returned.  The only
-  /// error or exception that may be put on the returned future is ArgumentError,
-  /// caused by passing the wrong type of arguments to the function.
-  static Future<FileSystemEntityType> type(String path,
-      {bool followLinks = true}) {
-    throw UnimplementedError();
-  }
+  /// The directory containing [this].
+  Directory get parent => Directory(parentOf(path));
 
-  /// Synchronously finds the type of file system object that a path points to.
+  // TODO(bkonyi): find a way to do this with raw paths.
+  static String _trimTrailingPathSeparators(String path) {
+    // Don't handle argument errors here.
+    if (path == null) return path;
+    if (Platform.isWindows) {
+      while (path.length > 1 &&
+          (path.endsWith(Platform.pathSeparator) || path.endsWith('/'))) {
+        path = path.substring(0, path.length - 1);
+      }
+    } else {
+      while (path.length > 1 && path.endsWith(Platform.pathSeparator)) {
+        path = path.substring(0, path.length - 1);
+      }
+    }
+    return path;
+  }
+}
+
+/// Base event class emitted by [FileSystemEntity.watch].
+class FileSystemEvent {
+  /// Bitfield for [FileSystemEntity.watch], to enable [FileSystemCreateEvent]s.
+  static const int create = 1 << 0;
+  @Deprecated("Use create instead")
+  static const int CREATE = 1 << 0;
+
+  /// Bitfield for [FileSystemEntity.watch], to enable [FileSystemModifyEvent]s.
+  static const int modify = 1 << 1;
+  @Deprecated("Use modify instead")
+  static const int MODIFY = 1 << 1;
+
+  /// Bitfield for [FileSystemEntity.watch], to enable [FileSystemDeleteEvent]s.
+  static const int delete = 1 << 2;
+  @Deprecated("Use delete instead")
+  static const int DELETE = 1 << 2;
+
+  /// Bitfield for [FileSystemEntity.watch], to enable [FileSystemMoveEvent]s.
+  static const int move = 1 << 3;
+  @Deprecated("Use move instead")
+  static const int MOVE = 1 << 3;
+
+  /// Bitfield for [FileSystemEntity.watch], for enabling all of [create],
+  /// [modify], [delete] and [move].
+  static const int all = create | modify | delete | move;
+  @Deprecated("Use all instead")
+  static const int ALL = create | modify | delete | move;
+
+  /// The type of event. See [FileSystemEvent] for a list of events.
+  final int type;
+
+  /// The path that triggered the event.
   ///
-  /// Returns a [FileSystemEntityType].
+  /// Depending on the platform and the FileSystemEntity, the path may be
+  /// relative.
+  final String path;
+
+  /// Is `true` if the event target was a directory.
   ///
-  /// [FileSystemEntityType] has the constant instances file, directory,
-  /// link, and notFound.  [type] will return link only if the optional
-  /// named argument [followLinks] is false, and [path] points to a link.
-  /// If the path does not point to a file system object, or any other error
-  /// occurs in looking up the path, notFound is returned.  The only
-  /// error or exception that may be thrown is ArgumentError,
-  /// caused by passing the wrong type of arguments to the function.
-  static FileSystemEntityType typeSync(String path, {bool followLinks = true}) {
-    throw UnimplementedError();
+  /// Note that if the file has been deleted by the time the event has arrived,
+  /// this will always be `false` on Windows. In particular, it will always be
+  /// `false` for `delete` events.
+  final bool isDirectory;
+
+  FileSystemEvent._(this.type, this.path, this.isDirectory);
+}
+
+/// File system event for newly created file system objects.
+class FileSystemCreateEvent extends FileSystemEvent {
+  FileSystemCreateEvent._(path, isDirectory)
+      : super._(FileSystemEvent.create, path, isDirectory);
+
+  String toString() => "FileSystemCreateEvent('$path')";
+}
+
+/// File system event for modifications of file system objects.
+class FileSystemModifyEvent extends FileSystemEvent {
+  /// If the content was changed and not only the attributes, [contentChanged]
+  /// is `true`.
+  final bool contentChanged;
+
+  FileSystemModifyEvent._(path, isDirectory, this.contentChanged)
+      : super._(FileSystemEvent.modify, path, isDirectory);
+
+  String toString() =>
+      "FileSystemModifyEvent('$path', contentChanged=$contentChanged)";
+}
+
+/// File system event for deletion of file system objects.
+class FileSystemDeleteEvent extends FileSystemEvent {
+  FileSystemDeleteEvent._(path, isDirectory)
+      : super._(FileSystemEvent.delete, path, isDirectory);
+
+  String toString() => "FileSystemDeleteEvent('$path')";
+}
+
+/// File system event for moving of file system objects.
+class FileSystemMoveEvent extends FileSystemEvent {
+  /// If the underlying implementation is able to identify the destination of
+  /// the moved file, [destination] will be set. Otherwise, it will be `null`.
+  final String destination;
+
+  FileSystemMoveEvent._(path, isDirectory, this.destination)
+      : super._(FileSystemEvent.move, path, isDirectory);
+
+  String toString() {
+    var buffer = StringBuffer();
+    buffer.write("FileSystemMoveEvent('$path'");
+    if (destination != null) buffer.write(", '$destination'");
+    buffer.write(')');
+    return buffer.toString();
   }
 }

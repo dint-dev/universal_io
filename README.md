@@ -3,8 +3,9 @@ A cross-platform version of [dart:io](https://api.dartlang.org/stable/2.1.1/dart
 
 You can just replace usages of "dart:io" with "package:universal_io/io.dart". This is what happens:
   * __In browser (and other Javascript targets)__:
-    * Exports our (only slightly modified) copy "dart:io" APIs.
-    * Some features work by default in browsers. Others features need a plugin (see below).
+    * Exports our copy "dart:io" APIs. The only changes are related to delegation to _IODriver_.
+    * Some "dart:io" features, such as _HttpClient_, work by default in browsers. Others only work
+      with a driver (see below).
   * __In Flutter and Dart VM__:
     * Exports the standard _"dart:io"_.
     * This is accomplished with conditional imports, which is an undocumented feature of Dart.
@@ -23,10 +24,10 @@ which was licensed under a BSD-style license.
 In `pubspec.yaml`:
 ```yaml
 dependencies:
-  universal_io: ^0.3.0
+  universal_io: ^0.4.0
 ```
 
-## 2. Choose a plugin (optional)
+## 2. Choose a driver (optional)
   * VM/Flutter?
     * Library "package:universal_io/io.dart" will automatically export _dart:io_ for you.
   * Browser?
@@ -34,11 +35,11 @@ dependencies:
       importantly, it implements  _HttpClient_ (with restrictions imposed by browsers).
     * If you need things like sockets or unrestricted _HttpClient_, choose one of the options below.
   * Chrome OS App?
-    * [universal_io_plugin_chrome_os](https://github.com/terrier989/dart-universal_io_plugin_chrome_os)
+    * [universal_io_driver_chrome_os](https://github.com/terrier989/dart-universal_io_driver_chrome_os)
   * Node.JS? Google Cloud Functions?
-    * [universal_io_plugin_node](https://github.com/terrier989/dart-universal_io_plugin_node)
+    * [universal_io_driver_node](https://github.com/terrier989/dart-universal_io_driver_node)
   * A backend + GRPC messaging?
-    * [universal_io_plugin_grpc](https://github.com/terrier989/dart-universal_io_plugin_grpc)
+    * [universal_io_driver_grpc](https://github.com/terrier989/dart-universal_io_driver_grpc)
 
 ## 3. Use
 
@@ -46,10 +47,10 @@ dependencies:
 import 'package:universal_io/io.dart';
 
 void main() async {
-  // Use 'dart:io' HttpClient API
+  // Use 'dart:io' HttpClient API.
   //
   // This works automatically in:
-  //   * Browser (where using standard 'dart:io' would not even compile)
+  //   * Browser (where usage of standard 'dart:io' would not even compile)
   //   * Flutter and VM
   final httpClient = new HttpClient();
   final request = await httpClient.getUrl(Uri.parse("http://google.com"));
@@ -99,7 +100,7 @@ include the following required CORS headers?
 ### Socket classes and HttpServer
   * Any attempt to use these APIs will throw _UnimplementedError_.
 
-## Writing your own plugin?
+## Writing your own driver?
 ```dart
 import 'package:universal_io/io.dart';
 import 'package:universal_io/driver.dart';
@@ -117,7 +118,7 @@ class ExampleDriver extends BaseDriver {
   const ExampleDriver() : super(fileSystemDriver:const MyFileSystemDriver());
 }
 
-class ExampleFileSystemDriver extends BaseFileSystemPlugin {
+class ExampleFileSystemDriver extends BaseFileSystemDriver {
   const ExampleFileSystemDriver();
 
   @override

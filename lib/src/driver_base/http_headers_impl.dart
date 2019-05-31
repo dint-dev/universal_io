@@ -14,5 +14,5 @@
 
 /// Solves the problem that 'dart:io' does not provide implementation of
 /// [HttpHeaders].
-export 'http_headers_impl_vm.dart' if (dart.library.js) '../io/http/http.dart'
+export '../io/http/http.dart' if (dart.library.io) 'http_headers_impl_vm.dart'
     show HttpHeadersImpl;

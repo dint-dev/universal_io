@@ -20,7 +20,6 @@ import 'package:universal_io/io.dart';
 
 import 'browser_http_client.dart';
 
-
 /// Browser implementation of [IODriver].
 ///
 /// This class is automatically used by 'package:universal_io/io.dart' when
@@ -28,21 +27,21 @@ import 'browser_http_client.dart';
 class BrowserIODriver extends BaseIODriver {
   BrowserIODriver(
       {FileSystemDriver fileSystemDriver,
-        InternetAddressDriver internetAddressDriver,
-        HttpClientDriver httpClientDriver = const BrowserHttpClientDriver(),
-        HttpServerDriver httpServerDriver,
-        PlatformDriver platformDriver,
-        ProcessDriver processDriver,
-        SocketsDriver socketsDriver})
+      InternetAddressDriver internetAddressDriver,
+      HttpClientDriver httpClientDriver = const BrowserHttpClientDriver(),
+      HttpServerDriver httpServerDriver,
+      PlatformDriver platformDriver,
+      ProcessDriver processDriver,
+      SocketsDriver socketsDriver})
       : super(
-    fileSystemDriver: fileSystemDriver,
-    internetAddressDriver: internetAddressDriver,
-    httpClientDriver: httpClientDriver,
-    httpServerDriver: httpServerDriver,
-    platformDriver: platformDriver ?? platformDriverFromEnvironment(),
-    processDriver: processDriver,
-    socketsDriver: socketsDriver,
-  );
+          fileSystemDriver: fileSystemDriver,
+          internetAddressDriver: internetAddressDriver,
+          httpClientDriver: httpClientDriver,
+          httpServerDriver: httpServerDriver,
+          platformDriver: platformDriver ?? platformDriverFromEnvironment(),
+          processDriver: processDriver,
+          socketsDriver: socketsDriver,
+        );
 
   /// Sets [BrowserIODriver] as the default driver.
   static void enable() {

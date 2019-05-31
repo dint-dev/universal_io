@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'package:meta/meta.dart';
 import 'package:universal_io/driver.dart';
 import 'package:universal_io/driver_base.dart';
 
@@ -24,7 +23,7 @@ class BaseIODriver extends IODriver {
     HttpServerDriver httpServerDriver,
     PlatformDriver platformDriver,
     ProcessDriver processDriver,
-    SocketsDriver socketsDriver =  const BaseSocketsDriver(),
+    SocketsDriver socketsDriver = const BaseSocketsDriver(),
   }) : super(
           fileSystemDriver: fileSystemDriver,
           internetAddressDriver: internetAddressDriver,

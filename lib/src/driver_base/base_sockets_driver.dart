@@ -122,4 +122,16 @@ class BaseSocketsDriver extends SocketsDriver {
       throw ArgumentError.value(host);
     }
   }
+
+  @override
+  Future<Socket> connectSocket(host, int port,
+      {sourceAddress, Duration timeout}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<ConnectionTask<Socket>> startConnectSocket(host, int port,
+      {sourceAddress}) {
+    throw UnimplementedError();
+  }
 }

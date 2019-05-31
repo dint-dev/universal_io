@@ -2017,7 +2017,9 @@ class _HttpConnectionInfo implements HttpConnectionInfo {
         ..remoteAddress = socket.remoteAddress
         ..remotePort = socket.remotePort
         ..localPort = socket.port;
-    } catch (e) {}
+    } catch (e) {
+      // Empty
+    }
     return null;
   }
 }

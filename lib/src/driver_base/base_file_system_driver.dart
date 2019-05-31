@@ -14,6 +14,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:universal_io/driver.dart';
 import 'package:universal_io/io.dart';
@@ -242,7 +243,7 @@ class BaseFileSystemDriver extends FileSystemDriver {
   }
 
   @override
-  Directory get systemTemp {
+  Directory getSystemTempDirectory() {
     throw UnimplementedError();
   }
 
@@ -273,6 +274,96 @@ class BaseFileSystemDriver extends FileSystemDriver {
 
   @override
   Link newLink(String path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Directory createDirectory(String path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Stream<FileSystemEvent> watch(String path, int events, bool recursive) {
+    throw UnimplementedError();
+  }
+
+  @override
+  FileStat statSync(String path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<FileStat> stat(String path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  void setCurrentDirectory(String path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Link newLinkFromRawPath(Uint8List path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  File newFileFromRawPath(Uint8List path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Directory newDirectoryFromRawPath(Uint8List path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  bool isLinkSync(String path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> isLink(String path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  bool isFileSync(String path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  bool isDirectorySync(String path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  bool identicalPathsSync(String path0, String path1) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> identicalPaths(String path0, String path1) {
+    throw UnimplementedError();
+  }
+
+  @override
+  FileSystemEntityType getTypeSync(String path, bool followLinks) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<FileSystemEntityType> getType(String path, bool followLinks) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Directory getCurrentDirectory() {
+    throw UnimplementedError();
+  }
+
+  @override
+  File createFile(String path) {
     throw UnimplementedError();
   }
 }

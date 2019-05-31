@@ -13,15 +13,12 @@
 // limitations under the License.
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:html' as html;
-import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
-import 'package:typed_data/typed_buffers.dart';
 import 'package:universal_io/driver_base.dart';
 import 'package:universal_io/io.dart';
-import 'browser_http_client_exception.dart';
+
 import 'browser_http_client.dart';
 
 /// Used by [BrowserHttpClient].
@@ -46,7 +43,7 @@ class BrowserHttpClientResponse extends BaseHttpClientResponse {
   @override
   bool get isRedirect =>
       HttpStatus.temporaryRedirect == statusCode ||
-          HttpStatus.movedPermanently == statusCode;
+      HttpStatus.movedPermanently == statusCode;
 
   @override
   String get reasonPhrase {

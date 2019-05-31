@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@TestOn("chrome")
-@Timeout(Duration(seconds: 5))
+@TestOn("browser")
+@Timeout(Duration(seconds: 20))
 import 'package:test/test.dart';
 
 import 'src/test_suite/common.dart';

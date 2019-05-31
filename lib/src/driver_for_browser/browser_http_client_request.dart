@@ -13,158 +13,45 @@
 // limitations under the License.
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:html' as html;
 import 'dart:typed_data';
 
-import 'package:typed_data/typed_buffers.dart';
 import 'package:universal_io/driver_base.dart';
 import 'package:universal_io/io.dart';
+
+import 'browser_http_client.dart';
 import 'browser_http_client_exception.dart';
 import 'browser_http_client_response.dart';
 
-import 'browser_http_client.dart';
+import '../driver_base/buffer.dart';
 
 /// Used by [BrowserHttpClient].
 class BrowserHttpClientRequest extends BaseHttpClientRequest {
   final HttpClient client;
 
-  @override
-  final String method;
-
-  @override
-  final Uri uri;
-
-  @override
-  final HttpHeaders headers = HttpHeadersImpl("1.0");
-
-  final Int8Buffer _buffer = Int8Buffer();
-
   final Completer<HttpClientResponse> _completer =
-  Completer<HttpClientResponse>();
-
-  bool _closed = false;
-  Future _requestBodyFuture;
-
-  @override
-  final List<Cookie> cookies = <Cookie>[];
+      Completer<HttpClientResponse>();
 
   bool useCorsCredentials = false;
 
-  BrowserHttpClientRequest(this.method, this.uri, {BrowserHttpClient client}) : this.client = client ?? new BrowserHttpClient();
+  final _buffer = Buffer();
+
+  BrowserHttpClientRequest(String method, Uri uri, {BrowserHttpClient client})
+      : this.client = client ?? BrowserHttpClient(),
+        super(method, uri);
 
   @override
   HttpConnectionInfo get connectionInfo => null;
 
   @override
-  Future<HttpClientResponse> get done {
-    return _completer.future;
-  }
-
-  @override
-  Encoding get encoding => utf8;
-
-  @override
-  set encoding(Encoding value) {
-    throw StateError("IOSink encoding is not mutable");
-  }
-
-  @override
-  void addError(Object error, [StackTrace stackTrace]) {
-    if (_closed) {
-      throw StateError("HTTP request is closed already");
-    }
-    _completer.completeError(error, stackTrace);
-  }
-
-  @override
-  Future<void> addStream(Stream<List<int>> stream) {
-    if (_requestBodyFuture != null) {
-      throw StateError("StreamSink is bound to a stream");
-    }
-    if (_closed) {
-      throw StateError("StreamSink is closed");
-    }
-    _requestBodyFuture = stream.listen((item) {
-      _buffer.addAll(item);
-    }, onError: (error) {
-      addError(error);
-    }, cancelOnError: true).asFuture(null);
-    return _requestBodyFuture;
-  }
-
-  @override
-  Future<void> flush() {
-    return Future<void>.value();
-  }
-
-  @override
   void internallyAdd(List<int> event) {
-    if (_requestBodyFuture != null) {
-      throw StateError("StreamSink is bound to a stream");
-    }
-    if (_closed) {
-      throw StateError("StreamSink is closed");
-    }
-    if (event.isEmpty) {
-      return;
-    }
-    if (!_httpMethodSupportsBody(method)) {
-      throw StateError("HTTP method $method does not support body");
-    }
-    _buffer.addAll(event);
+    _buffer.write(event);
   }
 
   @override
   Future<HttpClientResponse> internallyClose() {
-    if (_closed) {
-      throw StateError("StreamSink is closed");
-    }
-    if (!_completer.isCompleted) {
-      if (_requestBodyFuture != null) {
-        _requestBodyFuture.then((_) {
-          return _send();
-        });
-      } else {
-        _send();
-      }
-    }
+    _send();
     return _completer.future;
-  }
-
-  @override
-  void write(Object obj) {
-    String string = '$obj';
-    if (string.isEmpty) return;
-    add(utf8.encode(string));
-  }
-
-  @override
-  void writeAll(Iterable objects, [String separator = ""]) {
-    Iterator iterator = objects.iterator;
-    if (!iterator.moveNext()) return;
-    if (separator.isEmpty) {
-      do {
-        write(iterator.current);
-      } while (iterator.moveNext());
-    } else {
-      write(iterator.current);
-      while (iterator.moveNext()) {
-        write(separator);
-        write(iterator.current);
-      }
-    }
-  }
-
-  @override
-  void writeCharCode(int charCode) {
-    write(String.fromCharCode(charCode));
-  }
-
-  @override
-  void writeln([Object object = ""]) {
-    write(object);
-    write("\n");
   }
 
   void _send() {
@@ -250,9 +137,9 @@ class BrowserHttpClientRequest extends BaseHttpClientRequest {
         completer.completeError(error, StackTrace.current);
       });
 
-      if (_httpMethodSupportsBody(method)) {
+      if (_buffer.length > 0) {
         // Send with body
-        xhr.send(Uint8List.fromList(_buffer));
+        xhr.send(_buffer.read());
       } else {
         // Send without body
         xhr.send();
@@ -260,19 +147,6 @@ class BrowserHttpClientRequest extends BaseHttpClientRequest {
     } catch (e) {
       // Something went wrong
       _completer.completeError(e);
-    }
-  }
-
-  static bool _httpMethodSupportsBody(String method) {
-    switch (method) {
-      case "GET":
-        return false;
-      case "HEAD":
-        return false;
-      case "OPTIONS":
-        return false;
-      default:
-        return true;
     }
   }
 

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@TestOn("vm || flutter")
+@TestOn("dart-vm")
 @Timeout(Duration(seconds: 2))
 import 'package:test/test.dart';
 

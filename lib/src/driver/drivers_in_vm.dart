@@ -15,6 +15,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
 import 'package:zone_local/zone_local.dart';
@@ -45,19 +46,55 @@ abstract class FileSystemDriver {
 
   bool get isWatchSupported;
 
-  Directory get systemTemp;
+  Directory createDirectory(String path);
+
+  File createFile(String path);
+
+  Directory getCurrentDirectory();
+
+  Directory getSystemTempDirectory();
+
+  Future<FileSystemEntityType> getType(String path, bool followLinks);
+
+  FileSystemEntityType getTypeSync(String path, bool followLinks);
+
+  Future<bool> identicalPaths(String path0, String path1);
+
+  bool identicalPathsSync(String path0, String path1);
 
   Future<bool> isDirectory(String path);
 
+  bool isDirectorySync(String path);
+
   Future<bool> isFile(String path);
+
+  bool isFileSync(String path);
+
+  Future<bool> isLink(String path);
+
+  bool isLinkSync(String path);
 
   Directory newDirectory(String path);
 
+  Directory newDirectoryFromRawPath(Uint8List path);
+
   File newFile(String path);
+
+  File newFileFromRawPath(Uint8List path);
 
   FileSystemEntity newFileSystemEntity(String path);
 
   Link newLink(String path);
+
+  Link newLinkFromRawPath(Uint8List path);
+
+  void setCurrentDirectory(String path);
+
+  Future<FileStat> stat(String path);
+
+  FileStat statSync(String path);
+
+  Stream<FileSystemEvent> watch(String path, int events, bool recursive);
 }
 
 abstract class HttpClientDriver {
@@ -259,6 +296,9 @@ abstract class SocketsDriver {
     sourceAddress,
   });
 
+  Future<Socket> connectSocket(host, int port,
+      {sourceAddress, Duration timeout});
+
   Future<List<NetworkInterface>> listNetworkInterfaces({
     bool includeLoopback = false,
     bool includeLinkLocal = false,
@@ -283,4 +323,7 @@ abstract class SocketsDriver {
     bool requireClientCertificate = false,
     List<String> supportedProtocols,
   });
+
+  Future<ConnectionTask<Socket>> startConnectSocket(host, int port,
+      {sourceAddress});
 }

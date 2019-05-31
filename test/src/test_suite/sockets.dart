@@ -21,6 +21,24 @@ import 'dart:convert';
 import 'package:test/test.dart';
 import 'package:universal_io/io.dart';
 
+void testSockets({int times = 1}) {
+  final f = () {
+    testRawDatagramSocket();
+    testRawSocket();
+  };
+  if (times == 1) {
+    f();
+  } else {
+    // To deal with non-deterministic behavior,
+    // we run the same test many times.
+    for (var i = 0; i < 10; i++) {
+      group("Repeat #$i", () {
+        f();
+      });
+    }
+  }
+}
+
 void testRawDatagramSocket() {
   test("RawDatagramSocket", () async {
     // ----------------
@@ -201,17 +219,6 @@ void testRawSocket() {
       clientDone,
     ]);
   });
-}
-
-void testSockets() {
-  // To deal with non-deterministic behavior,
-  // we run the same test many times.
-  for (var i = 0; i < 10; i++) {
-    group("Repeat #$i", () {
-      testRawDatagramSocket();
-      testRawSocket();
-    });
-  }
 }
 
 /// A helper that builds a timeline of [RawDatagramSocket] events.
