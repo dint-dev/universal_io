@@ -349,7 +349,7 @@ class _TestHttpServer {
     // Send "bind" message
     channel.sink.add([secure ? "bindSecure" : "bind"]);
 
-    final requestsSink = new StreamController<_TestHttpRequest>();
+    final requestsSink = StreamController<_TestHttpRequest>();
     Completer completer = Completer<_TestHttpServer>();
     channel.stream.listen(
       (args) {
@@ -358,17 +358,17 @@ class _TestHttpServer {
           case "info":
             final port = (args[1] as num).toInt();
 
-            final result = new _TestHttpServer._(
+            final result = _TestHttpServer._(
               channel.cast<List>(),
               port,
-              new StreamQueue<_TestHttpRequest>(requestsSink.stream),
+              StreamQueue<_TestHttpRequest>(requestsSink.stream),
             );
             completer.complete(result);
             completer = null;
             break;
 
           case "request":
-            requestsSink.add(new _TestHttpRequest(
+            requestsSink.add(_TestHttpRequest(
               args[1] as String,
               args[2] as String,
               args[3] as String,
@@ -376,7 +376,7 @@ class _TestHttpServer {
             break;
 
           default:
-            throw new ArgumentError("Unsupported message type '$type'");
+            throw ArgumentError("Unsupported message type '$type'");
         }
       },
       onError: (error, stackTrace) {
@@ -388,7 +388,7 @@ class _TestHttpServer {
       },
       onDone: () {
         if (completer != null) {
-          completer.completeError(new StateError(
+          completer.completeError(StateError(
             "Channel was closed before 'info' message was received.",
           ));
           completer = null;

@@ -116,7 +116,7 @@ abstract class BaseRawSocket extends Stream<RawSocketEvent>
 
   @override
   List<int> read([int len]) {
-    return _buffer.read(maxLength:len);
+    return _buffer.read(maxLength: len);
   }
 
   @override

@@ -33,6 +33,12 @@ abstract class BaseRawDatagramSocket extends Stream<RawSocketEvent>
   @override
   bool broadcastEnabled = false;
 
+  @override
+  bool multicastLoopback = true;
+
+  @override
+  int multicastHops = 1;
+
   BaseRawDatagramSocket() {
     this.readEventsEnabled = true;
     this.writeEventsEnabled = true;

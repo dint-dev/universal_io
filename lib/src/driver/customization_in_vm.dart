@@ -22,9 +22,12 @@ import 'dart:io';
 ///   * Null otherwise (VM, Flutter).
 final IODriver defaultIODriver = null;
 
-InternetAddress internetAddressFrom({List<int> bytes, String address, String host}) {
-  if (bytes==null && address==null) {
-    throw new ArgumentError("Bytes and address can't be both null");
+/// Constructs [InternetAddress] from bytes and/or string. You can optionally
+/// specify a hostname too.
+InternetAddress internetAddressFrom(
+    {List<int> bytes, String address, String host}) {
+  if (bytes == null && address == null) {
+    throw ArgumentError("Bytes and address can't be both null");
   }
-  return new InternetAddress(address ?? stringFromIp(bytes));
+  return InternetAddress(address ?? stringFromIp(bytes));
 }

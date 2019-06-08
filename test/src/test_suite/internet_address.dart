@@ -24,7 +24,7 @@ void testInternetAddress() {
   group("InternetAddress", () {
     group("Parsing/printing IPv4", () {
       test("255.0.254.1", () {
-        final address = new InternetAddress("255.0.254.1");
+        final address = InternetAddress("255.0.254.1");
         expect(address.rawAddress[0], 255);
         expect(address.rawAddress[1], 0);
         expect(address.rawAddress[2], 254);
@@ -35,7 +35,7 @@ void testInternetAddress() {
 
     group("ParsingIPv6", () {
       test("'0123:4567:89ab:cdef:0123:4567:89ab:cdef'", () {
-        final actual = new InternetAddress(
+        final actual = InternetAddress(
           "0123:4567:89ab:cdef:0123:4567:89ab:cdef",
         ).rawAddress;
         final expected = Uint8List(16);
@@ -105,7 +105,7 @@ void testInternetAddress() {
       // and returns its address string.
       String toString(String s) {
         final parsed = InternetAddress(s);
-        return internetAddressFrom(bytes:parsed.rawAddress).address;
+        return internetAddressFrom(bytes: parsed.rawAddress).address;
       }
 
       test("'0123:4567:89ab:cdef:0123:4567:89ab:cdef'", () {

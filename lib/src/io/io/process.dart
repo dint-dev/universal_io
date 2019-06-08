@@ -126,16 +126,226 @@ void sleep(Duration duration) {
   }
 }
 
+/// The means to execute a program.
+///
+/// Use the static [start] and [run] methods to start a new process.
+/// The run method executes the process non-interactively to completion.
+/// In contrast, the start method allows your code to interact with the
+/// running process.
+///
+/// ## Start a process with the run method
+///
+/// The following code sample uses the run method to create a process
+/// that runs the UNIX command `ls`, which lists the contents of a directory.
+/// The run method completes with a [ProcessResult] object when the process
+/// terminates. This provides access to the output and exit code from the
+/// process. The run method does not return a Process object; this prevents your
+/// code from interacting with the running process.
+///
+///     import 'dart:io';
+///
+///     main() {
+///       // List all files in the current directory in UNIX-like systems.
+///       Process.run('ls', ['-l']).then((ProcessResult results) {
+///         print(results.stdout);
+///       });
+///     }
+///
+/// ## Start a process with the start method
+///
+/// The following example uses start to create the process.
+/// The start method returns a [Future] for a Process object.
+/// When the future completes the process is started and
+/// your code can interact with the
+/// Process: writing to stdin, listening to stdout, and so on.
+///
+/// The following sample starts the UNIX `cat` utility, which when given no
+/// command-line arguments, echos its input.
+/// The program writes to the process's standard input stream
+/// and prints data from its standard output stream.
+///
+///     import 'dart:io';
+///     import 'dart:convert';
+///
+///     main() {
+///       Process.start('cat', []).then((Process process) {
+///         process.stdout
+///             .transform(utf8.decoder)
+///             .listen((data) { print(data); });
+///         process.stdin.writeln('Hello, world!');
+///         process.stdin.writeln('Hello, galaxy!');
+///         process.stdin.writeln('Hello, universe!');
+///       });
+///     }
+///
+/// ## Standard I/O streams
+///
+/// As seen in the previous code sample, you can interact with the Process's
+/// standard output stream through the getter [stdout],
+/// and you can interact with the Process's standard input stream through
+/// the getter [stdin].
+/// In addition, Process provides a getter [stderr] for using the Process's
+/// standard error stream.
+///
+/// A Process's streams are distinct from the top-level streams
+/// for the current program.
+///
+/// ## Exit codes
+///
+/// Call the [exitCode] method to get the exit code of the process.
+/// The exit code indicates whether the program terminated successfully
+/// (usually indicated with an exit code of 0) or with an error.
+///
+/// If the start method is used, the exitCode is available through a future
+/// on the Process object (as shown in the example below).
+/// If the run method is used, the exitCode is available
+/// through a getter on the ProcessResult instance.
+///
+///     import 'dart:io';
+///
+///     main() {
+///       Process.start('ls', ['-l']).then((process) {
+///         // Get the exit code from the new process.
+///         process.exitCode.then((exitCode) {
+///           print('exit code: $exitCode');
+///         });
+///       });
+///     }
+///
+/// ## Other resources
+///
+/// [Dart by Example](https://www.dartlang.org/dart-by-example/#dart-io-and-command-line-apps)
+/// provides additional task-oriented code samples that show how to use
+/// various API from the [dart:io] library.
 abstract class Process {
+  /// Returns a [:Future:] which completes with the exit code of the process
+  /// when the process completes.
+  ///
+  /// The handling of exit codes is platform specific.
+  ///
+  /// On Linux and OS X a normal exit code will be a positive value in
+  /// the range [0..255]. If the process was terminated due to a signal
+  /// the exit code will be a negative value in the range [-255..-1],
+  /// where the absolute value of the exit code is the signal
+  /// number. For example, if a process crashes due to a segmentation
+  /// violation the exit code will be -11, as the signal SIGSEGV has the
+  /// number 11.
+  ///
+  /// On Windows a process can report any 32-bit value as an exit
+  /// code. When returning the exit code this exit code is turned into
+  /// a signed value. Some special values are used to report
+  /// termination due to some system event. E.g. if a process crashes
+  /// due to an access violation the 32-bit exit code is `0xc0000005`,
+  /// which will be returned as the negative number `-1073741819`. To
+  /// get the original 32-bit value use `(0x100000000 + exitCode) &
+  /// 0xffffffff`.
+  ///
+  /// There is no guarantee that [stdout] and [stderr] have finished reporting
+  /// the buffered output of the process when the returned future completes.
+  /// To be sure that all output is captured,
+  /// wait for the done event on the streams.
   Future<int> get exitCode;
+
   int get pid;
+
   Stream<List<int>> get stderr;
+
   IOSink get stdin;
+
   Stream<List<int>> get stdout;
 
+  /// Kills the process.
+  ///
+  /// Where possible, sends the [signal] to the process. This includes
+  /// Linux and OS X. The default signal is [ProcessSignal.sigterm]
+  /// which will normally terminate the process.
+  ///
+  /// On platforms without signal support, including Windows, the call
+  /// just terminates the process in a platform specific way, and the
+  /// `signal` parameter is ignored.
+  ///
+  /// Returns `true` if the signal is successfully delivered to the
+  /// process. Otherwise the signal could not be sent, usually meaning
+  /// that the process is already dead.
   bool kill([ProcessSignal signal = ProcessSignal.sigterm]);
 
-  ProcessResult runSync(String executable, List<String> arguments,
+  /// Kills the process with id [pid].
+  ///
+  /// Where possible, sends the [signal] to the process with id
+  /// `pid`. This includes Linux and OS X. The default signal is
+  /// [ProcessSignal.sigterm] which will normally terminate the
+  /// process.
+  ///
+  /// On platforms without signal support, including Windows, the call
+  /// just terminates the process with id `pid` in a platform specific
+  /// way, and the `signal` parameter is ignored.
+  ///
+  /// Returns `true` if the signal is successfully delivered to the
+  /// process. Otherwise the signal could not be sent, usually meaning
+  /// that the process is already dead.
+  static bool killPid(int pid, [ProcessSignal signal = ProcessSignal.sigterm]) {
+    return false;
+  }
+
+  /// Starts a process and runs it non-interactively to completion. The
+  /// process run is [executable] with the specified [arguments].
+  ///
+  /// Use [workingDirectory] to set the working directory for the process. Note
+  /// that the change of directory occurs before executing the process on some
+  /// platforms, which may have impact when using relative paths for the
+  /// executable and the arguments.
+  ///
+  /// Use [environment] to set the environment variables for the process. If not
+  /// set the environment of the parent process is inherited. Currently, only
+  /// US-ASCII environment variables are supported and errors are likely to occur
+  /// if an environment variable with code-points outside the US-ASCII range is
+  /// passed in.
+  ///
+  /// If [includeParentEnvironment] is `true`, the process's environment will
+  /// include the parent process's environment, with [environment] taking
+  /// precedence. Default is `true`.
+  ///
+  /// If [runInShell] is true, the process will be spawned through a system
+  /// shell. On Linux and OS X, `/bin/sh` is used, while
+  /// `%WINDIR%\system32\cmd.exe` is used on Windows.
+  ///
+  /// The encoding used for decoding `stdout` and `stderr` into text is
+  /// controlled through [stdoutEncoding] and [stderrEncoding]. The
+  /// default encoding is [systemEncoding]. If `null` is used no
+  /// decoding will happen and the [ProcessResult] will hold binary
+  /// data.
+  ///
+  /// Returns a `Future<ProcessResult>` that completes with the
+  /// result of running the process, i.e., exit code, standard out and
+  /// standard in.
+  ///
+  /// The following code uses `Process.run` to grep for `main` in the
+  /// file `test.dart` on Linux.
+  ///
+  ///     Process.run('grep', ['-i', 'main', 'test.dart']).then((result) {
+  ///       stdout.write(result.stdout);
+  ///       stderr.write(result.stderr);
+  ///     });
+  static Future<ProcessResult> run(String executable, List<String> arguments,
+      {String workingDirectory,
+      Map<String, String> environment,
+      bool includeParentEnvironment = true,
+      bool runInShell = false,
+      Encoding stdoutEncoding = systemEncoding,
+      Encoding stderrEncoding = systemEncoding}) {
+    return ProcessDriver.current.run(
+      executable,
+      arguments,
+      workingDirectory: workingDirectory,
+      environment: environment,
+      includeParentEnvironment: includeParentEnvironment,
+      runInShell: runInShell,
+      stdoutEncoding: stdoutEncoding,
+      stderrEncoding: stderrEncoding,
+    );
+  }
+
+  static ProcessResult runSync(String executable, List<String> arguments,
       {String workingDirectory,
       Map<String, String> environment,
       bool includeParentEnvironment = true,
@@ -154,7 +364,65 @@ abstract class Process {
     );
   }
 
-  Future<Process> start(String executable, List<String> arguments,
+  /// Starts a process running the [executable] with the specified
+  /// [arguments]. Returns a [:Future<Process>:] that completes with a
+  /// Process instance when the process has been successfully
+  /// started. That [Process] object can be used to interact with the
+  /// process. If the process cannot be started the returned [Future]
+  /// completes with an exception.
+  ///
+  /// Use [workingDirectory] to set the working directory for the process. Note
+  /// that the change of directory occurs before executing the process on some
+  /// platforms, which may have impact when using relative paths for the
+  /// executable and the arguments.
+  ///
+  /// Use [environment] to set the environment variables for the process. If not
+  /// set the environment of the parent process is inherited. Currently, only
+  /// US-ASCII environment variables are supported and errors are likely to occur
+  /// if an environment variable with code-points outside the US-ASCII range is
+  /// passed in.
+  ///
+  /// If [includeParentEnvironment] is `true`, the process's environment will
+  /// include the parent process's environment, with [environment] taking
+  /// precedence. Default is `true`.
+  ///
+  /// If [runInShell] is `true`, the process will be spawned through a system
+  /// shell. On Linux and OS X, [:/bin/sh:] is used, while
+  /// [:%WINDIR%\system32\cmd.exe:] is used on Windows.
+  ///
+  /// Users must read all data coming on the [stdout] and [stderr]
+  /// streams of processes started with [:Process.start:]. If the user
+  /// does not read all data on the streams the underlying system
+  /// resources will not be released since there is still pending data.
+  ///
+  /// The following code uses `Process.start` to grep for `main` in the
+  /// file `test.dart` on Linux.
+  ///
+  ///     Process.start('grep', ['-i', 'main', 'test.dart']).then((process) {
+  ///       stdout.addStream(process.stdout);
+  ///       stderr.addStream(process.stderr);
+  ///     });
+  ///
+  /// If [mode] is [ProcessStartMode.normal] (the default) a child
+  /// process will be started with `stdin`, `stdout` and `stderr`
+  /// connected.
+  ///
+  /// If `mode` is [ProcessStartMode.detached] a detached process will
+  /// be created. A detached process has no connection to its parent,
+  /// and can keep running on its own when the parent dies. The only
+  /// information available from a detached process is its `pid`. There
+  /// is no connection to its `stdin`, `stdout` or `stderr`, nor will
+  /// the process' exit code become available when it terminates.
+  ///
+  /// If `mode` is [ProcessStartMode.detachedWithStdio] a detached
+  /// process will be created where the `stdin`, `stdout` and `stderr`
+  /// are connected. The creator can communicate with the child through
+  /// these. The detached process will keep running even if these
+  /// communication channels are closed. The process' exit code will
+  /// not become available when it terminated.
+  ///
+  /// The default value for `mode` is `ProcessStartMode.normal`.
+  static Future<Process> start(String executable, List<String> arguments,
       {String workingDirectory,
       Map<String, String> environment,
       bool includeParentEnvironment = true,
@@ -167,29 +435,6 @@ abstract class Process {
       environment: environment,
       includeParentEnvironment: includeParentEnvironment,
       runInShell: runInShell,
-    );
-  }
-
-  static bool killPid(int pid, [ProcessSignal signal = ProcessSignal.sigterm]) {
-    return false;
-  }
-
-  static Future<ProcessResult> run(String executable, List<String> arguments,
-      {String workingDirectory,
-      Map<String, String> environment,
-      bool includeParentEnvironment = true,
-      bool runInShell = false,
-      Encoding stdoutEncoding = systemEncoding,
-      Encoding stderrEncoding = systemEncoding}) {
-    return ProcessDriver.current.run(
-      executable,
-      arguments,
-      workingDirectory: workingDirectory,
-      environment: environment,
-      includeParentEnvironment: includeParentEnvironment,
-      runInShell: runInShell,
-      stdoutEncoding: stdoutEncoding,
-      stderrEncoding: stderrEncoding,
     );
   }
 }

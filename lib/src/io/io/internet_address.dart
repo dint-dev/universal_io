@@ -54,7 +54,7 @@ import 'package:universal_io/src/internal/ip_utils.dart' as ip_utils;
 /// This is declared for drivers.
 InternetAddress internetAddressFromBytes(List<int> bytes,
     {String address, String host}) {
-  return new InternetAddress._(bytes, address: address, host: host);
+  return InternetAddress._(bytes, address: address, host: host);
 }
 
 /// An internet address.

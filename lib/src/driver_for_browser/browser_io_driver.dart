@@ -58,23 +58,31 @@ PlatformDriver platformDriverFromEnvironment() {
   }
 
   // Operating system
-  String operatingSystem = "windows";
   final userAgent = html.window.navigator.userAgent;
-  if (userAgent.contains("Android")) {
-    operatingSystem = "android";
-  } else if (userAgent.contains("iPhone")) {
-    operatingSystem = "ios";
-  } else if (userAgent.contains("Mac OS X")) {
-    operatingSystem = "macos";
-  } else if (userAgent.contains("CrOS")) {
-    operatingSystem = "linux";
-  }
+  final operatingSystem = operatingSystemFromUserAgent(userAgent);
 
   return PlatformDriver(
     numberOfProcessors: html.window.navigator.hardwareConcurrency ?? 1,
     localeName: locale,
     operatingSystem: operatingSystem,
   );
+}
+
+String operatingSystemFromUserAgent(String userAgent) {
+  final userAgent = html.window.navigator.userAgent;
+  if (userAgent.contains("Mac OS X")) {
+    return "macos";
+  }
+  if (userAgent.contains("CrOS")) {
+    return "linux";
+  }
+  if (userAgent.contains("Android")) {
+    return "android";
+  }
+  if (userAgent.contains("iPhone")) {
+    return "ios";
+  }
+  return "windows";
 }
 
 class BrowserHttpClientDriver extends HttpClientDriver {

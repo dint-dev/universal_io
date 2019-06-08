@@ -23,8 +23,8 @@ void hybridMain(StreamChannel channel, Object message) async {
 }
 
 void handleChannel(StreamChannel channel) {
-  final httpServerCompleter = new Completer<HttpServer>();
-  final doneCompleter = new Completer();
+  final httpServerCompleter = Completer<HttpServer>();
+  final doneCompleter = Completer();
   channel.stream.listen((message) async {
     final type = message[0] as String;
     switch (type) {
@@ -55,7 +55,7 @@ void handleChannel(StreamChannel channel) {
         break;
 
       default:
-        throw new ArgumentError("Unsupported message type '$type'");
+        throw ArgumentError("Unsupported message type '$type'");
     }
   }, onDone: () {
     if (!httpServerCompleter.isCompleted) {
@@ -66,7 +66,7 @@ void handleChannel(StreamChannel channel) {
 
   // When we receive a server
   httpServerCompleter.future.then((server) {
-    if (server==null) {
+    if (server == null) {
       return;
     }
 

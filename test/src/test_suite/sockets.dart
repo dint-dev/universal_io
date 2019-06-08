@@ -67,7 +67,7 @@ void testRawDatagramSocket() {
     final socket0Done = () async {
       final thisSocket = socket0;
       final peerSocket = socket1;
-      final events = new StreamQueue<RawSocketEvent>(thisSocket);
+      final events = StreamQueue<RawSocketEvent>(thisSocket);
 
       // Receive a message
       {
@@ -112,7 +112,7 @@ void testRawDatagramSocket() {
     final socket1Done = () async {
       final thisSocket = socket1;
       final peerSocket = socket0;
-      final events = new StreamQueue<RawSocketEvent>(thisSocket);
+      final events = StreamQueue<RawSocketEvent>(thisSocket);
 
       // Send a message
       {
@@ -190,7 +190,7 @@ void testRawSocket() {
     final serverDone = () async {
       // Wait for the first TCP connection.
       final socket = await server.first;
-      final events = new StreamQueue<RawSocketEvent>(socket);
+      final events = StreamQueue<RawSocketEvent>(socket);
 
       // Close server
       await server.close();
@@ -221,7 +221,7 @@ void testRawSocket() {
     final clientDone = () async {
       // Start collecting timeline of TCP events
       final socket = client;
-      final events = new StreamQueue<RawSocketEvent>(socket);
+      final events = StreamQueue<RawSocketEvent>(socket);
 
       // Send a message
       {

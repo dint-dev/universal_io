@@ -21,7 +21,7 @@ import 'dart:typed_data';
 /// This was implemented because classes in 'package:typed_data/buffer.dart' are
 /// append-only.
 class Uint8ListBuffer implements Sink<List<int>>, StreamConsumer<List<int>> {
-  final Uint8List _empty = new Uint8List(0);
+  final Uint8List _empty = Uint8List(0);
   int _start = 0;
   int _length = 0;
   Uint8List _buffer;
@@ -37,7 +37,7 @@ class Uint8ListBuffer implements Sink<List<int>>, StreamConsumer<List<int>> {
   @override
   void add(List<int> input, {bool copyNotNeeded = false}) {
     if (_isClosed) {
-      throw new StateError("close() has been invoked");
+      throw StateError("close() has been invoked");
     }
     final inputLength = input.length;
     if (inputLength == 0) {
@@ -109,7 +109,7 @@ class Uint8ListBuffer implements Sink<List<int>>, StreamConsumer<List<int>> {
     final start = this._start;
     final end = start + _length;
     if (start >= end) {
-      throw new ArgumentError.value(
+      throw ArgumentError.value(
           start, "start", "Buffer has only $_length bytes");
     }
     for (var i = start; i < end; i++) {
@@ -128,7 +128,7 @@ class Uint8ListBuffer implements Sink<List<int>>, StreamConsumer<List<int>> {
     if (start == null) {
       start = _length - 1;
     } else if (start >= _length) {
-      throw new ArgumentError.value(
+      throw ArgumentError.value(
           start, "start", "Buffer has only $_length bytes");
     }
     for (var i = bufferStart + start; i >= bufferStart; i--) {
@@ -245,8 +245,8 @@ class Uint8ListBuffer implements Sink<List<int>>, StreamConsumer<List<int>> {
   /// length.
   static int _lengthOfIncompleteUtf8Rune(List<int> buffer,
       [int start, int end]) {
-    assert(start>=0);
-    assert(end<=buffer.length);
+    assert(start >= 0);
+    assert(end <= buffer.length);
     end ??= buffer.length;
     for (var i = 1; i < 5; i++) {
       final byteIndex = end - i;

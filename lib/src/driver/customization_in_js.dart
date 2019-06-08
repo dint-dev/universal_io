@@ -17,14 +17,19 @@ import '../io/io/internet_address.dart' as internet_address;
 import 'package:universal_io/src/internal/ip_utils.dart';
 export 'package:universal_io/driver_base.dart';
 
-export 'customization_in_js_non_browser.dart' if (dart.library.html) 'customization_in_js_browser.dart';
+export 'customization_in_js_non_browser.dart'
+    if (dart.library.html) 'customization_in_js_browser.dart';
 
-InternetAddress internetAddressFrom({List<int> bytes, String address, String host}) {
-  if (bytes==null) {
-    if (address==null) {
-      throw new ArgumentError("Bytes and address can't be both null");
+/// Constructs [InternetAddress] from bytes and/or string. You can optionally
+/// specify a hostname too.
+InternetAddress internetAddressFrom(
+    {List<int> bytes, String address, String host}) {
+  if (bytes == null) {
+    if (address == null) {
+      throw ArgumentError("Bytes and address can't be both null");
     }
     bytes = parseIp(address);
   }
-  return internet_address.internetAddressFromBytes(bytes, address: address, host: host);
+  return internet_address.internetAddressFromBytes(bytes,
+      address: address, host: host);
 }

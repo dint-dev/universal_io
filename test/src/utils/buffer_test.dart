@@ -8,7 +8,7 @@ import 'dart:convert';
 void main() {
   group("Uint8ListBuffer", () {
     test("add(chunk)", () {
-      final buffer = new Uint8ListBuffer();
+      final buffer = Uint8ListBuffer();
       expect(buffer.length, 0);
       expect(buffer.read(), _equalsUint8List([]));
 
@@ -35,14 +35,14 @@ void main() {
 
     test("add(chunk), n-1 bytes (n=2^k)", () {
       for (var n in [8, 16, 32, 64, 128, 256, 512]) {
-        final buffer = new Uint8ListBuffer();
+        final buffer = Uint8ListBuffer();
 
         // Write 2 bytes
         // These will be copied to the new buffer.
         buffer.add(<int>[1, 2]);
 
         // Write N-3 bytes
-        buffer.add(new List<int>.generate(n - 3, (i) => 2 + i + 1));
+        buffer.add(List<int>.generate(n - 3, (i) => 2 + i + 1));
 
         // Verify N-1 bytes
         expect(buffer.length, n - 1);
@@ -57,20 +57,20 @@ void main() {
 
     test("add(chunk), n+1 bytes (n=2^k)", () {
       for (var n in [16, 32, 64, 128, 256, 512]) {
-        final buffer = new Uint8ListBuffer();
+        final buffer = Uint8ListBuffer();
         buffer.add(<int>[1, 2]);
-        buffer.add(new List.generate(n - 1, (i) => 2 + i + 1));
+        buffer.add(List.generate(n - 1, (i) => 2 + i + 1));
         expect(buffer.length, n + 1);
         expect(buffer.read(preview: true), _equalsUint8List(_range(1, n + 1)));
       }
     });
 
     test("addStream(stream)", () async {
-      final stream = new Stream<List<int>>.fromIterable(<List<int>>[
+      final stream = Stream<List<int>>.fromIterable(<List<int>>[
         <int>[1],
         <int>[2, 3],
       ]);
-      final buffer = new Uint8ListBuffer();
+      final buffer = Uint8ListBuffer();
 
       // Add stream
       final future = buffer.addStream(stream);
@@ -85,7 +85,7 @@ void main() {
 
     test("read()", () {
       // Empty buffer
-      final buffer = new Uint8ListBuffer();
+      final buffer = Uint8ListBuffer();
 
       // read()
       expect(buffer.read(), <int>[]);
@@ -103,10 +103,10 @@ void main() {
     test(
         "read() after a single add(copyNotNeeded:true) returns the same reference",
         () {
-      final buffer = new Uint8ListBuffer();
+      final buffer = Uint8ListBuffer();
 
       // Define input
-      final input = new Uint8List(1024);
+      final input = Uint8List(1024);
 
       // Write
       buffer.add(input, copyNotNeeded: true);
@@ -116,7 +116,7 @@ void main() {
     });
 
     test("read(preview:true)", () {
-      final buffer = new Uint8ListBuffer();
+      final buffer = Uint8ListBuffer();
       buffer.add(<int>[1, 2, 3, 4, 5]);
       expect(buffer.read(preview: true), _equalsUint8List([1, 2, 3, 4, 5]));
       expect(buffer.read(preview: true), _equalsUint8List([1, 2, 3, 4, 5]));
@@ -125,8 +125,8 @@ void main() {
     test(
         "read(maxLength:N) after a single add(copyNotNeeded:true) returns the same reference",
         () {
-      final buffer = new Uint8ListBuffer();
-      final written = new Uint8List(5);
+      final buffer = Uint8ListBuffer();
+      final written = Uint8List(5);
       for (var i = 0; i < written.length; i++) {
         written[i] = i + 1;
       }
@@ -136,7 +136,7 @@ void main() {
 
     test("read(maxLength:N)", () {
       // Empty buffer
-      final buffer = new Uint8ListBuffer();
+      final buffer = Uint8ListBuffer();
 
       // Read
       expect(buffer.read(maxLength: 0), _equalsUint8List([]));
@@ -153,7 +153,7 @@ void main() {
     });
 
     test("read(maxLength:N), whole buffer", () {
-      final buffer = new Uint8ListBuffer();
+      final buffer = Uint8ListBuffer();
       buffer.add(<int>[1, 2, 3, 4, 5]);
       expect(buffer.length, 5);
       expect(buffer.read(maxLength: 5), _equalsUint8List([1, 2, 3, 4, 5]));
@@ -161,7 +161,7 @@ void main() {
     });
 
     test("read(maxLength:N, preview:true), with preview", () {
-      final buffer = new Uint8ListBuffer();
+      final buffer = Uint8ListBuffer();
       buffer.add(<int>[1, 2, 3, 4, 5]);
       expect(buffer.length, 5);
       expect(
@@ -192,7 +192,7 @@ void main() {
     });
 
     test("readUff8", () {
-      final buffer = new Uint8ListBuffer();
+      final buffer = Uint8ListBuffer();
       buffer.add(utf8.encode("abc"));
       expect(buffer.length, 3);
       expect(buffer.readUtf8(preview: true), "abc");
@@ -202,7 +202,7 @@ void main() {
     });
 
     test("readUff8Incomplete, 1 byte", () {
-      final buffer = new Uint8ListBuffer();
+      final buffer = Uint8ListBuffer();
       buffer.add(utf8.encode("abc"));
       expect(buffer.length, 3);
       expect(buffer.readUtf8Incomplete(preview: true), "abc");
@@ -218,18 +218,18 @@ void main() {
       expect(writtenData, hasLength(2));
 
       // Create a buffer
-      final buffer = new Uint8ListBuffer();
+      final buffer = Uint8ListBuffer();
 
       // Write a single-byte character
       buffer.add(utf8.encode("a"));
 
       // Write byte 0, try to read
-      buffer.add(writtenData.sublist(0,1));
+      buffer.add(writtenData.sublist(0, 1));
       expect(buffer.readUtf8Incomplete(), "a");
       expect(buffer.readUtf8Incomplete(), "");
 
       // Write byte 1
-      buffer.add(writtenData.sublist(1,2));
+      buffer.add(writtenData.sublist(1, 2));
 
       // Finally we can read the rune
       expect(buffer.readUtf8Incomplete(), writtenString);
@@ -243,7 +243,7 @@ void main() {
       expect(writtenData, hasLength(4));
 
       // Create a buffer
-      final buffer = new Uint8ListBuffer();
+      final buffer = Uint8ListBuffer();
 
       // Write a single-byte character
       buffer.add(utf8.encode("a"));
@@ -258,7 +258,7 @@ void main() {
       expect(buffer.readUtf8Incomplete(), "");
 
       // Write byte 2, try to read
-      buffer.add(writtenData.sublist(2,3));
+      buffer.add(writtenData.sublist(2, 3));
       expect(buffer.readUtf8Incomplete(), "");
 
       // Write byte 3
@@ -276,5 +276,5 @@ Matcher _equalsUint8List(List<int> data) {
 }
 
 List<int> _range(int from, int to) {
-  return new List<int>.generate(to - from + 1, (i) => (from + i) % 256);
+  return List<int>.generate(to - from + 1, (i) => (from + i) % 256);
 }

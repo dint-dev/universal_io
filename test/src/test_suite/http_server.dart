@@ -17,7 +17,7 @@ void testHttpServer() {
     });
 
     test("bindSecure(...)", () async {
-      final securityContext = new SecurityContext();
+      final securityContext = SecurityContext();
       securityContext.useCertificateChain("test/src/test_suite/localhost.crt");
       securityContext.usePrivateKey("test/src/test_suite/localhost.key");
 
@@ -58,7 +58,7 @@ Future<void> _runTest(HttpServer httpServer, {@required String scheme}) async {
     await response.close();
   }));
 
-  final client = new HttpClient();
+  final client = HttpClient();
   client.badCertificateCallback = (certificate, host, port) {
     return true;
   };

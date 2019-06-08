@@ -102,7 +102,7 @@ String stringFromIp(List<int> bytes) {
     case 16:
       return _stringFromIp6(bytes);
     default:
-      throw new ArgumentError.value(bytes);
+      throw ArgumentError.value(bytes);
   }
 }
 
