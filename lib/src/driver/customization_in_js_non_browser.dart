@@ -12,18 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@TestOn("dart-vm")
-@Timeout(Duration(seconds: 5))
-import 'package:test/test.dart';
+import 'drivers_in_js.dart';
+import 'package:universal_io/driver_base.dart';
 
-import 'src/test_suite/suite.dart';
-
-void main() {
-  group("Test suite in VM (validates that tests pass with 'dart:io'):", () {
-    runTestSuite(
-      httpClient: true,
-      httpServer: true,
-      sockets: true,
-    );
-  });
-}
+/// Determines the default IODriver:
+///   * _BrowserIODriver_ in browser (when 'dart:html' is available).
+///   * _BaseIODriver_ in Javascript targets such as Node.JS.
+///   * Null otherwise (VM, Flutter).
+final IODriver defaultIODriver = BaseIODriver();

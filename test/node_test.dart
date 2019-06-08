@@ -16,10 +16,10 @@
 @Timeout(Duration(seconds: 5))
 import 'package:test/test.dart';
 
-import 'src/test_suite/internet_address.dart';
+import 'src/test_suite/suite.dart';
 
 void main() {
   group("Test suite in Node.JS:", () {
-    testInternetAddress();
+    runTestSuite();
   });
 }

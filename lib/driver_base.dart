@@ -25,6 +25,5 @@ export 'src/driver_base/base_raw_server_socket.dart';
 export 'src/driver_base/base_raw_socket.dart';
 export 'src/driver_base/base_sockets_driver.dart';
 export 'src/driver_base/base_std_out.dart';
-export 'src/driver_base/buffer.dart';
 export 'src/driver_base/driver.dart';
 export 'src/driver_base/http_headers_impl.dart';

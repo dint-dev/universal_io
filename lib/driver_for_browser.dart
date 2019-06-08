@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'http_client.dart';
-import 'internet_address.dart';
+library universal_io.driver.browser;
 
-void testCommon({bool isBrowser = false}) {
-  testInternetAddress();
-  testHttpClient(isBrowser: isBrowser);
-}
+export 'src/driver_for_browser/browser_http_client.dart';
+export 'src/driver_for_browser/browser_http_client_exception.dart';
+export 'src/driver_for_browser/browser_http_client_request.dart';
+export 'src/driver_for_browser/browser_http_client_response.dart';
+export 'src/driver_for_browser/browser_io_driver.dart';

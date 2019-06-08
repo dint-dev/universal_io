@@ -20,9 +20,9 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 import 'package:zone_local/zone_local.dart';
 
-import 'defaults_in_vm.dart';
+import 'customization_in_vm.dart';
 
-export 'defaults_in_vm.dart';
+export 'customization_in_vm.dart';
 
 // ----------
 // IMPORTANT:
@@ -236,6 +236,8 @@ abstract class ProcessDriver {
 }
 
 abstract class SocketsDriver {
+  static SocketsDriver get current => IODriver.current.socketsDriver;
+
   const SocketsDriver();
 
   Future<RawDatagramSocket> bindRawDatagramSocket(

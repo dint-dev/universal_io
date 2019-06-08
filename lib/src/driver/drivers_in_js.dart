@@ -20,9 +20,9 @@ import 'package:meta/meta.dart';
 import 'package:universal_io/src/io/io.dart';
 import 'package:zone_local/zone_local.dart';
 
-import 'defaults_in_js.dart' if (dart.library.html) 'defaults_in_browser.dart';
+import 'customization_in_js.dart';
 
-export 'defaults_in_js.dart' if (dart.library.html) 'defaults_in_browser.dart';
+export 'customization_in_js.dart';
 
 // ----------
 // IMPORTANT:

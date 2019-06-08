@@ -21,7 +21,7 @@ class BaseIODriver extends IODriver {
     InternetAddressDriver internetAddressDriver,
     HttpClientDriver httpClientDriver,
     HttpServerDriver httpServerDriver,
-    PlatformDriver platformDriver,
+    PlatformDriver platformDriver = const PlatformDriver(),
     ProcessDriver processDriver,
     SocketsDriver socketsDriver = const BaseSocketsDriver(),
   }) : super(

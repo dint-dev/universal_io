@@ -12,173 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@Timeout(Duration(seconds: 2))
-library http_client_test;
-
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:async/async.dart';
 import 'package:meta/meta.dart';
-import 'package:stream_channel/stream_channel.dart';
 import 'package:test/test.dart';
 import 'package:universal_io/io.dart';
-
-const _spawnUri = "src/test_suite/http_client_spawn_server.dart";
+import 'package:stream_channel/stream_channel.dart';
 
 void testHttpClient({bool isBrowser = false}) {
   group("HttpClient:", () {
-    // -------------------------------------------------------------------------
-    // Set up / tear down external process for all tests
-    // -------------------------------------------------------------------------
-    StreamChannel channel;
-
-    // This will receive the server host (e.g. "localhost:80")
-    final serverInfoCompleter = Completer<_ServerInfo>();
-
-    // This will receive the next request
-    Completer<_ReceivedRequest> receivedRequestCompleter;
-
-    void receivedMessage(Object event) {
-      if (event is Map) {
-        final type = event["type"] as String;
-        switch (type) {
-          case "info":
-            serverInfoCompleter.complete(_ServerInfo(
-              port: (event["port"] as num).toInt(),
-              securePort: (event["securePort"] as num).toInt(),
-            ));
-            break;
-          case "request":
-            receivedRequestCompleter.complete(_ReceivedRequest(
-              event["method"] as String,
-              event["uri"] as String,
-              event["body"] as String,
-            ));
-            break;
-          default:
-            throw StateError("Invalid type '$type'");
-        }
-      } else {
-        throw ArgumentError.value(event);
-      }
-    }
-
-    setUpAll(() async {
-      channel = await spawnHybridUri(_spawnUri);
-      channel.stream.listen((event) {
-        receivedMessage(event);
-      }, onError: (error) {
-        throw error;
-      });
-    });
-
-    tearDownAll(() {
-      if (channel != null) {
-        channel.sink.close();
-      }
-    });
-
-    setUp(() {
-      receivedRequestCompleter = Completer<_ReceivedRequest>();
-    });
-
-    /// Tests methods like 'client.get(host,port,path)'.
-    ///
-    /// These should default to TLS.
-    Future _testClientMethodWithoutUri({
-      @required String method,
-      @required
-          Future<HttpClientRequest> openUrl(
-              HttpClient client, String host, int port, String path),
-    }) async {
-      if (method == null) {
-        throw ArgumentError.notNull("method");
-      }
-
-      // Wait for the server to be listening
-      final serverInfo = await serverInfoCompleter.future;
-
-      // Create a HTTP client
-      final client = HttpClient();
-
-      // Create a HTTP request
-      final host = "localhost";
-      final port = serverInfo.port;
-      final path = "/greeting";
-      final request = await openUrl(client, host, port, path);
-
-      // Test that the request seems correct
-      expect(request.uri.scheme, "http");
-      expect(request.uri.host, "localhost");
-      expect(request.uri.port, port);
-      expect(request.uri.path, path);
-
-      // Close request
-      final response = await request.close();
-      expect(response.statusCode, 200);
-    }
-
-    Future _testClient({
-      @required String method,
-      @required String path,
-      String requestBody,
-      int status = 200,
-      String responseBody,
-      Future<HttpClientRequest> openUrl(HttpClient client, Uri uri),
-    }) async {
-      if (method == null) {
-        throw ArgumentError.notNull("method");
-      }
-      if (path == null) {
-        throw ArgumentError.notNull("path");
-      }
-
-      // Wait for the server to be listening
-      final serverInfo = await serverInfoCompleter.future;
-
-      // Send HTTP request
-      final client = HttpClient();
-      HttpClientRequest request;
-      final host = "localhost";
-      final port = serverInfo.port;
-      final uri = Uri.parse("http://$host:$port$path");
-      if (openUrl != null) {
-        // Use a custom method
-        // (we test their correctness)
-        request = await openUrl(client, uri);
-      } else {
-        // Use 'openUrl'
-        request = await client.openUrl(method, uri);
-      }
-
-      // If HTTP method supports a request body,
-      // write it.
-      if (requestBody != null) {
-        request.write(requestBody);
-      }
-
-      // Close HTTP request
-      final response = await request.close();
-
-      // Check response status code
-      expect(response, isNotNull);
-      expect(response.statusCode, status);
-
-      // Check response body
-      if (responseBody != null) {
-        final actualResponseBody = await utf8.decodeStream(response);
-        expect(actualResponseBody, responseBody);
-      }
-
-      // Check request
-      final requestInfo = await receivedRequestCompleter.future;
-      expect(requestInfo.method, method);
-      expect(requestInfo.body, requestBody ?? "");
-
-      // Check response headers
-      expect(response.headers.value("X-Response-Header"), "value");
-    }
-
     test("GET", () async {
       await _testClient(
         method: "GET",
@@ -324,9 +168,12 @@ void testHttpClient({bool isBrowser = false}) {
     });
 
     test("TLS connection to a self-signed server fails", () async {
-      final serverInfo = await serverInfoCompleter.future;
+      final server = await _TestHttpServer.bind();
+      addTearDown(() {
+        server.close();
+      });
       final client = HttpClient();
-      final port = serverInfo.securePort;
+      final port = server.port;
       final uri = Uri.parse("https://localhost:$port/greeting");
       if (isBrowser) {
         // In browser, request is sent only after it's closed.
@@ -340,14 +187,17 @@ void testHttpClient({bool isBrowser = false}) {
 
     if (!isBrowser) {
       test(
-          "TLS connection to a self-signed server succeeds with the help of 'badCertificateCallback'",
-          () async {
-        final serverInfo = await serverInfoCompleter.future;
+          "TLS connection to a self-signed server succeeds with"
+          " the help of 'badCertificateCallback'", () async {
+        final server = await _TestHttpServer.bind(secure: true);
+        addTearDown(() {
+          server.close();
+        });
         final client = HttpClient();
         client.badCertificateCallback = (certificate, host, port) {
           return true;
         };
-        final port = serverInfo.securePort;
+        final port = server.port;
         final uri = Uri.parse("https://localhost:$port/greeting");
         final request = await client.getUrl(uri);
         final response = await request.close();
@@ -357,15 +207,197 @@ void testHttpClient({bool isBrowser = false}) {
   });
 }
 
-class _ServerInfo {
-  final int port;
-  final int securePort;
-  _ServerInfo({@required this.port, @required this.securePort});
+/// Tests methods like 'client.get(host,port,path)'.
+///
+/// These should default to TLS.
+Future _testClientMethodWithoutUri({
+  @required String method,
+  @required
+      Future<HttpClientRequest> openUrl(
+          HttpClient client, String host, int port, String path),
+}) async {
+  if (method == null) {
+    throw ArgumentError.notNull("method");
+  }
+
+  // Wait for the server to be listening
+  final server = await _TestHttpServer.bind();
+  addTearDown(() {
+    server.close();
+  });
+
+  // Create a HTTP client
+  final client = HttpClient();
+
+  // Create a HTTP request
+  final host = "localhost";
+  final port = server.port;
+  final path = "/greeting";
+  final request = await openUrl(client, host, port, path);
+
+  // Test that the request seems correct
+  expect(request.uri.scheme, "http");
+  expect(request.uri.host, "localhost");
+  expect(request.uri.port, port);
+  expect(request.uri.path, path);
+
+  // Close request
+  final response = await request.close();
+  await utf8.decodeStream(response);
+  expect(response.statusCode, 200);
 }
 
-class _ReceivedRequest {
+Future _testClient({
+  @required String method,
+  @required String path,
+  String requestBody,
+  int status = 200,
+  String responseBody,
+  Future<HttpClientRequest> openUrl(HttpClient client, Uri uri),
+}) async {
+  if (method == null) {
+    throw ArgumentError.notNull("method");
+  }
+  if (path == null) {
+    throw ArgumentError.notNull("path");
+  }
+
+  // Wait for the server to be listening
+  final server = await _TestHttpServer.bind();
+  addTearDown(() {
+    server.close();
+  });
+
+  // Send HTTP request
+  final client = HttpClient();
+  HttpClientRequest request;
+  final host = "localhost";
+  final port = server.port;
+  final uri = Uri.parse("http://$host:$port$path");
+  if (openUrl != null) {
+    // Use a custom method
+    // (we test their correctness)
+    request =
+        await openUrl(client, uri).timeout(const Duration(milliseconds: 500));
+  } else {
+    // Use 'openUrl'
+    request = await client
+        .openUrl(method, uri)
+        .timeout(const Duration(milliseconds: 500));
+  }
+
+  // If HTTP method supports a request body,
+  // write it.
+  if (requestBody != null) {
+    request.write(requestBody);
+  }
+
+  // Close HTTP request
+  final response =
+      await request.close().timeout(const Duration(milliseconds: 500));
+  final actualResponseBody = await utf8
+      .decodeStream(response)
+      .timeout(const Duration(milliseconds: 500));
+
+  // Check response status code
+  expect(response, isNotNull);
+  expect(response.statusCode, status);
+
+  // Check response body
+  if (responseBody != null) {
+    expect(actualResponseBody, responseBody);
+  }
+
+  // Check request
+  expect(
+      await server.requestsQueue.hasNext
+          .timeout(const Duration(milliseconds: 200)),
+      isTrue);
+  final requestInfo = await server.requestsQueue.next;
+  expect(requestInfo.method, method);
+  expect(requestInfo.uri, "$path");
+  expect(requestInfo.body, requestBody ?? "");
+
+  // Check response headers
+  expect(response.headers.value("X-Response-Header"), "value");
+}
+
+class _TestHttpRequest {
   final String method;
   final String uri;
   final String body;
-  _ReceivedRequest(this.method, this.uri, this.body);
+  _TestHttpRequest(this.method, this.uri, this.body);
+}
+
+class _TestHttpServer {
+  static const _spawnUri = "src/test_suite/http_client_spawn_server.dart";
+
+  final StreamChannel<List> _streamChannel;
+  final int port;
+  final StreamQueue<_TestHttpRequest> requestsQueue;
+
+  _TestHttpServer._(this._streamChannel, this.port, this.requestsQueue);
+
+  void close() {
+    _streamChannel.sink.close();
+  }
+
+  static Future<_TestHttpServer> bind({bool secure = false}) async {
+    // Get channel
+    final channel = spawnHybridUri(_spawnUri);
+
+    // Send "bind" message
+    channel.sink.add([secure ? "bindSecure" : "bind"]);
+
+    final requestsSink = new StreamController<_TestHttpRequest>();
+    Completer completer = Completer<_TestHttpServer>();
+    channel.stream.listen(
+      (args) {
+        final type = args[0] as String;
+        switch (type) {
+          case "info":
+            final port = (args[1] as num).toInt();
+
+            final result = new _TestHttpServer._(
+              channel.cast<List>(),
+              port,
+              new StreamQueue<_TestHttpRequest>(requestsSink.stream),
+            );
+            completer.complete(result);
+            completer = null;
+            break;
+
+          case "request":
+            requestsSink.add(new _TestHttpRequest(
+              args[1] as String,
+              args[2] as String,
+              args[3] as String,
+            ));
+            break;
+
+          default:
+            throw new ArgumentError("Unsupported message type '$type'");
+        }
+      },
+      onError: (error, stackTrace) {
+        if (completer != null) {
+          completer.completeError(error, stackTrace);
+          completer = null;
+        }
+        requestsSink.addError(error, stackTrace);
+      },
+      onDone: () {
+        if (completer != null) {
+          completer.completeError(new StateError(
+            "Channel was closed before 'info' message was received.",
+          ));
+          completer = null;
+        }
+        requestsSink.close();
+      },
+    );
+
+    // Create server
+    return completer.future;
+  }
 }

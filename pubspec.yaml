@@ -1,19 +1,19 @@
 name: universal_io
-version: 0.4.0
+version: 0.5.0
 description:
-  Cross-platform version of 'dart:io'. Supports browsers, Node.JS, and other targets.
-homepage: https://github.com/gohilla/dart-universal_io
+  Cross-platform 'dart:io' that works in VM/Flutter, browsers, and elsewhere.
+homepage: https://github.com/terrier989/dart-universal_io
 author: terrier989 <terrier989@gmail.com>
 
 environment:
   sdk: '>=2.0.0 <3.0.0'
 
 dependencies:
-  ip: ^0.1.1
   meta: ^1.1.7
-  zone_local: ^0.1.0
+  zone_local: '>=0.1.0 <2.0.0'
 
 dev_dependencies:
+  async: ^2.2.0
   pedantic: ^1.7.0
-  stream_channel: any
+  stream_channel: ^2.0.0
   test: ^1.6.3

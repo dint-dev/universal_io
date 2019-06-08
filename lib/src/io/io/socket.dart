@@ -47,7 +47,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:ip/ip.dart';
+import 'internet_address.dart';
 import 'package:universal_io/src/driver/drivers_in_js.dart';
 
 import '../io.dart';
@@ -92,130 +92,6 @@ class Datagram {
   int port;
 
   Datagram(this.data, this.address, this.port);
-}
-
-/// An internet address.
-///
-/// This object holds an internet address. If this internet address
-/// is the result of a DNS lookup, the address also holds the hostname
-/// used to make the lookup.
-/// An Internet address combined with a port number represents an
-/// endpoint to which a socket can connect or a listening socket can
-/// bind.
-class InternetAddress {
-  /// IP version 4 loopback address. Use this address when listening on
-  /// or connecting to the loopback adapter using IP version 4 (IPv4).
-  static final InternetAddress loopbackIPv4 = InternetAddress("127.0.0.1");
-
-  /// IP version 6 loopback address. Use this address when listening on
-  /// or connecting to the loopback adapter using IP version 6 (IPv6).
-  static final InternetAddress loopbackIPv6 = InternetAddress("::1");
-
-  /// IP version 4 any address. Use this address when listening on
-  /// all adapters IP addresses using IP version 4 (IPv4).
-  static final InternetAddress anyIPv4 = InternetAddress("0.0.0.0");
-
-  /// IP version 6 any address. Use this address when listening on
-  /// all adapters IP addresses using IP version 6 (IPv6).
-  static final InternetAddress anyIPv6 = InternetAddress("::");
-
-  final IpAddress _ip;
-
-  /// The host used to lookup the address. If there is no host
-  /// associated with the address this returns the numeric address.
-  final String host;
-
-  /// Creates a new [InternetAddress] from a numeric address.
-  ///
-  /// If the address in [address] is not a numeric IPv4
-  /// (dotted-decimal notation) or IPv6 (hexadecimal representation).
-  /// address [ArgumentError] is thrown.
-  factory InternetAddress(String address) {
-    return InternetAddress._(IpAddress.parse(address), address);
-  }
-
-  InternetAddress._(this._ip, this.host);
-
-  /// The numeric address of the host. For IPv4 addresses this is using
-  /// the dotted-decimal notation. For IPv6 it is using the
-  /// hexadecimal representation.
-  String get address => _ip.toString();
-
-  /// Returns true if the [InternetAddress]s scope is a link-local.
-  bool get isLinkLocal => throw UnimplementedError();
-
-  /// Returns true if the [InternetAddress] is a loopback address.
-  bool get isLoopback => _ip.isLoopback;
-
-  /// Returns true if the [InternetAddress]s scope is multicast.
-  bool get isMulticast => throw UnimplementedError();
-
-  /// Get the raw address of this [InternetAddress]. The result is either a
-  /// 4 or 16 byte long list. The returned list is a copy, making it possible
-  /// to change the list without modifying the [InternetAddress].
-  List<int> get rawAddress => _ip.toMutableBytes();
-
-  /// The [type] of the [InternetAddress] specified what IP protocol.
-  InternetAddressType get type {
-    if (_ip is Ip4Address) {
-      return InternetAddressType.IPv4;
-    }
-    return InternetAddressType.IPv6;
-  }
-
-  /// Perform a reverse dns lookup on the [address], creating a new
-  /// [InternetAddress] where the host field set to the result.
-  Future<InternetAddress> reverse() {
-    return IODriver.current.internetAddressDriver
-        .reverseLookupInternetAddress(this);
-  }
-
-  /// Lookup a host, returning a Future of a list of
-  /// [InternetAddress]s. If [type] is [InternetAddressType.any], it
-  /// will lookup both IP version 4 (IPv4) and IP version 6 (IPv6)
-  /// addresses. If [type] is either [InternetAddressType.IPv4] or
-  /// [InternetAddressType.IPv6] it will only lookup addresses of the
-  /// specified type. The order of the list can, and most likely will,
-  /// change over time.
-  static Future<List<InternetAddress>> lookup(String host,
-      {InternetAddressType type = InternetAddressType.any}) {
-    return IODriver.current.internetAddressDriver
-        .lookupInternetAddress(host, type: type);
-  }
-}
-
-/// [InternetAddressType] is the type an [InternetAddress]. Currently,
-/// IP version 4 (IPv4) and IP version 6 (IPv6) are supported.
-class InternetAddressType {
-  static const InternetAddressType IPv4 = InternetAddressType._(0);
-  static const InternetAddressType IPv6 = InternetAddressType._(1);
-  static const InternetAddressType any = InternetAddressType._(-1);
-
-  final int _value;
-
-  const InternetAddressType._(this._value);
-
-  factory InternetAddressType._from(int value) {
-    if (value == 0) return IPv4;
-    if (value == 1) return IPv6;
-    throw ArgumentError("Invalid type: $value");
-  }
-
-  /// Get the name of the type, e.g. "IPv4" or "IPv6".
-  String get name {
-    switch (_value) {
-      case -1:
-        return "ANY";
-      case 0:
-        return "IPv4";
-      case 1:
-        return "IPv6";
-      default:
-        throw ArgumentError("Invalid InternetAddress");
-    }
-  }
-
-  String toString() => "InternetAddressType: $name";
 }
 
 /// A [NetworkInterface] represents an active network interface on the current

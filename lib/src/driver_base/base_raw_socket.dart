@@ -17,7 +17,7 @@ import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
 import 'package:universal_io/io.dart';
-import 'buffer.dart';
+import 'package:universal_io/utils.dart';
 
 abstract class BaseRawSocket extends Stream<RawSocketEvent>
     implements RawSocket {
@@ -34,7 +34,7 @@ abstract class BaseRawSocket extends Stream<RawSocketEvent>
   bool _closedWrite = false;
 
   /// Received bytes.
-  final Buffer _buffer = Buffer();
+  final Uint8ListBuffer _buffer = Uint8ListBuffer();
 
   /// Received stream of events and errors.
   final StreamController<RawSocketEvent> _streamController =
@@ -63,7 +63,7 @@ abstract class BaseRawSocket extends Stream<RawSocketEvent>
       return;
     }
     _streamController.add(RawSocketEvent.read);
-    _buffer.write(data);
+    _buffer.add(data);
   }
 
   /// Adds an error to the received stream.
@@ -116,7 +116,7 @@ abstract class BaseRawSocket extends Stream<RawSocketEvent>
 
   @override
   List<int> read([int len]) {
-    return _buffer.read(len);
+    return _buffer.read(maxLength:len);
   }
 
   @override

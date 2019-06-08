@@ -16,10 +16,13 @@
 @Timeout(Duration(seconds: 20))
 import 'package:test/test.dart';
 
-import 'src/test_suite/common.dart';
+import 'src/test_suite/suite.dart';
 
 void main() {
   group("Test suite in browsers:", () {
-    testCommon(isBrowser: true);
+    runTestSuite(
+      isBrowser: true,
+      httpClient: true,
+    );
   });
 }

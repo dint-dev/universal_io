@@ -19,61 +19,92 @@ import 'dart:io';
 import 'package:stream_channel/stream_channel.dart';
 
 void hybridMain(StreamChannel channel, Object message) async {
-  // Bind server
-  final server = await HttpServer.bind(
-    "localhost",
-    0,
-  );
-
-  // Create TLS security context
-  final securityContext = SecurityContext();
-  securityContext.useCertificateChain("test/src/test_suite/localhost.crt");
-  securityContext.usePrivateKey("test/src/test_suite/localhost.key");
-  final secureServer = await HttpServer.bindSecure(
-    "localhost",
-    0,
-    securityContext,
-  );
-
-  // Tell the test where we are listening
-  channel.sink.add({
-    "type": "info",
-    "port": server.port,
-    "securePort": secureServer.port,
-  });
-
-  // Handle non-TLS requests
-  final serverFuture = server.listen((request) async {
-    await handleRequest(request, channel);
-  }).asFuture();
-
-  // Handle TLS requests
-  final secureServerFuture = secureServer.listen((request) async {
-    await handleRequest(request, channel);
-  }).asFuture();
-
-  try {
-    await Future.wait(<Future>[
-      serverFuture,
-      secureServerFuture,
-    ]);
-  } finally {
-    await channel.sink.close();
-  }
+  handleChannel(channel.cast<List>());
 }
 
-Future<void> handleRequest(HttpRequest request, StreamChannel channel) async {
+void handleChannel(StreamChannel channel) {
+  final httpServerCompleter = new Completer<HttpServer>();
+  final doneCompleter = new Completer();
+  channel.stream.listen((message) async {
+    final type = message[0] as String;
+    switch (type) {
+      case "bind":
+        // Bind
+        httpServerCompleter.complete(HttpServer.bind(
+          "localhost",
+          0,
+        ));
+        break;
+
+      case "bindSecure":
+        // Create TLS security context
+        final securityContext = SecurityContext();
+        securityContext.useCertificateChain(
+          "test/src/test_suite/localhost.crt",
+        );
+        securityContext.usePrivateKey(
+          "test/src/test_suite/localhost.key",
+        );
+
+        // Bind
+        httpServerCompleter.complete(HttpServer.bindSecure(
+          "localhost",
+          0,
+          securityContext,
+        ));
+        break;
+
+      default:
+        throw new ArgumentError("Unsupported message type '$type'");
+    }
+  }, onDone: () {
+    if (!httpServerCompleter.isCompleted) {
+      httpServerCompleter.complete();
+    }
+    doneCompleter.complete();
+  });
+
+  // When we receive a server
+  httpServerCompleter.future.then((server) {
+    if (server==null) {
+      return;
+    }
+
+    // Tell the test where we are listening
+    channel.sink.add(["info", server.port]);
+
+    // Close it when the channel closes
+    doneCompleter.future.whenComplete(() {
+      server.close();
+    });
+
+    // Listen for requests
+    server.listen(
+      (request) {
+        handleHttpRequest(channel, request);
+      },
+      onError: (error, stackTrace) {
+        channel.sink.addError(error, stackTrace);
+      },
+      onDone: () {
+        channel.sink.close();
+      },
+    );
+  });
+}
+
+void handleHttpRequest(StreamChannel channel, HttpRequest request) async {
   // Decode request body
   final requestBody = await utf8.decodeStream(request);
 
   // Tell the test about the request we received
   if (request.method != "OPTIONS") {
-    channel.sink.add({
-      "type": "request",
-      "method": request.method,
-      "uri": request.uri.toString(),
-      "body": requestBody,
-    });
+    channel.sink.add([
+      "request",
+      request.method,
+      request.uri.toString(),
+      requestBody,
+    ]);
   }
 
   // Respond based on the path
@@ -132,5 +163,5 @@ Future<void> handleRequest(HttpRequest request, StreamChannel channel) async {
       response.write("Invalid path '${request.uri.path}'");
       break;
   }
-  await response.close();
+  await request.response.close();
 }

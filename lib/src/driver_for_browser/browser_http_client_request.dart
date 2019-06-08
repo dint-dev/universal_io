@@ -23,7 +23,7 @@ import 'browser_http_client.dart';
 import 'browser_http_client_exception.dart';
 import 'browser_http_client_response.dart';
 
-import '../driver_base/buffer.dart';
+import 'package:universal_io/utils.dart';
 
 /// Used by [BrowserHttpClient].
 class BrowserHttpClientRequest extends BaseHttpClientRequest {
@@ -34,7 +34,7 @@ class BrowserHttpClientRequest extends BaseHttpClientRequest {
 
   bool useCorsCredentials = false;
 
-  final _buffer = Buffer();
+  final _buffer = Uint8ListBuffer();
 
   BrowserHttpClientRequest(String method, Uri uri, {BrowserHttpClient client})
       : this.client = client ?? BrowserHttpClient(),
@@ -45,7 +45,7 @@ class BrowserHttpClientRequest extends BaseHttpClientRequest {
 
   @override
   void internallyAdd(List<int> event) {
-    _buffer.write(event);
+    _buffer.add(event);
   }
 
   @override

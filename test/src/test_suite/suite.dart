@@ -12,19 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'package:universal_io/driver.dart';
-import 'package:universal_io/driver_base.dart';
+import 'http_client.dart';
+import 'internet_address.dart';
+import 'platform.dart';
+import 'http_server.dart';
+import 'sockets.dart';
 
-/// Determines the default IODriver:
-///   1.) BrowserIODriver when 'dart:html' is available.
-///   2.) IODriver in 'drivers_in_js.dart' when when 'dart:js' is available.
-///   3.) IODriver in "drivers_in_vm.dart' otherwise.
-final IODriver defaultIODriver = BaseIODriver(
-  fileSystemDriver: null,
-  internetAddressDriver: null,
-  httpClientDriver: null,
-  httpServerDriver: null,
-  platformDriver: null,
-  processDriver: null,
-  socketsDriver: null,
-);
+void runTestSuite({
+  bool isBrowser = false,
+  bool httpClient = false,
+  bool httpServer = false,
+  bool sockets = false,
+}) {
+  testPlatform();
+  testInternetAddress();
+  if (httpClient) {
+    testHttpClient(isBrowser: isBrowser);
+  }
+  if (httpServer) {
+    testHttpServer();
+  }
+  if (sockets) {
+    testSockets();
+  }
+}

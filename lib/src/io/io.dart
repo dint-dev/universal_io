@@ -6,6 +6,7 @@ export 'io/data_transformer.dart';
 export 'io/directory.dart';
 export 'io/file.dart';
 export 'io/file_system_entity.dart';
+export 'io/internet_address.dart' hide internetAddressFromBytes;
 export 'io/io_sink.dart';
 export 'io/link.dart';
 export 'io/overrides.dart';

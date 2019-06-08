@@ -18,6 +18,7 @@ library sockets_test;
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:async/async.dart';
 import 'package:test/test.dart';
 import 'package:universal_io/io.dart';
 
@@ -44,83 +45,120 @@ void testRawDatagramSocket() {
     // ----------------
     // Bind two sockets
     // ----------------
-    final server = await RawDatagramSocket.bind(
+    final socket0 = await RawDatagramSocket.bind(
       InternetAddress.loopbackIPv4,
       0,
     );
     addTearDown(() {
-      server.close();
+      socket0.close();
     });
 
-    final client = await RawDatagramSocket.bind(
+    final socket1 = await RawDatagramSocket.bind(
       InternetAddress.loopbackIPv4,
       0,
     );
-    final clientPort = client.port;
-    final clientAddress = client.address;
     addTearDown(() {
-      client.close();
+      socket1.close();
     });
 
-    // -------------------
-    // Server expectations
-    // -------------------
-    final serverDone = () async {
-      // Collect a timeline of UDP events
-      final timeline = await _RawDatagramSocketTimeline.collect(server);
+    // --------
+    // Socket 0
+    // --------
+    final socket0Done = () async {
+      final thisSocket = socket0;
+      final peerSocket = socket1;
+      final events = new StreamQueue<RawSocketEvent>(thisSocket);
 
-      // Is the events correct?
-      expect(
-          timeline.events,
-          [
-            RawSocketEvent.write,
-            RawSocketEvent.read,
-            RawSocketEvent.closed,
-          ],
-          reason: "UDP server observed an unexpected sequence of events");
+      // Receive a message
+      {
+        expect(await events.next, RawSocketEvent.write);
+        final datagram = thisSocket.receive();
+        expect(utf8.decode(datagram.data), "S1/M0");
+        expect(datagram.address, peerSocket.address);
+        expect(datagram.port, peerSocket.port);
+      }
 
-      // Are the received datagrams correct?
-      expect(timeline.datagrams, hasLength(1));
-      final datagram = timeline.datagrams.single;
-      expect(datagram, isNotNull);
-      expect(datagram.port, clientPort);
-      expect(datagram.address, clientAddress);
-      expect(utf8.decode(datagram.data), "This was sent by the client");
+      // Send a message
+      {
+        final data = utf8.encode("S0/M0");
+        final result = thisSocket.send(
+          data,
+          peerSocket.address,
+          peerSocket.port,
+        );
+        expect(result, data.length);
+        expect(await events.next, RawSocketEvent.read);
+      }
+
+      // Receive a message
+      {
+        expect(await events.next, RawSocketEvent.read);
+        final datagram = thisSocket.receive();
+        expect(utf8.decode(datagram.data), "S1/M1");
+        expect(datagram.address, peerSocket.address);
+        expect(datagram.port, peerSocket.port);
+      }
+
+      // Close server
+      {
+        socket0.close();
+        expect(await events.rest.toList(), [RawSocketEvent.closed]);
+      }
     }();
 
-    // -------------------
-    // Client expectations
-    // -------------------
-    final clientDone = () async {
-      // Start collecting a timeline of UDP events
-      final timelineFuture = _RawDatagramSocketTimeline.collect(client);
+    // --------
+    // Socket 1
+    // --------
+    final socket1Done = () async {
+      final thisSocket = socket1;
+      final peerSocket = socket0;
+      final events = new StreamQueue<RawSocketEvent>(thisSocket);
 
-      // Send a greeting
-      final data = utf8.encode("This was sent by the client");
-      final result = client.send(
-        data,
-        server.address,
-        server.port,
-      );
-      expect(result, data.length);
+      // Send a message
+      {
+        final data = utf8.encode("S1/M0");
+        final result = thisSocket.send(
+          data,
+          peerSocket.address,
+          peerSocket.port,
+        );
+        expect(result, data.length);
 
-      // Wait for the timeline to be ready
-      final timeline = await timelineFuture;
+        // The first message should fire 'write'
+        expect(await events.next, RawSocketEvent.write);
+      }
 
-      // Are the events correct?
-      expect(
-          timeline.events,
-          [
-            RawSocketEvent.write,
-            RawSocketEvent.closed,
-          ],
-          reason: "UDP client observed an unexpected sequence of events");
+      // Receive a message
+      {
+        expect(await events.next, RawSocketEvent.read);
+        final datagram = thisSocket.receive();
+        expect(utf8.decode(datagram.data), "S0/M0");
+        expect(datagram.address, peerSocket.address);
+        expect(datagram.port, peerSocket.port);
+      }
+
+      // Send a message
+      {
+        final data = utf8.encode("S1/M1");
+        final result = thisSocket.send(
+          data,
+          peerSocket.address,
+          peerSocket.port,
+        );
+        expect(result, data.length);
+      }
+
+      // Close the socket
+      {
+        thisSocket.close();
+        expect(await events.rest.toList(), [RawSocketEvent.closed]);
+      }
     }();
 
     // Wait both tests to finish
     await Future.wait(<Future>[
-      serverDone,
-      clientDone,
+      socket0Done,
+      socket1Done,
     ]);
   });
 }
@@ -150,35 +188,31 @@ void testRawSocket() {
     // Server expectations
     // -------------------
     final serverDone = () async {
-      // Wait for the first TCP connection,
-      // then stop listening for TCP connections.
+      // Wait for the first TCP connection.
       final socket = await server.first;
+      final events = new StreamQueue<RawSocketEvent>(socket);
+
+      // Close server
       await server.close();
 
-      // Start collecting timeline of TCP events
-      final timelineFuture = _RawSocketTimeline.collect(socket);
+      // Receive a message
+      expect(await events.next, RawSocketEvent.read);
+      expect(utf8.decode(socket.read()), "Client/0");
 
-      // Send a greeting
-      final data = utf8.encode("This was sent by the server");
-      final result = socket.write(data);
-      expect(result, data.length);
+      // Send a message
+      {
+        final data = utf8.encode("Server/0");
+        final result = socket.write(data);
+        expect(result, data.length);
+        expect(await events.next, RawSocketEvent.write);
+      }
 
-      // Wait for the timeline to be ready
-      final timeline = await timelineFuture;
+      // Receive 'readClosed'
+      expect(await events.next, RawSocketEvent.readClosed);
 
-      // Are the events correct?
-      expect(
-          timeline.events,
-          [
-            RawSocketEvent.read,
-            RawSocketEvent.write,
-            RawSocketEvent.readClosed,
-            RawSocketEvent.closed,
-          ],
-          reason: "TCP server observed an unexpected sequence of events");
-
-      // Is the received data correct?
-      expect(timeline.received, "This was sent by the client");
+      // Close socket
+      await socket.close();
+      expect(await events.rest.toList(), [RawSocketEvent.closed]);
     }();
 
     // -------------------
@@ -187,30 +221,25 @@ void testRawSocket() {
     final clientDone = () async {
       // Start collecting timeline of TCP events
       final socket = client;
-      final timelineFuture = _RawSocketTimeline.collect(socket);
+      final events = new StreamQueue<RawSocketEvent>(socket);
 
-      // Send a greeting
-      final data = utf8.encode("This was sent by the client");
-      final result = socket.write(data);
-      expect(result, data.length);
-      await Future.delayed(const Duration(milliseconds: 100));
+      // Send a message
+      {
+        final data = utf8.encode("Client/0");
+        final result = socket.write(data);
+        expect(result, data.length);
+        expect(await events.next, RawSocketEvent.write);
+      }
+
+      // Receive a message
+      expect(await events.next, RawSocketEvent.read);
+      expect(utf8.decode(socket.read()), "Server/0");
+
+      // Close the socket
       await socket.close();
-
-      // Wait for the timeline to be ready
-      final timeline = await timelineFuture;
-
-      // Are the events correct?
-      expect(
-          timeline.events,
-          [
-            RawSocketEvent.write,
-            RawSocketEvent.read,
-            RawSocketEvent.closed,
-          ],
-          reason: "TCP client observed an unexpected sequence of events");
-
-      // Is the received data correct?
-      expect(timeline.received, "This was sent by the server");
+      expect(await events.rest.toList(), [
+        RawSocketEvent.closed,
+      ]);
     }();
 
     // Wait both tests to finish
@@ -219,81 +248,4 @@ void testRawSocket() {
       clientDone,
     ]);
   });
-}
-
-/// A helper that builds a timeline of [RawDatagramSocket] events.
-class _RawDatagramSocketTimeline {
-  final List<RawSocketEvent> events;
-  final List<Datagram> datagrams;
-
-  _RawDatagramSocketTimeline(this.events, this.datagrams);
-
-  /// Collects all events during the period (default: 200 milliseconds).
-  static Future<_RawDatagramSocketTimeline> collect(RawDatagramSocket socket,
-      {Duration timeout = const Duration(milliseconds: 500)}) async {
-    // Create a timer that will close the socket
-    var isClosed = false;
-    Timer(timeout, () {
-      if (!isClosed) {
-        socket.close();
-      }
-    });
-
-    // Collect events and datagrams
-    final events = <RawSocketEvent>[];
-    final datagrams = <Datagram>[];
-    try {
-      await for (var event in socket) {
-        if (event == RawSocketEvent.read) {
-          datagrams.add(socket.receive());
-        }
-        events.add(event);
-      }
-    } finally {
-      isClosed = true;
-    }
-
-    // OK, return the timeline
-    return _RawDatagramSocketTimeline(events, datagrams);
-  }
-}
-
-/// A helper that builds a timeline of [RawSocket] events.
-class _RawSocketTimeline {
-  final List<RawSocketEvent> events;
-  final String received;
-
-  _RawSocketTimeline(this.events, this.received);
-
-  /// Collects all events during the period (default: 200 milliseconds).
-  static Future<_RawSocketTimeline> collect(RawSocket socket,
-      {Duration timeout = const Duration(milliseconds: 500)}) async {
-    // Create a timer that will close the socket.
-    var isClosed = false;
-    Timer(timeout, () {
-      if (!isClosed) {
-        socket.close();
-      }
-    });
-
-    // Collect events and data.
-    final events = <RawSocketEvent>[];
-    final data = <int>[];
-    try {
-      await for (var event in socket) {
-        if (event == RawSocketEvent.read) {
-          data.addAll(socket.read());
-        }
-        events.add(event);
-      }
-    } finally {
-      isClosed = true;
-    }
-
-    // Decode UTF-8.
-    final content = utf8.decode(data);
-
-    // OK, return the timeline
-    return _RawSocketTimeline(events, content);
-  }
 }
