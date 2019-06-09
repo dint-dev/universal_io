@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// Various utilities that either used by 'universal_io' or are useful for
-/// users of 'universal_io.
+/// Various utilities.
 library universal_io.utils;
 
 export 'src/utils/buffer.dart';

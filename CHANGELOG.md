@@ -1,5 +1,5 @@
-# 0.5.2
-  * Fixed a small bug in RawDatagramSocket.
+# 0.6.0
+  * Major refactoring of IODriver API.
 
 # 0.5.1
   * Fixed small bugs.

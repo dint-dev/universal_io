@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'package:universal_io/src/internal/ip_utils.dart';
+
 import '../io/io/internet_address.dart' show InternetAddress;
 import '../io/io/internet_address.dart' as internet_address;
-import 'package:universal_io/src/internal/ip_utils.dart';
+
 export 'package:universal_io/driver_base.dart';
 
 export 'customization_in_js_non_browser.dart'

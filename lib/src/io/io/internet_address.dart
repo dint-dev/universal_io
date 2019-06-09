@@ -44,9 +44,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'package:universal_io/src/driver/drivers_in_js.dart';
-
 import 'dart:async';
+
+import 'package:universal_io/src/driver/drivers_in_js.dart';
 import 'package:universal_io/src/internal/ip_utils.dart' as ip_utils;
 
 /// Not exported by 'package:universal_io/io.dart'.
@@ -142,8 +142,7 @@ class InternetAddress {
   /// Perform a reverse dns lookup on the [address], creating a new
   /// [InternetAddress] where the host field set to the result.
   Future<InternetAddress> reverse() {
-    return IODriver.current.internetAddressDriver
-        .reverseLookupInternetAddress(this);
+    return IODriver.current.internetAddressDriver.reverseLookup(this);
   }
 
   /// Lookup a host, returning a Future of a list of
@@ -155,8 +154,7 @@ class InternetAddress {
   /// change over time.
   static Future<List<InternetAddress>> lookup(String host,
       {InternetAddressType type = InternetAddressType.any}) {
-    return IODriver.current.internetAddressDriver
-        .lookupInternetAddress(host, type: type);
+    return IODriver.current.internetAddressDriver.lookup(host, type: type);
   }
 
   @override

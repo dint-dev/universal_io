@@ -268,22 +268,13 @@ class BaseFileSystemDriver extends FileSystemDriver {
   }
 
   @override
-  FileSystemEntity newFileSystemEntity(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
   Link newLink(String path) {
     throw UnimplementedError();
   }
 
   @override
-  Directory createDirectory(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Stream<FileSystemEvent> watch(String path, int events, bool recursive) {
+  Stream<FileSystemEvent> watch(String path,
+      {int events = FileSystemEvent.all, bool recursive = false}) {
     throw UnimplementedError();
   }
 
@@ -348,22 +339,17 @@ class BaseFileSystemDriver extends FileSystemDriver {
   }
 
   @override
-  FileSystemEntityType getTypeSync(String path, bool followLinks) {
+  FileSystemEntityType typeSync(String path, {bool followLinks}) {
     throw UnimplementedError();
   }
 
   @override
-  Future<FileSystemEntityType> getType(String path, bool followLinks) {
+  Future<FileSystemEntityType> type(String path, {bool followLinks}) {
     throw UnimplementedError();
   }
 
   @override
   Directory getCurrentDirectory() {
-    throw UnimplementedError();
-  }
-
-  @override
-  File createFile(String path) {
     throw UnimplementedError();
   }
 }

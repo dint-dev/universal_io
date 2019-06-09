@@ -13,10 +13,11 @@
 // limitations under the License.
 
 import 'drivers_in_js.dart';
-import 'package:universal_io/driver_base.dart';
 
 /// Determines the default IODriver:
 ///   * _BrowserIODriver_ in browser (when 'dart:html' is available).
 ///   * _BaseIODriver_ in Javascript targets such as Node.JS.
 ///   * Null otherwise (VM, Flutter).
-final IODriver defaultIODriver = BaseIODriver();
+final IODriver defaultIODriver = const IODriver(
+  platformDriver: PlatformDriver(),
+);

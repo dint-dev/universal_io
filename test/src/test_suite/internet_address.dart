@@ -15,10 +15,11 @@
 @Timeout(Duration(seconds: 2))
 library internet_address_test;
 
-import 'package:test/test.dart';
-import 'package:universal_io/io.dart';
-import 'package:universal_io/driver.dart';
 import 'dart:typed_data';
+
+import 'package:test/test.dart';
+import 'package:universal_io/driver.dart';
+import 'package:universal_io/io.dart';
 
 void testInternetAddress() {
   group("InternetAddress", () {

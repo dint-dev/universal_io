@@ -243,7 +243,7 @@ abstract class RawSecureSocket implements RawSocket {
       bool onBadCertificate(X509Certificate certificate),
       List<String> supportedProtocols,
       Duration timeout}) {
-    return IODriver.current.socketsDriver.connectRawSecureSocket(
+    return IODriver.current.rawSecureSocketDriver.connect(
       host,
       port,
       context: context,
@@ -287,7 +287,7 @@ abstract class RawSecureSocket implements RawSocket {
       List<String> supportedProtocols}) {
     socket.readEventsEnabled = false;
     socket.writeEventsEnabled = false;
-    return IODriver.current.socketsDriver.newSecureRawSocket(
+    return IODriver.current.rawSecureSocketDriver.secure(
       socket,
       subscription: subscription,
       host: (host != null ? host : socket.address.host),
@@ -327,7 +327,7 @@ abstract class RawSecureSocket implements RawSocket {
       List<String> supportedProtocols}) {
     socket.readEventsEnabled = false;
     socket.writeEventsEnabled = false;
-    return IODriver.current.socketsDriver.newSecureServerRawSocket(
+    return IODriver.current.rawSecureSocketDriver.secureServer(
       socket,
       context,
       subscription: subscription,
@@ -345,7 +345,7 @@ abstract class RawSecureSocket implements RawSocket {
       {SecurityContext context,
       bool onBadCertificate(X509Certificate certificate),
       List<String> supportedProtocols}) {
-    return IODriver.current.socketsDriver.connectRawSecureSocketStart(
+    return IODriver.current.rawSecureSocketDriver.startConnect(
       host,
       port,
       context: context,

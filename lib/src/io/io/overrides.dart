@@ -48,6 +48,7 @@ import 'dart:async';
 
 import 'package:universal_io/src/driver/drivers_in_js.dart';
 
+import 'socket_impl.dart';
 import '../io.dart';
 
 final _ioOverridesToken = Object();
@@ -192,7 +193,7 @@ abstract class IOOverrides {
   /// When this override is installed, this function overrides the behavior of
   /// `new Directory()` and `new Directory.fromUri()`.
   Directory createDirectory(String path) {
-    return IODriver.current.fileSystemDriver.createDirectory(path);
+    return IODriver.current.fileSystemDriver.newDirectory(path);
   }
 
   /// Returns the current working directory.
@@ -226,7 +227,7 @@ abstract class IOOverrides {
   /// When this override is installed, this function overrides the behavior of
   /// `new File()` and `new File.fromUri()`.
   File createFile(String path) {
-    return IODriver.current.fileSystemDriver.createFile(path);
+    return IODriver.current.fileSystemDriver.newFile(path);
   }
 
   // FileStat
@@ -272,7 +273,10 @@ abstract class IOOverrides {
   /// When this override is installed, this function overrides the behavior of
   /// `FileSystemEntity.type`.
   Future<FileSystemEntityType> fseGetType(String path, bool followLinks) {
-    return IODriver.current.fileSystemDriver.getType(path, followLinks);
+    return IODriver.current.fileSystemDriver.type(
+      path,
+      followLinks: followLinks,
+    );
   }
 
   /// Returns the [FileSystemEntityType] for [path].
@@ -280,7 +284,10 @@ abstract class IOOverrides {
   /// When this override is installed, this function overrides the behavior of
   /// `FileSystemEntity.typeSync`.
   FileSystemEntityType fseGetTypeSync(String path, bool followLinks) {
-    return IODriver.current.fileSystemDriver.getTypeSync(path, followLinks);
+    return IODriver.current.fileSystemDriver.typeSync(
+      path,
+      followLinks: followLinks,
+    );
   }
 
   // _FileSystemWatcher
@@ -290,7 +297,11 @@ abstract class IOOverrides {
   /// When this override is installed, this function overrides the behavior of
   /// `FileSystemEntity.watch()`.
   Stream<FileSystemEvent> fsWatch(String path, int events, bool recursive) {
-    return IODriver.current.fileSystemDriver.watch(path, events, recursive);
+    return IODriver.current.fileSystemDriver.watch(
+      path,
+      events: events,
+      recursive: recursive,
+    );
   }
 
   /// Returns `true` when [FileSystemEntity.watch] is supported.
@@ -319,7 +330,7 @@ abstract class IOOverrides {
   /// `Socket.connect(...)`.
   Future<Socket> socketConnect(host, int port,
       {sourceAddress, Duration timeout}) {
-    return IODriver.current.socketsDriver.connectSocket(
+    return SocketImpl.connect(
       host,
       port,
       sourceAddress: sourceAddress,
@@ -334,8 +345,11 @@ abstract class IOOverrides {
   /// `Socket.startConnect(...)`.
   Future<ConnectionTask<Socket>> socketStartConnect(host, int port,
       {sourceAddress}) {
-    return IODriver.current.socketsDriver
-        .startConnectSocket(host, port, sourceAddress: sourceAddress);
+    return SocketImpl.startConnect(
+      host,
+      port,
+      sourceAddress: sourceAddress,
+    );
   }
 }
 

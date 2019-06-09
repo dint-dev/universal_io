@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// This library provides _universal_io_ driver base classes.
+/// Useful classes and functions for implementing _dart:io_ drivers.
 library universal_io.driver.base;
 
 export 'src/driver_base/base_file_system_driver.dart';

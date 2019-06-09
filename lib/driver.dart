@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// This library contains _universal_io_ API for drivers.
+/// API for _dart:io_ drivers.
 library universal_io.driver;
 
 export 'src/driver/drivers.dart';

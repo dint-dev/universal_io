@@ -194,6 +194,7 @@ class Platform {
   /// If present, it specifies the directory where Dart packages are looked up.
   ///
   /// Is `null` if there is no `--package-root` flag.
+  @deprecated
   static String get packageRoot => PlatformDriver.current.packageRoot;
 
   /// The path separator used by the operating system to separate

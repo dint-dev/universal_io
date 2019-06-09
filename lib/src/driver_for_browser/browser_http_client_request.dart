@@ -18,12 +18,11 @@ import 'dart:typed_data';
 
 import 'package:universal_io/driver_base.dart';
 import 'package:universal_io/io.dart';
+import 'package:universal_io/utils.dart';
 
 import 'browser_http_client.dart';
 import 'browser_http_client_exception.dart';
 import 'browser_http_client_response.dart';
-
-import 'package:universal_io/utils.dart';
 
 /// Used by [BrowserHttpClient].
 class BrowserHttpClientRequest extends BaseHttpClientRequest {

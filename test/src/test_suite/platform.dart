@@ -1,5 +1,6 @@
-import 'package:universal_io/io.dart';
 import 'package:test/test.dart';
+import 'package:universal_io/io.dart';
+
 import 'platform_impl_default.dart'
     if (dart.library.html) 'platform_impl_browser.dart';
 

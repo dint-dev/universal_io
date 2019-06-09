@@ -128,7 +128,7 @@ abstract class Directory implements FileSystemEntity {
   factory Directory(String path) {
     final IOOverrides overrides = IOOverrides.current;
     if (overrides == null) {
-      return IODriver.current.fileSystemDriver.createDirectory(path);
+      return IODriver.current.fileSystemDriver.newDirectory(path);
     }
     return overrides.createDirectory(path);
   }

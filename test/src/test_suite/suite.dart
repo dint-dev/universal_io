@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import 'http_client.dart';
+import 'http_server.dart';
 import 'internet_address.dart';
 import 'platform.dart';
-import 'http_server.dart';
 import 'sockets.dart';
 
 void runTestSuite({

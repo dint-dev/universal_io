@@ -45,8 +45,9 @@
 // limitations under the License.
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:typed_data';
+
+import 'package:universal_io/driver_base.dart' show BaseIOSink;
 
 import '../io.dart';
 import 'socket.dart';
@@ -77,14 +78,29 @@ class SecureSocketImpl<T extends RawSecureSocket> extends SocketImpl<T>
 
 /// Internal [Socket] implementation that uses [RawSocket].
 class SocketImpl<T extends RawSocket> extends Stream<List<int>>
-    with IOSink
+    with BaseIOSink
     implements Socket {
   final T rawSocket;
 
   final StreamController<List<int>> _streamController =
       StreamController<List<int>>();
 
-  SocketImpl(this.rawSocket);
+  SocketImpl(this.rawSocket) {
+    _streamController.onListen = () {
+      final subscription = rawSocket.listen(
+        (event) {
+          if (event == RawSocketEvent.read) {
+            _streamController.add(rawSocket.read());
+          }
+        },
+        onError: addError,
+        onDone: _streamController.close,
+      );
+      _streamController.onPause = subscription.pause;
+      _streamController.onResume = subscription.resume;
+      _streamController.onCancel = subscription.cancel;
+    };
+  }
 
   @override
   InternetAddress get address => rawSocket.address;
@@ -114,24 +130,16 @@ class SocketImpl<T extends RawSocket> extends Stream<List<int>>
   }
 
   @override
-  Future addStream(Stream<List<int>> stream) {
-    return stream.listen((data) {
-      add(data);
-    }).asFuture();
-  }
-
-  @override
   Future close() async {
+    // ignore: unawaited_futures
+    _streamController.close();
     await rawSocket.close();
   }
 
   @override
   void destroy() {
-    rawSocket.close();
+    close();
   }
-
-  @override
-  Future flush() async {}
 
   @override
   Uint8List getRawOption(RawSocketOption option) =>
@@ -140,9 +148,7 @@ class SocketImpl<T extends RawSocket> extends Stream<List<int>>
   @override
   StreamSubscription<List<int>> listen(void onData(List<int> data),
       {Function onError, void onDone(), bool cancelOnError}) {
-    return rawSocket.map((event) {
-      return rawSocket.read();
-    }).listen(
+    return _streamController.stream.listen(
       onData,
       onError: onError,
       onDone: onDone,
@@ -160,23 +166,45 @@ class SocketImpl<T extends RawSocket> extends Stream<List<int>>
     rawSocket.setRawOption(option);
   }
 
-  @override
-  void write(Object obj) {
-    add(utf8.encode(obj.toString()));
+  static Future<Socket> connect(host, int port,
+      {sourceAddress, Duration timeout}) async {
+    final rawSocket = await RawSocket.connect(
+      host,
+      port,
+      sourceAddress: sourceAddress,
+      timeout: timeout,
+    );
+    return SocketImpl(rawSocket);
   }
 
-  @override
-  void writeAll(Iterable objects, [String separator = ""]) {
-    write(objects.join(separator));
+  static Future<ConnectionTask<Socket>> startConnect(host, int port,
+      {sourceAddress}) async {
+    final rawSocketConnectTask = await RawSocket.startConnect(
+      host,
+      port,
+      sourceAddress: sourceAddress,
+    );
+    final future =
+        rawSocketConnectTask.socket.then((rawSocket) => SocketImpl(rawSocket));
+    return _ConnectionTask<Socket>._(
+        socket: future,
+        onCancel: () {
+          rawSocketConnectTask.cancel();
+        });
   }
+}
 
-  @override
-  void writeCharCode(int charCode) {
-    write(String.fromCharCode(charCode));
-  }
+class _ConnectionTask<S> implements ConnectionTask<S> {
+  final Future<S> socket;
+  final void Function() _onCancel;
 
-  @override
-  void writeln([Object obj = ""]) {
-    write("${obj}\n");
+  _ConnectionTask._({Future<S> socket, void Function() onCancel()})
+      : assert(socket != null),
+        assert(onCancel != null),
+        this.socket = socket,
+        this._onCancel = onCancel;
+
+  void cancel() {
+    _onCancel();
   }
 }

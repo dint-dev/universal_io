@@ -418,7 +418,11 @@ abstract class FileSystemEntity {
     final String trimmedPath = _trimTrailingPathSeparators(path);
     final IOOverrides overrides = IOOverrides.current;
     if (overrides == null) {
-      return IODriver.current.fileSystemDriver.watch(path, events, recursive);
+      return IODriver.current.fileSystemDriver.watch(
+        path,
+        events: events,
+        recursive: recursive,
+      );
     }
     return overrides.fsWatch(trimmedPath, events, recursive);
   }
@@ -510,7 +514,10 @@ abstract class FileSystemEntity {
   /// caused by passing the wrong type of arguments to the function.
   static Future<FileSystemEntityType> type(String path,
       {bool followLinks = true}) {
-    return IODriver.current.fileSystemDriver.getType(path, followLinks);
+    return IODriver.current.fileSystemDriver.type(
+      path,
+      followLinks: followLinks,
+    );
   }
 
   /// Synchronously finds the type of file system object that a path points to.
@@ -525,7 +532,10 @@ abstract class FileSystemEntity {
   /// error or exception that may be thrown is ArgumentError,
   /// caused by passing the wrong type of arguments to the function.
   static FileSystemEntityType typeSync(String path, {bool followLinks = true}) {
-    return IODriver.current.fileSystemDriver.getTypeSync(path, followLinks);
+    return IODriver.current.fileSystemDriver.typeSync(
+      path,
+      followLinks: followLinks,
+    );
   }
 
   /// Checks if type(path, followLinks: false) returns FileSystemEntityType.link.

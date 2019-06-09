@@ -21,14 +21,13 @@ class BaseInternetAddressDriver extends InternetAddressDriver {
   const BaseInternetAddressDriver();
 
   @override
-  Future<List<InternetAddress>> lookupInternetAddress(String host,
+  Future<List<InternetAddress>> lookup(String host,
       {InternetAddressType type = InternetAddressType.any}) {
     throw UnimplementedError();
   }
 
   @override
-  Future<InternetAddress> reverseLookupInternetAddress(
-      InternetAddress address) {
+  Future<InternetAddress> reverseLookup(InternetAddress address) {
     throw UnimplementedError();
   }
 }

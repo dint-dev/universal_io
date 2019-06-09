@@ -15,39 +15,18 @@
 import 'dart:html' as html;
 
 import 'package:universal_io/driver.dart';
-import 'package:universal_io/driver_base.dart';
 import 'package:universal_io/io.dart';
 
 import 'browser_http_client.dart';
 
-/// Browser implementation of [IODriver].
+/// IO driver in browser.
 ///
-/// This class is automatically used by 'package:universal_io/io.dart' when
+/// This is automatically used by 'package:universal_io/io.dart' when
 /// you target browsers with Dart2js.
-class BrowserIODriver extends BaseIODriver {
-  BrowserIODriver(
-      {FileSystemDriver fileSystemDriver,
-      InternetAddressDriver internetAddressDriver,
-      HttpClientDriver httpClientDriver = const BrowserHttpClientDriver(),
-      HttpServerDriver httpServerDriver,
-      PlatformDriver platformDriver,
-      ProcessDriver processDriver,
-      SocketsDriver socketsDriver})
-      : super(
-          fileSystemDriver: fileSystemDriver,
-          internetAddressDriver: internetAddressDriver,
-          httpClientDriver: httpClientDriver,
-          httpServerDriver: httpServerDriver,
-          platformDriver: platformDriver ?? platformDriverFromEnvironment(),
-          processDriver: processDriver,
-          socketsDriver: socketsDriver,
-        );
-
-  /// Sets [BrowserIODriver] as the default driver.
-  static void enable() {
-    IODriver.zoneLocal.freezeDefaultValue(BrowserIODriver());
-  }
-}
+final IODriver browserIODriver = IODriver(
+  httpClientDriver: const BrowserHttpClientDriver(),
+  platformDriver: platformDriverFromEnvironment(),
+);
 
 PlatformDriver platformDriverFromEnvironment() {
   // Locale

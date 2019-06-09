@@ -11,26 +11,3 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-import 'package:universal_io/driver.dart';
-import 'package:universal_io/driver_base.dart';
-
-class BaseIODriver extends IODriver {
-  const BaseIODriver({
-    FileSystemDriver fileSystemDriver,
-    InternetAddressDriver internetAddressDriver,
-    HttpClientDriver httpClientDriver,
-    HttpServerDriver httpServerDriver,
-    PlatformDriver platformDriver = const PlatformDriver(),
-    ProcessDriver processDriver,
-    SocketsDriver socketsDriver = const BaseSocketsDriver(),
-  }) : super(
-          fileSystemDriver: fileSystemDriver,
-          internetAddressDriver: internetAddressDriver,
-          httpClientDriver: httpClientDriver,
-          httpServerDriver: httpServerDriver,
-          platformDriver: platformDriver,
-          processDriver: processDriver,
-          socketsDriver: socketsDriver,
-        );
-}

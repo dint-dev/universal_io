@@ -101,27 +101,11 @@ import 'package:universal_io/driver.dart';
 import 'package:universal_io/driver_base.dart';
 
 void main() {
-  IODriver.zoneLocal.freezeDefault(const ExampleDriver());
-  
-  // Now the APIs will use your driver.
-  final file = new File();
-  print(file is ExampleFile);
+  exampleIODriver.enable();
 }
 
-class ExampleDriver extends BaseDriver {
-  const ExampleDriver() : super(fileSystemDriver:const MyFileSystemDriver());
-}
-
-class ExampleFileSystemDriver extends BaseFileSystemDriver {
-  const ExampleFileSystemDriver();
-
-  @override
-  File newFile(String path) {
-    return new ExampleFile();
-  }
-}
-
-class ExampleFile extends BaseFile {
-  // ...
-}
+/// Let's change 'Platform' implementation (in browser).
+final exampleIODriver = IODriver(
+  platformDriver: PlatformDriver(localeName:"en-US"),
+).fillMissingFieldsFrom(defaultIODriver);
 ```

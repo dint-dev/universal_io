@@ -47,11 +47,11 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'internet_address.dart';
 import 'package:universal_io/src/driver/drivers_in_js.dart';
+import 'package:universal_io/src/io/io/socket_impl.dart';
 
 import '../io.dart';
-import 'socket_impl.dart';
+import 'internet_address.dart';
 
 // Copyright (c) 2013, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
@@ -128,7 +128,7 @@ abstract class NetworkInterface {
       {bool includeLoopback = false,
       bool includeLinkLocal = false,
       InternetAddressType type = InternetAddressType.any}) {
-    return IODriver.current.socketsDriver.listNetworkInterfaces(
+    return IODriver.current.networkInterfaceDriver.listNetworkInterfaces(
         includeLoopback: includeLoopback,
         includeLinkLocal: includeLinkLocal,
         type: type);
@@ -236,7 +236,7 @@ abstract class RawDatagramSocket extends Stream<RawSocketEvent> {
   /// port.
   static Future<RawDatagramSocket> bind(host, int port,
       {bool reuseAddress = true, bool reusePort = false, int ttl = 1}) async {
-    return IODriver.current.socketsDriver.bindRawDatagramSocket(
+    return IODriver.current.rawDatagramSocketDriver.bind(
       host,
       port,
       reuseAddress: reuseAddress,
@@ -299,7 +299,7 @@ abstract class RawServerSocket implements Stream<RawSocket> {
   /// distributed over multiple isolates this way.
   static Future<RawServerSocket> bind(address, int port,
       {int backlog = 0, bool v6Only = false, bool shared = false}) {
-    return IODriver.current.socketsDriver.bindRawServerSocket(
+    return IODriver.current.rawServerSocketDriver.bind(
       address,
       port,
       backlog: backlog,
@@ -410,7 +410,7 @@ abstract class RawSocket implements Stream<RawSocketEvent> {
   /// connection attempts to [host] are cancelled.
   static Future<RawSocket> connect(host, int port,
       {sourceAddress, Duration timeout}) {
-    return IODriver.current.socketsDriver.connectRawSocket(
+    return IODriver.current.rawSocketDriver.connect(
       host,
       port,
       sourceAddress: sourceAddress,
@@ -423,8 +423,8 @@ abstract class RawSocket implements Stream<RawSocketEvent> {
   /// longer needed.
   static Future<ConnectionTask<RawSocket>> startConnect(host, int port,
       {sourceAddress}) {
-    return IODriver.current.socketsDriver
-        .connectRawSocketStart(host, port, sourceAddress: sourceAddress);
+    return IODriver.current.rawSocketDriver
+        .startConnect(host, port, sourceAddress: sourceAddress);
   }
 }
 
@@ -698,13 +698,12 @@ abstract class Socket implements Stream<List<int>>, IOSink {
       {sourceAddress, Duration timeout}) async {
     final IOOverrides overrides = IOOverrides.current;
     if (overrides == null) {
-      final rawSocket = await RawSocket.connect(
+      return SocketImpl.connect(
         host,
         port,
         sourceAddress: sourceAddress,
         timeout: timeout,
       );
-      return SocketImpl(rawSocket);
     }
     return overrides.socketConnect(
       host,

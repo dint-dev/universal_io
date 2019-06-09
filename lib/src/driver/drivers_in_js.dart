@@ -39,6 +39,10 @@ export 'customization_in_js.dart';
 // Only imports are different.
 // --
 
+/// Implements static members of [FileSystemEntity], [File], [Directory],
+/// [Link], and [FileStat] as well as some instance members.
+///
+/// TODO: Refactor?
 abstract class FileSystemDriver {
   static FileSystemDriver get current => IODriver.current.fileSystemDriver;
 
@@ -46,17 +50,9 @@ abstract class FileSystemDriver {
 
   bool get isWatchSupported;
 
-  Directory createDirectory(String path);
-
-  File createFile(String path);
-
   Directory getCurrentDirectory();
 
   Directory getSystemTempDirectory();
-
-  Future<FileSystemEntityType> getType(String path, bool followLinks);
-
-  FileSystemEntityType getTypeSync(String path, bool followLinks);
 
   Future<bool> identicalPaths(String path0, String path1);
 
@@ -76,17 +72,15 @@ abstract class FileSystemDriver {
 
   Directory newDirectory(String path);
 
-  Directory newDirectoryFromRawPath(Uint8List path);
+  Directory newDirectoryFromRawPath(Uint8List rawPath);
 
   File newFile(String path);
 
-  File newFileFromRawPath(Uint8List path);
-
-  FileSystemEntity newFileSystemEntity(String path);
+  File newFileFromRawPath(Uint8List rawPath);
 
   Link newLink(String path);
 
-  Link newLinkFromRawPath(Uint8List path);
+  Link newLinkFromRawPath(Uint8List rawPath);
 
   void setCurrentDirectory(String path);
 
@@ -94,9 +88,15 @@ abstract class FileSystemDriver {
 
   FileStat statSync(String path);
 
-  Stream<FileSystemEvent> watch(String path, int events, bool recursive);
+  Future<FileSystemEntityType> type(String path, {bool followLinks});
+
+  FileSystemEntityType typeSync(String path, {bool followLinks});
+
+  Stream<FileSystemEvent> watch(String path,
+      {int events = FileSystemEvent.all, bool recursive = false});
 }
 
+/// Implements static members of [HttpClient].
 abstract class HttpClientDriver {
   static HttpClientDriver get current => IODriver.current.httpClientDriver;
 
@@ -105,6 +105,7 @@ abstract class HttpClientDriver {
   HttpClient newHttpClient({SecurityContext context});
 }
 
+/// Implements static members of [HttpServer].
 abstract class HttpServerDriver {
   const HttpServerDriver();
 
@@ -117,19 +118,22 @@ abstract class HttpServerDriver {
   });
 }
 
+/// Implements:
+///   * [InternetAddress.lookup]
+///   * [InternetAddress.reverse]
 abstract class InternetAddressDriver {
   const InternetAddressDriver();
 
-  Future<List<InternetAddress>> lookupInternetAddress(
+  Future<List<InternetAddress>> lookup(
     String host, {
     InternetAddressType type = InternetAddressType.any,
   });
 
-  Future<InternetAddress> reverseLookupInternetAddress(InternetAddress address);
+  Future<InternetAddress> reverseLookup(InternetAddress address);
 }
 
-/// A driver that implements 'dart:io' APIs.
-abstract class IODriver {
+/// Implements 'dart:io' APIs.
+class IODriver {
   /// Access to zone-local instance of [IODriver].
   static final ZoneLocal<IODriver> zoneLocal = ZoneLocal<IODriver>(
     // ignore: unnecessary_cast
@@ -147,19 +151,88 @@ abstract class IODriver {
   final InternetAddressDriver internetAddressDriver;
   final PlatformDriver platformDriver;
   final ProcessDriver processDriver;
-  final SocketsDriver socketsDriver;
+  final RawDatagramSocketDriver rawDatagramSocketDriver;
+  final RawSocketDriver rawSocketDriver;
+  final RawServerSocketDriver rawServerSocketDriver;
+  final RawSecureSocketDriver rawSecureSocketDriver;
+  final RawSecureServerSocketDriver rawSecureServerSocketDriver;
+  final NetworkInterfaceDriver networkInterfaceDriver;
 
+  /// Constructs a new driver.
   const IODriver({
+    this.fileSystemDriver,
+    this.httpClientDriver,
+    this.httpServerDriver,
+    this.internetAddressDriver,
+    this.platformDriver,
+    this.processDriver,
+    this.networkInterfaceDriver,
+    this.rawDatagramSocketDriver,
+    this.rawSocketDriver,
+    this.rawServerSocketDriver,
+    this.rawSecureSocketDriver,
+    this.rawSecureServerSocketDriver,
+  });
+
+  /// Like the default constructor, but all parameters have been annotated with
+  /// @required.
+  const IODriver.requireAll({
     @required this.fileSystemDriver,
     @required this.httpClientDriver,
     @required this.httpServerDriver,
     @required this.internetAddressDriver,
     @required this.platformDriver,
     @required this.processDriver,
-    @required this.socketsDriver,
+    @required this.networkInterfaceDriver,
+    @required this.rawDatagramSocketDriver,
+    @required this.rawSocketDriver,
+    @required this.rawServerSocketDriver,
+    @required this.rawSecureSocketDriver,
+    @required this.rawSecureServerSocketDriver,
+  });
+
+  void enable() {
+    IODriver.zoneLocal.freezeDefaultValue(this);
+  }
+
+  /// Returns a new instance where null fields have been replaced with values
+  /// from the argument.
+  IODriver withMissingFeaturesFrom(IODriver driver) {
+    return IODriver.requireAll(
+      fileSystemDriver: fileSystemDriver ?? driver.fileSystemDriver,
+      httpClientDriver: httpClientDriver ?? driver.httpClientDriver,
+      httpServerDriver: httpServerDriver ?? driver.httpServerDriver,
+      internetAddressDriver:
+          internetAddressDriver ?? driver.internetAddressDriver,
+      platformDriver: platformDriver ?? driver.platformDriver,
+      processDriver: processDriver ?? driver.processDriver,
+      networkInterfaceDriver:
+          networkInterfaceDriver ?? driver.networkInterfaceDriver,
+      rawDatagramSocketDriver:
+          rawDatagramSocketDriver ?? driver.rawDatagramSocketDriver,
+      rawSocketDriver: rawSocketDriver ?? driver.rawSocketDriver,
+      rawServerSocketDriver:
+          rawServerSocketDriver ?? driver.rawServerSocketDriver,
+      rawSecureSocketDriver:
+          rawSecureSocketDriver ?? driver.rawSecureSocketDriver,
+      rawSecureServerSocketDriver:
+          rawSecureServerSocketDriver ?? driver.rawSecureServerSocketDriver,
+    );
+  }
+}
+
+/// Implements static members of [NetworkInterface].
+abstract class NetworkInterfaceDriver {
+  const NetworkInterfaceDriver();
+
+  Future<List<NetworkInterface>> listNetworkInterfaces({
+    bool includeLoopback = false,
+    bool includeLinkLocal = false,
+    InternetAddressType type = InternetAddressType.any,
   });
 }
 
+/// Implements static members of [Platform].
 class PlatformDriver {
   static PlatformDriver get current => IODriver.current.platformDriver;
 
@@ -202,6 +275,7 @@ class PlatformDriver {
   });
 }
 
+/// Implements static members of [Process].
 abstract class ProcessDriver {
   static ProcessDriver get current => IODriver.current.processDriver;
 
@@ -235,18 +309,24 @@ abstract class ProcessDriver {
       ProcessStartMode mode = ProcessStartMode.normal});
 }
 
-abstract class SocketsDriver {
-  const SocketsDriver();
+/// Implements static members of [RawDatagramSocket].
+abstract class RawDatagramSocketDriver {
+  const RawDatagramSocketDriver();
 
-  Future<RawDatagramSocket> bindRawDatagramSocket(
+  Future<RawDatagramSocket> bind(
     host,
     int port, {
     bool reuseAddress = true,
     bool reusePort = false,
     int ttl = 1,
   });
+}
 
-  Future<RawSecureServerSocket> bindRawSecureServerSocket(
+/// Implements static members of [RawSecureServerSocket].
+abstract class RawSecureServerSocketDriver {
+  const RawSecureServerSocketDriver();
+
+  Future<RawSecureServerSocket> bind(
     address,
     int port,
     SecurityContext context, {
@@ -257,16 +337,13 @@ abstract class SocketsDriver {
     List<String> supportedProtocols,
     bool shared = false,
   });
+}
 
-  Future<RawServerSocket> bindRawServerSocket(
-    address,
-    int port, {
-    int backlog = 0,
-    bool v6Only = false,
-    bool shared = false,
-  });
+/// Implements static members of [RawSecureSocket].
+abstract class RawSecureSocketDriver {
+  const RawSecureSocketDriver();
 
-  Future<RawSecureSocket> connectRawSecureSocket(
+  Future<RawSecureSocket> connect(
     host,
     int port, {
     SecurityContext context,
@@ -275,37 +352,7 @@ abstract class SocketsDriver {
     Duration timeout,
   });
 
-  Future<ConnectionTask<RawSecureSocket>> connectRawSecureSocketStart(
-    host,
-    int port, {
-    SecurityContext context,
-    bool onBadCertificate(X509Certificate certificate),
-    List<String> supportedProtocols,
-  });
-
-  Future<RawSocket> connectRawSocket(
-    host,
-    int port, {
-    sourceAddress,
-    Duration timeout,
-  });
-
-  Future<ConnectionTask<RawSocket>> connectRawSocketStart(
-    host,
-    int port, {
-    sourceAddress,
-  });
-
-  Future<Socket> connectSocket(host, int port,
-      {sourceAddress, Duration timeout});
-
-  Future<List<NetworkInterface>> listNetworkInterfaces({
-    bool includeLoopback = false,
-    bool includeLinkLocal = false,
-    InternetAddressType type = InternetAddressType.any,
-  });
-
-  Future<RawSecureSocket> newSecureRawSocket(
+  Future<RawSecureSocket> secure(
     RawSocket socket, {
     StreamSubscription<RawSocketEvent> subscription,
     host,
@@ -314,7 +361,7 @@ abstract class SocketsDriver {
     List<String> supportedProtocols,
   });
 
-  Future<RawSecureSocket> newSecureServerRawSocket(
+  Future<RawSecureSocket> secureServer(
     RawSocket socket,
     SecurityContext context, {
     StreamSubscription<RawSocketEvent> subscription,
@@ -324,6 +371,42 @@ abstract class SocketsDriver {
     List<String> supportedProtocols,
   });
 
-  Future<ConnectionTask<Socket>> startConnectSocket(host, int port,
-      {sourceAddress});
+  Future<ConnectionTask<RawSecureSocket>> startConnect(
+    host,
+    int port, {
+    SecurityContext context,
+    bool onBadCertificate(X509Certificate certificate),
+    List<String> supportedProtocols,
+  });
+}
+
+/// Implements static members of [RawServerSocket] and [ServerSocket].
+abstract class RawServerSocketDriver {
+  const RawServerSocketDriver();
+
+  Future<RawServerSocket> bind(
+    address,
+    int port, {
+    int backlog = 0,
+    bool v6Only = false,
+    bool shared = false,
+  });
+}
+
+/// Implements static members of [RawSocket] and [Socket].
+abstract class RawSocketDriver {
+  const RawSocketDriver();
+
+  Future<RawSocket> connect(
+    host,
+    int port, {
+    sourceAddress,
+    Duration timeout,
+  });
+
+  Future<ConnectionTask<RawSocket>> startConnect(
+    host,
+    int port, {
+    sourceAddress,
+  });
 }

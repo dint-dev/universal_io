@@ -12,15 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'drivers_in_vm.dart'; // <--- IMPORTANT
-import 'package:universal_io/src/internal/ip_utils.dart';
 import 'dart:io';
+
+import 'package:universal_io/src/internal/ip_utils.dart';
+import '../driver_for_vm/vm_io_driver.dart';
+
+import 'drivers_in_vm.dart'; // <--- IMPORTANT
 
 /// Determines the default IODriver:
 ///   * _BrowserIODriver_ in browser (when 'dart:html' is available).
 ///   * _BaseIODriver_ in Javascript targets such as Node.JS.
 ///   * Null otherwise (VM, Flutter).
-final IODriver defaultIODriver = null;
+final IODriver defaultIODriver = vmIODriver;
 
 /// Constructs [InternetAddress] from bytes and/or string. You can optionally
 /// specify a hostname too.

@@ -55,4 +55,7 @@ abstract class BaseIOSink implements IOSink {
     }
     write("\n");
   }
+
+  @override
+  Encoding encoding = utf8;
 }
