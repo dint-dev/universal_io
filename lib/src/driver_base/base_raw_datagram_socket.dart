@@ -39,6 +39,9 @@ abstract class BaseRawDatagramSocket extends Stream<RawSocketEvent>
   @override
   int multicastHops = 1;
 
+  @override
+  NetworkInterface multicastInterface;
+
   BaseRawDatagramSocket() {
     this.readEventsEnabled = true;
     this.writeEventsEnabled = true;

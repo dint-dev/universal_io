@@ -1,6 +1,8 @@
+# 0.5.2
+  * Fixed a small bug in RawDatagramSocket.
+
 # 0.5.1
   * Fixed small bugs.
-  
   
 # 0.5.0
   * Fixed various bugs.

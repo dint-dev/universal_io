@@ -166,6 +166,16 @@ abstract class RawDatagramSocket extends Stream<RawSocketEvent> {
   /// the local network.
   int multicastHops;
 
+  /// Set or get, the network interface used for outgoing multicast packages.
+  ///
+  /// A value of `null`indicate that the system chooses the network
+  /// interface to use.
+  ///
+  /// By default this value is `null`
+  @Deprecated("This property is not implemented. Use getRawOption and "
+      "setRawOption instead.")
+  NetworkInterface multicastInterface;
+
   /// Set or get, whether IPv4 broadcast is enabled.
   ///
   /// IPv4 broadcast needs to be enabled by the sender for sending IPv4
