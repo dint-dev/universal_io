@@ -148,7 +148,7 @@ abstract class Directory implements FileSystemEntity {
   static Directory get current {
     final IOOverrides overrides = IOOverrides.current;
     if (overrides == null) {
-      return IODriver.current.fileSystemDriver.getCurrentDirectory();
+      return IODriver.current.fileSystemDriver.currentDirectory;
     }
     return overrides.getCurrentDirectory();
   }
@@ -179,7 +179,7 @@ abstract class Directory implements FileSystemEntity {
   static set current(path) {
     final IOOverrides overrides = IOOverrides.current;
     if (overrides == null) {
-      IODriver.current.fileSystemDriver.setCurrentDirectory(path);
+      IODriver.current.fileSystemDriver.currentDirectory = path;
       return;
     }
     overrides.setCurrentDirectory(path);
@@ -214,7 +214,7 @@ abstract class Directory implements FileSystemEntity {
   static Directory get systemTemp {
     final IOOverrides overrides = IOOverrides.current;
     if (overrides == null) {
-      return IODriver.current.fileSystemDriver.getSystemTempDirectory();
+      return IODriver.current.fileSystemDriver.systemTempDirectory;
     }
     return overrides.getSystemTempDirectory();
   }

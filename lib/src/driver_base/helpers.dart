@@ -34,3 +34,20 @@ Future<InternetAddress> resolveHostOrInternetAddress(Object host) async {
     throw ArgumentError.value(host);
   }
 }
+
+class BaseConnectionTask<S> implements ConnectionTask<S> {
+  @override
+  final Future<S> socket;
+  final void Function() _onCancel;
+
+  BaseConnectionTask({Future<S> socket, void Function() onCancel})
+      : assert(socket != null),
+        assert(onCancel != null),
+        this.socket = socket,
+        this._onCancel = onCancel;
+
+  @override
+  void cancel() {
+    _onCancel();
+  }
+}

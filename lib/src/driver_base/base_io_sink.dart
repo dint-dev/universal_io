@@ -20,6 +20,9 @@ import 'package:universal_io/io.dart';
 /// An internal helper for [IOSink] subclasses.
 abstract class BaseIOSink implements IOSink {
   @override
+  Encoding encoding = utf8;
+
+  @override
   Future addStream(Stream<List<int>> stream) {
     return stream.listen((data) {
       add(data);
@@ -55,7 +58,4 @@ abstract class BaseIOSink implements IOSink {
     }
     write("\n");
   }
-
-  @override
-  Encoding encoding = utf8;
 }

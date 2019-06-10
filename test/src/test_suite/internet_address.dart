@@ -23,7 +23,15 @@ import 'package:universal_io/io.dart';
 
 void testInternetAddress() {
   group("InternetAddress", () {
-    group("Parsing/printing IPv4", () {
+    test("InternetAddress.loopbackIPv4", () {
+      expect(InternetAddress.loopbackIPv4.address, "127.0.0.1");
+    });
+
+    test("InternetAddress.loopbackIPv6", () {
+      expect(InternetAddress.loopbackIPv6.address, "::1");
+    });
+
+    group("InternetAddress('{ipv4}')", () {
       test("255.0.254.1", () {
         final address = InternetAddress("255.0.254.1");
         expect(address.rawAddress[0], 255);
@@ -34,7 +42,7 @@ void testInternetAddress() {
       });
     });
 
-    group("ParsingIPv6", () {
+    group("InternetAddress('{ipv6}')", () {
       test("'0123:4567:89ab:cdef:0123:4567:89ab:cdef'", () {
         final actual = InternetAddress(
           "0123:4567:89ab:cdef:0123:4567:89ab:cdef",
@@ -100,7 +108,11 @@ void testInternetAddress() {
       });
     });
 
-    group("Printing IPv6", () {
+    test("address (IPv4)", () {
+      expect(InternetAddress("0.1.2.9").address, "0.1.2.9");
+    });
+
+    group("address (IPv6)", () {
       // Parses bytes of IP address.
       // constructs an InternetAddress only from the bytes,
       // and returns its address string.
@@ -145,10 +157,6 @@ void testInternetAddress() {
       });
     });
 
-    test("address", () {
-      expect(InternetAddress("0.1.2.9").address, "0.1.2.9");
-    });
-
     test("host", () {
       expect(InternetAddress("0.1.2.9").host, "0.1.2.9");
     });
@@ -169,7 +177,7 @@ void testInternetAddress() {
       expect(InternetAddress("::1").isLoopback, isTrue);
     });
 
-    test("rawAddress", () {
+    test("rawAddress (IPv4)", () {
       expect(InternetAddress("10.0.0.1").rawAddress, [10, 0, 0, 1]);
     });
   });

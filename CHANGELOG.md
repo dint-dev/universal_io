@@ -1,3 +1,6 @@
+# 0.7.0
+  * Improved driver base classes and the test suite.
+  
 # 0.6.0
   * Major refactoring of IODriver API.
 

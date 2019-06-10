@@ -22,16 +22,6 @@ import 'package:universal_io/io.dart';
 import 'base_io_sink.dart';
 import 'http_headers_impl.dart';
 
-class BaseHttpServerDriver extends HttpServerDriver {
-  const BaseHttpServerDriver();
-
-  @override
-  Future<HttpServer> bindHttpServer(address, int port,
-      {int backlog = 0, bool v6Only = false, bool shared = false}) {
-    throw UnimplementedError();
-  }
-}
-
 abstract class BaseHttpRequest extends Stream<List<int>>
     implements HttpRequest {
   @override
@@ -62,9 +52,17 @@ abstract class BaseHttpRequest extends Stream<List<int>>
     return null;
   }
 
+  List<Cookie> _cookies;
+
   @override
   List<Cookie> get cookies {
-    throw UnimplementedError();
+    if (_cookies == null) {
+      _cookies = <Cookie>[];
+      for (var item in headers["Cookie"]) {
+        _cookies.add(Cookie.fromSetCookieValue(item));
+      }
+    }
+    return _cookies;
   }
 
   @override
@@ -123,16 +121,14 @@ abstract class BaseHttpResponse extends BaseIOSink implements HttpResponse {
   }
 
   @override
-  List<Cookie> get cookies {
-    throw UnimplementedError();
-  }
+  final List<Cookie> cookies = <Cookie>[];
 
   @override
   Future get done => _completer.future;
 
   @override
   void add(List<int> data) {
-    final future = internallyAdd(data);
+    final future = didAdd(data);
     _futures.add(future);
   }
 
@@ -156,8 +152,9 @@ abstract class BaseHttpResponse extends BaseIOSink implements HttpResponse {
     throw UnimplementedError();
   }
 
+  /// A protected method only for implementations.
   @protected
-  Future<void> internallyAdd(List<int> data);
+  Future<void> didAdd(List<int> data);
 
   @override
   Future redirect(Uri location, {int status = HttpStatus.movedTemporarily}) {
@@ -187,5 +184,32 @@ abstract class BaseHttpServer extends Stream<HttpRequest>
   @override
   HttpConnectionsInfo connectionsInfo() {
     return HttpConnectionsInfo();
+  }
+
+  @protected
+  final StreamController<HttpRequest> streamController =
+      StreamController<HttpRequest>();
+
+  @protected
+  Future didClose({bool force = false});
+
+  Future close({bool force = false}) async {
+    if (streamController.isClosed) {
+      return;
+    }
+    // ignore: unawaited_futures
+    streamController.close();
+    await didClose(force: force);
+  }
+
+  @override
+  StreamSubscription<HttpRequest> listen(void onData(HttpRequest event),
+      {Function onError, void onDone(), bool cancelOnError}) {
+    return streamController.stream.listen(
+      onData,
+      onError: onError,
+      onDone: onDone,
+      cancelOnError: cancelOnError,
+    );
   }
 }

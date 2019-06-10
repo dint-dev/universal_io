@@ -48,50 +48,69 @@ abstract class FileSystemDriver {
 
   const FileSystemDriver();
 
+  /// For [Directory.current].
+  Directory get currentDirectory;
+
+  /// For [Directory.current].
+  set currentDirectory(Directory directory);
+
   bool get isWatchSupported;
 
-  Directory getCurrentDirectory();
-
-  Directory getSystemTempDirectory();
+  /// For [Directory.systemTemp].
+  Directory get systemTempDirectory;
 
   Future<bool> identicalPaths(String path0, String path1);
 
   bool identicalPathsSync(String path0, String path1);
 
+  /// For [FileSystemEntity.isDirectory].
   Future<bool> isDirectory(String path);
 
+  /// For [FileSystemEntity.isDirectorySync].
   bool isDirectorySync(String path);
 
+  /// For [FileSystemEntity.isFile].
   Future<bool> isFile(String path);
 
+  /// For [FileSystemEntity.isFileSync].
   bool isFileSync(String path);
 
+  /// For [FileSystemEntity.isLink].
   Future<bool> isLink(String path);
 
+  /// For [FileSystemEntity.isLinkSync].
   bool isLinkSync(String path);
 
+  /// For [Directory].
   Directory newDirectory(String path);
 
+  /// For [Directory.fromRawPath].
   Directory newDirectoryFromRawPath(Uint8List rawPath);
 
+  /// For [File].
   File newFile(String path);
 
+  /// For [File.fromRawPath].
   File newFileFromRawPath(Uint8List rawPath);
 
+  /// For [Link].
   Link newLink(String path);
 
   Link newLinkFromRawPath(Uint8List rawPath);
 
-  void setCurrentDirectory(String path);
-
+  /// For [FileStat.stat].
   Future<FileStat> stat(String path);
 
+  /// For [FileStat.statSync].
   FileStat statSync(String path);
 
+  /// For [FileSystemEntity.type].
   Future<FileSystemEntityType> type(String path, {bool followLinks});
 
+  /// For [FileSystemEntity.typeSync].
   FileSystemEntityType typeSync(String path, {bool followLinks});
 
+  /// For [FileSystemEntity.watch].
   Stream<FileSystemEvent> watch(String path,
       {int events = FileSystemEvent.all, bool recursive = false});
 }
@@ -281,14 +300,47 @@ abstract class ProcessDriver {
 
   const ProcessDriver();
 
+  /// For [Process.run].
   Future<ProcessResult> run(String executable, List<String> arguments,
       {String workingDirectory,
       Map<String, String> environment,
       bool includeParentEnvironment = true,
       bool runInShell = false,
       Encoding stdoutEncoding = systemEncoding,
-      Encoding stderrEncoding = systemEncoding});
+      Encoding stderrEncoding = systemEncoding}) async {
+    final process = await start(
+      executable,
+      arguments,
+      workingDirectory: workingDirectory,
+      environment: environment,
+      includeParentEnvironment: includeParentEnvironment,
+      runInShell: runInShell,
+    );
+    final exitCode = await process.exitCode;
+    var stdout;
+    if (stdoutEncoding == null) {
+      final buffer = BytesBuilder();
+      process.stdout.listen((data) {
+        buffer.add(data);
+      });
+      stdout = buffer.toBytes();
+    } else {
+      stdout = await stdoutEncoding.decodeStream(process.stdout);
+    }
+    var stderr;
+    if (stderrEncoding == null) {
+      final buffer = BytesBuilder();
+      process.stderr.listen((data) {
+        buffer.add(data);
+      });
+      stderr = buffer.toBytes();
+    } else {
+      stderr = await stderrEncoding.decodeStream(process.stderr);
+    }
+    return ProcessResult(process.pid, exitCode, stdout, stderr);
+  }
 
+  /// For [Process.runSync].
   ProcessResult runSync(String executable, List<String> arguments,
       {String workingDirectory,
       Map<String, String> environment,
@@ -301,6 +353,7 @@ abstract class ProcessDriver {
     );
   }
 
+  /// For [Process.start].
   Future<Process> start(String executable, List<String> arguments,
       {String workingDirectory,
       Map<String, String> environment,
@@ -313,6 +366,7 @@ abstract class ProcessDriver {
 abstract class RawDatagramSocketDriver {
   const RawDatagramSocketDriver();
 
+  /// For [RawDatagramSocket.bind].
   Future<RawDatagramSocket> bind(
     host,
     int port, {
@@ -343,6 +397,7 @@ abstract class RawSecureServerSocketDriver {
 abstract class RawSecureSocketDriver {
   const RawSecureSocketDriver();
 
+  /// For [RawSecureSocket.connect].
   Future<RawSecureSocket> connect(
     host,
     int port, {
@@ -350,8 +405,24 @@ abstract class RawSecureSocketDriver {
     bool onBadCertificate(X509Certificate certificate),
     List<String> supportedProtocols,
     Duration timeout,
-  });
+  }) async {
+    final connectionTask = await startConnect(
+      host,
+      port,
+      context: context,
+      onBadCertificate: onBadCertificate,
+      supportedProtocols: supportedProtocols,
+    );
+    if (timeout == null) {
+      return connectionTask.socket;
+    }
+    return connectionTask.socket.timeout(timeout, onTimeout: () {
+      connectionTask.cancel();
+      throw TimeoutException("RawSecureSocket.connect(...) timeout");
+    });
+  }
 
+  /// For [RawSecureSocket.secure].
   Future<RawSecureSocket> secure(
     RawSocket socket, {
     StreamSubscription<RawSocketEvent> subscription,
@@ -361,6 +432,7 @@ abstract class RawSecureSocketDriver {
     List<String> supportedProtocols,
   });
 
+  /// For [RawSecureSocket.secureServer].
   Future<RawSecureSocket> secureServer(
     RawSocket socket,
     SecurityContext context, {
@@ -371,19 +443,38 @@ abstract class RawSecureSocketDriver {
     List<String> supportedProtocols,
   });
 
+  /// For [RawSecureSocket.startConnect].
   Future<ConnectionTask<RawSecureSocket>> startConnect(
     host,
     int port, {
     SecurityContext context,
     bool onBadCertificate(X509Certificate certificate),
     List<String> supportedProtocols,
-  });
+  }) async {
+    final socketConnectionTask = await RawSocket.startConnect(host, port);
+    final secureSocketFuture = socketConnectionTask.socket.then((rawSocket) {
+      return secure(
+        rawSocket,
+        host: host,
+        context: context,
+        onBadCertificate: onBadCertificate,
+        supportedProtocols: supportedProtocols,
+      );
+    });
+    return _ConnectionTask(
+      socket: secureSocketFuture,
+      onCancel: () {
+        socketConnectionTask.cancel();
+      },
+    );
+  }
 }
 
 /// Implements static members of [RawServerSocket] and [ServerSocket].
 abstract class RawServerSocketDriver {
   const RawServerSocketDriver();
 
+  /// For [RawServerSocket.bind].
   Future<RawServerSocket> bind(
     address,
     int port, {
@@ -397,16 +488,48 @@ abstract class RawServerSocketDriver {
 abstract class RawSocketDriver {
   const RawSocketDriver();
 
+  /// For [RawSocket.connect].
   Future<RawSocket> connect(
     host,
     int port, {
     sourceAddress,
     Duration timeout,
-  });
+  }) async {
+    final connectionTask = await startConnect(
+      host,
+      port,
+      sourceAddress: sourceAddress,
+    );
+    if (timeout == null) {
+      return connectionTask.socket;
+    }
+    return connectionTask.socket.timeout(timeout, onTimeout: () {
+      connectionTask.cancel();
+      throw TimeoutException("RawSocket.connect(...) timeout");
+    });
+  }
 
+  /// For [RawSocket.startConnect].
   Future<ConnectionTask<RawSocket>> startConnect(
     host,
     int port, {
     sourceAddress,
   });
+}
+
+class _ConnectionTask<S> implements ConnectionTask<S> {
+  @override
+  final Future<S> socket;
+  final void Function() _onCancel;
+
+  _ConnectionTask({Future<S> socket, void Function() onCancel})
+      : assert(socket != null),
+        assert(onCancel != null),
+        this.socket = socket,
+        this._onCancel = onCancel;
+
+  @override
+  void cancel() {
+    _onCancel();
+  }
 }

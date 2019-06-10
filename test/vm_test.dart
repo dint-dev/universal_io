@@ -16,14 +16,10 @@
 @Timeout(Duration(seconds: 5))
 import 'package:test/test.dart';
 
-import 'src/test_suite/suite.dart';
+import 'src/test_suite/all.dart';
 
 void main() {
   group("Test suite in VM (validates that tests pass with 'dart:io'):", () {
-    runTestSuite(
-      httpClient: true,
-      httpServer: true,
-      sockets: true,
-    );
+    testAll();
   });
 }

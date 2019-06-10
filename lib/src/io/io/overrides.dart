@@ -48,8 +48,8 @@ import 'dart:async';
 
 import 'package:universal_io/src/driver/drivers_in_js.dart';
 
-import 'socket_impl.dart';
 import '../io.dart';
+import 'socket_impl.dart';
 
 final _ioOverridesToken = Object();
 
@@ -201,7 +201,7 @@ abstract class IOOverrides {
   /// When this override is installed, this function overrides the behavior of
   /// the static getter `Directory.current`
   Directory getCurrentDirectory() {
-    return IODriver.current.fileSystemDriver.getCurrentDirectory();
+    return IODriver.current.fileSystemDriver.currentDirectory;
   }
 
   /// Sets the current working directory to be [path].
@@ -209,7 +209,7 @@ abstract class IOOverrides {
   /// When this override is installed, this function overrides the behavior of
   /// the setter `Directory.current`.
   void setCurrentDirectory(String path) {
-    return IODriver.current.fileSystemDriver.setCurrentDirectory(path);
+    IODriver.current.fileSystemDriver.currentDirectory = Directory(path);
   }
 
   /// Returns the system temporary directory.
@@ -217,7 +217,7 @@ abstract class IOOverrides {
   /// When this override is installed, this function overrides the behavior of
   /// `Directory.systemTemp`.
   Directory getSystemTempDirectory() {
-    return IODriver.current.fileSystemDriver.getSystemTempDirectory();
+    return IODriver.current.fileSystemDriver.systemTempDirectory;
   }
 
   // File

@@ -14,9 +14,40 @@
 
 import 'dart:async';
 
+import 'package:meta/meta.dart';
 import 'package:universal_io/io.dart';
 
 abstract class BaseRawServerSocket extends Stream<RawSocket>
     implements RawServerSocket {
+  @protected
+  final StreamController<RawSocket> streamController =
+      StreamController<RawSocket>();
+
+  bool _isClosed = false;
+
   BaseRawServerSocket();
+
+  @override
+  Future<RawServerSocket> close() async {
+    if (_isClosed) {
+      return this;
+    }
+    _isClosed = true;
+    didClose();
+    return this;
+  }
+
+  @protected
+  FutureOr didClose();
+
+  @override
+  StreamSubscription<RawSocket> listen(void onData(RawSocket event),
+      {Function onError, void onDone(), bool cancelOnError}) {
+    return streamController.stream.listen(
+      onData,
+      onError: onError,
+      onDone: onDone,
+      cancelOnError: cancelOnError,
+    );
+  }
 }

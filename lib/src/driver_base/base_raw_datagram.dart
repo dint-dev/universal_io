@@ -49,40 +49,68 @@ abstract class BaseRawDatagramSocket extends Stream<RawSocketEvent>
     this.multicastHops = 1;
   }
 
+  @mustCallSuper
   @override
   void close() {
-    internallyClose();
+    if (_streamController.isClosed) {
+      return;
+    }
     _streamController.add(RawSocketEvent.closed);
+    _streamController.close();
+    didClose();
+  }
+
+  /// A protected method only for implementations.
+  @protected
+  void didClose();
+
+  /// A protected method only for implementations.
+  ///
+  /// This method is called when a valid datagram is sent.
+  @protected
+  int didSend(List<int> buffer, InternetAddress address, int port);
+
+  /// A protected method only for implementations.
+  ///
+  /// Dispatches an error.
+  @protected
+  void dispatchError(Object error) {
+    _streamController.addError(error);
+  }
+
+  /// A protected method only for implementations.
+  ///
+  /// Dispatches [RawSocketEvent.readClosed].
+  @protected
+  void dispatchReadClosedEvent() {
+    _streamController.add(RawSocketEvent.readClosed);
+  }
+
+  /// A protected method only for implementations.
+  ///
+  /// Dispatches [RawSocketEvent.read] and adds datagram to the queue.
+  @protected
+  void dispatchReadEvent(Datagram datagram) {
+    _streamController.add(RawSocketEvent.read);
+    _queue.add(datagram);
   }
 
   @override
   Uint8List getRawOption(RawSocketOption option) {
     throw OSError(
-        "getRawSocketOption(...) is unsupported by the socket implementation");
+      "getRawSocketOption(...) is unsupported by $this",
+    );
   }
-
-  @protected
-  void internallyAddReceived(Datagram datagram) {
-    _streamController.add(RawSocketEvent.read);
-    _queue.add(datagram);
-  }
-
-  @protected
-  void internallyAddReceivedError(Object error) {
-    _streamController.addError(error);
-  }
-
-  @protected
-  void internallyClose();
-
-  @protected
-  int internallySend(List<int> buffer, InternetAddress address, int port);
 
   @override
-  void joinMulticast(InternetAddress group, [NetworkInterface interface]) {}
+  void joinMulticast(InternetAddress group, [NetworkInterface interface]) {
+    throw UnimplementedError();
+  }
 
   @override
-  void leaveMulticast(InternetAddress group, [NetworkInterface interface]) {}
+  void leaveMulticast(InternetAddress group, [NetworkInterface interface]) {
+    throw UnimplementedError();
+  }
 
   @override
   StreamSubscription<RawSocketEvent> listen(void onData(RawSocketEvent event),
@@ -104,12 +132,13 @@ abstract class BaseRawDatagramSocket extends Stream<RawSocketEvent>
       _streamController.add(RawSocketEvent.write);
       writeEventsEnabled = false;
     }
-    return internallySend(buffer, address, port);
+    return didSend(buffer, address, port);
   }
 
   @override
   void setRawOption(RawSocketOption option) {
     throw OSError(
-        "setRawSocketOption(...) is unsupported by the socket implementation");
+      "setRawSocketOption(...) is unsupported by $this",
+    );
   }
 }

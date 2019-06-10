@@ -16,14 +16,12 @@
 library universal_io.driver.base;
 
 export 'src/driver_base/base_file_system_driver.dart';
-export 'src/driver_base/base_http_client_driver.dart';
-export 'src/driver_base/base_http_server_driver.dart';
-export 'src/driver_base/base_internet_address_driver.dart';
+export 'src/driver_base/base_http_client.dart';
+export 'src/driver_base/base_http_server.dart';
 export 'src/driver_base/base_io_sink.dart';
-export 'src/driver_base/base_raw_datagram_socket.dart';
+export 'src/driver_base/base_raw_datagram.dart';
 export 'src/driver_base/base_raw_server_socket.dart';
 export 'src/driver_base/base_raw_socket.dart';
-export 'src/driver_base/base_sockets_driver.dart';
+export 'src/driver_base/helpers.dart';
 export 'src/driver_base/base_std_out.dart';
-export 'src/driver_base/driver.dart';
 export 'src/driver_base/http_headers_impl.dart';

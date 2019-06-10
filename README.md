@@ -12,14 +12,13 @@ code files that were derived from Dart SDK).
 
 ## Similar packages
   * [universal_html](https://pub.dev/packages/universal_html) (cross-platform _dart:html_)
-  * [node_io](https://pub.dev/packages/node_io)
 
 # Getting started
 ## 1.Add a dependency
 In `pubspec.yaml`:
 ```yaml
 dependencies:
-  universal_io: '>=0.5.1 <2.0.0'
+  universal_io: '>=0.7.0 <2.0.0'
 ```
 
 ## 2. Choose a driver (optional)
@@ -36,7 +35,7 @@ dependencies:
 ### Chrome OS App?
   * [universal_io_driver_chrome_os](https://github.com/terrier989/dart-universal_io_driver_chrome_os)
 
-### Node.JS? Google Cloud Functions?
+### Node.JS?
   * [universal_io_driver_node](https://github.com/terrier989/dart-universal_io_driver_node)
 
 ### GRPC messaging?

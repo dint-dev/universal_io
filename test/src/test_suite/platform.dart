@@ -14,5 +14,5 @@ void testPlatform() {
 
     // Run tests that only work in browser
     testPlatformInBrowser();
-  });
+  }, timeout: Timeout(Duration(seconds: 1)));
 }

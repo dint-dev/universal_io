@@ -15,8 +15,8 @@
 import 'dart:io';
 
 import 'package:universal_io/src/internal/ip_utils.dart';
-import '../driver_for_vm/vm_io_driver.dart';
 
+import '../driver_for_vm/vm_io_driver.dart';
 import 'drivers_in_vm.dart'; // <--- IMPORTANT
 
 /// Determines the default IODriver:

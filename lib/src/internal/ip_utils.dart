@@ -2,6 +2,9 @@ import 'dart:typed_data';
 
 /// Parses IPv4/IPv6 address.
 List<int> parseIp(String source) {
+  if (source==null) {
+    throw new ArgumentError.notNull();
+  }
   // Find first '.' or ':'
   for (var i = 0; i < source.length; i++) {
     final c = source.substring(i, i + 1);
@@ -96,6 +99,9 @@ List<int> _parseIp6(String source) {
 }
 
 String stringFromIp(List<int> bytes) {
+  if (bytes==null) {
+    throw new ArgumentError.notNull();
+  }
   switch (bytes.length) {
     case 4:
       return bytes.map((item) => item.toString()).join(".");

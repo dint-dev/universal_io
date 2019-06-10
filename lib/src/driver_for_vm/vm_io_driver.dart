@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:io' as dart_io;
 import 'dart:typed_data';
 
 import 'package:universal_io/src/driver/drivers_in_vm.dart';
-import 'dart:io';
-import 'dart:io' as dart_io;
 
 // -----------------------------------------------------------------------------
 // This file is used lib/src/driver/customization_in_vm.dart
@@ -29,15 +29,20 @@ class VMFileSystemDriver implements FileSystemDriver {
   const VMFileSystemDriver();
 
   @override
-  bool get isWatchSupported => FileSystemEntity.isWatchSupported;
-
-  @override
-  Directory getCurrentDirectory() {
+  Directory get currentDirectory {
     return Directory.current;
   }
 
   @override
-  Directory getSystemTempDirectory() {
+  set currentDirectory(Directory value) {
+    Directory.current = value;
+  }
+
+  @override
+  bool get isWatchSupported => FileSystemEntity.isWatchSupported;
+
+  @override
+  Directory get systemTempDirectory {
     return Directory.systemTemp;
   }
 
@@ -109,11 +114,6 @@ class VMFileSystemDriver implements FileSystemDriver {
   @override
   Link newLinkFromRawPath(Uint8List rawPath) {
     return Link.fromRawPath(rawPath);
-  }
-
-  @override
-  void setCurrentDirectory(String path) {
-    Directory.current = path;
   }
 
   @override

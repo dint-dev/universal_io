@@ -43,12 +43,12 @@ class BrowserHttpClientRequest extends BaseHttpClientRequest {
   HttpConnectionInfo get connectionInfo => null;
 
   @override
-  void internallyAdd(List<int> event) {
+  void didAdd(List<int> event) {
     _buffer.add(event);
   }
 
   @override
-  Future<HttpClientResponse> internallyClose() {
+  Future<HttpClientResponse> didClose() {
     _send();
     return _completer.future;
   }

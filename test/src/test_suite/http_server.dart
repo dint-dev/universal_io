@@ -5,43 +5,89 @@ import 'package:meta/meta.dart';
 import 'package:test/test.dart';
 import 'package:universal_io/io.dart';
 
-void testHttpServer() {
+void testHttpServer({bool httpClient = true}) {
   group("HttpServer", () {
-    test("bind(...)", () async {
-      final httpServer = await HttpServer.bind("127.0.0.1", 0);
-      expect(httpServer, isNotNull);
-      try {
-        await _runTest(httpServer, scheme: "http");
-      } finally {
-        await httpServer.close(force: true);
-      }
-    });
-
-    test("bindSecure(...)", () async {
-      final securityContext = SecurityContext();
-      securityContext.useCertificateChain("test/src/test_suite/localhost.crt");
-      securityContext.usePrivateKey("test/src/test_suite/localhost.key");
-
-      final httpServer = await HttpServer.bindSecure(
-        "127.0.0.1",
-        0,
-        securityContext,
+    test("HttpServer.bind(null, 12345) should fail", () async {
+      await expectLater(
+        () => HttpServer.bind(null, 12345),
+        throwsArgumentError,
       );
-      expect(httpServer, isNotNull);
-      try {
-        await _runTest(httpServer, scheme: "https");
-      } finally {
-        await httpServer.close(force: true);
-      }
     });
+
+    test("HttpServer.bind('localhost', null) should fail", () async {
+      await expectLater(
+        () => HttpServer.bind('localhost', null),
+        throwsArgumentError,
+      );
+    });
+
+    test("HttpServer.bind('localhost', 12345) should succeed", () async {
+      final server = await HttpServer.bind('localhost', 12345);
+      expect(server, isNotNull);
+      expect(server.port, 12345);
+      // ignore: unawaited_futures
+      server.close();
+      expect(await server.toList(), []);
+    });
+
+    test("HttpServer.bind(InternetAddress.loopbackIPv4, 0) should succeed",
+        () async {
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      expect(server, isNotNull);
+      expect(server.port, greaterThan(0));
+      // ignore: unawaited_futures
+      server.close();
+      expect(await server.toList(), []);
+    });
+
+    test("HttpServer.bind(InternetAddress.loopbackIPv6, 0) should succeed",
+        () async {
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv6, 0);
+      expect(server, isNotNull);
+      expect(server.port, greaterThan(0));
+      // ignore: unawaited_futures
+      server.close();
+      expect(await server.toList(), []);
+    });
+
+    if (httpClient) {
+      test("Should respond to HttpClient", () async {
+        final server = await HttpServer.bind("127.0.0.1", 0);
+        expect(server, isNotNull);
+        try {
+          await _runTest(server, scheme: "http");
+        } finally {
+          await server.close(force: true);
+        }
+      });
+
+      test("bindSecure(...): responds to HttpClient", () async {
+        final securityContext = SecurityContext();
+        securityContext
+            .useCertificateChain("test/src/test_suite/localhost.crt");
+        securityContext.usePrivateKey("test/src/test_suite/localhost.key");
+
+        final server = await HttpServer.bindSecure(
+          "127.0.0.1",
+          0,
+          securityContext,
+        );
+        expect(server, isNotNull);
+        try {
+          await _runTest(server, scheme: "https");
+        } finally {
+          await server.close(force: true);
+        }
+      });
+    }
   });
 }
 
-Future<void> _runTest(HttpServer httpServer, {@required String scheme}) async {
-  final port = httpServer.port;
+Future<void> _runTest(HttpServer server, {@required String scheme}) async {
+  final port = server.port;
   expect(port, greaterThan(0));
 
-  httpServer.listen(expectAsync1((request) async {
+  server.listen(expectAsync1((request) async {
     final requestBody = await utf8.decodeStream(request);
     expect(
       request.uri.toString(),

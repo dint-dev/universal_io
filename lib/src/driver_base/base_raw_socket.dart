@@ -51,14 +51,50 @@ abstract class BaseRawSocket extends Stream<RawSocketEvent>
     return this;
   }
 
-  @override
-  Uint8List getRawOption(RawSocketOption option) {
-    throw UnimplementedError();
+  /// A protected method only for implementations.
+  ///
+  /// Called after both reading and writing has been shutdown.
+  ///
+  /// This method is guaranteed to be called only once during the socket
+  /// lifetime.
+  @protected
+  FutureOr<void> didShutdown();
+
+  /// A protected method only for implementations.
+  ///
+  /// Called when reading has been shutdown.
+  ///
+  /// This method is guaranteed to be called exactly once during the socket
+  /// lifetime. This method is called before [didShutdown].
+  @protected
+  FutureOr<void> didShutdownReading() async {}
+
+  /// A protected method only for implementations.
+  ///
+  /// Called when writing has been shutdown.
+  ///
+  /// This method is guaranteed to be called exactly once during the socket
+  /// lifetime. This method is called before [didShutdown].
+  @protected
+  FutureOr<void> didShutdownWriting() async {}
+
+  /// A protected method only for implementations.
+  ///
+  /// Called when valid data is written.
+  ///
+  /// This method will not be called if writing is disabled.
+  @protected
+  int didWrite(List<int> data);
+
+  /// A protected method only for implementations.
+  @protected
+  void dispatchStreamError(Object error) {
+    _streamController.addError(error);
   }
 
-  /// Adds bytes to the received stream.
+  /// A protected method only for implementations.
   @protected
-  void internallyAddReceived(List<int> data) {
+  void dispatchReadEvent(List<int> data) {
     if (_closedRead) {
       return;
     }
@@ -66,42 +102,10 @@ abstract class BaseRawSocket extends Stream<RawSocketEvent>
     _buffer.add(data);
   }
 
-  /// Adds an error to the received stream.
-  @protected
-  void internallyAddReceivedError(Object error) {
-    _streamController.addError(error);
+  @override
+  Uint8List getRawOption(RawSocketOption option) {
+    throw UnimplementedError();
   }
-
-  /// An internal method called when the socket is closed.
-  ///
-  /// This method is guaranteed to be called only once during the socket
-  /// lifetime.
-  @protected
-  Future<void> internallyCloseBoth() async {}
-
-  /// An internal method called when reading is disabled.
-  ///
-  /// This method is guaranteed to be called only once during the socket
-  /// lifetime.
-  ///
-  /// This method is called before [internallyCloseBoth].
-  @protected
-  Future<void> internallyCloseReader() async {}
-
-  /// An internal method called when writing is disabled.
-  ///
-  /// This method is guaranteed to be called only once during the socket
-  /// lifetime.
-  ///
-  /// This method is called before [internallyCloseBoth].
-  @protected
-  Future<void> internallyCloseWriter() async {}
-
-  /// An internal method called when bytes are written.
-  ///
-  /// This method will not be called if writing is disabled.
-  @protected
-  int internallyWrite(List<int> data);
 
   @override
   StreamSubscription<RawSocketEvent> listen(void onData(RawSocketEvent event),
@@ -152,7 +156,7 @@ abstract class BaseRawSocket extends Stream<RawSocketEvent>
     }
 
     // Write
-    return internallyWrite(buffer);
+    return didWrite(buffer);
   }
 
   /// Used by [close] and [shutdown].
@@ -163,7 +167,7 @@ abstract class BaseRawSocket extends Stream<RawSocketEvent>
       if (!_closedWrite) {
         _closedWrite = true;
         isStatedChanged = true;
-        await internallyCloseWriter();
+        await didShutdownWriting();
       }
     }
     if (direction == SocketDirection.both ||
@@ -171,7 +175,7 @@ abstract class BaseRawSocket extends Stream<RawSocketEvent>
       if (!_closedRead) {
         _closedRead = true;
         isStatedChanged = true;
-        await internallyCloseReader();
+        await didShutdownReading();
         if (direction == SocketDirection.receive) {
           _streamController.add(RawSocketEvent.readClosed);
         }
@@ -180,7 +184,7 @@ abstract class BaseRawSocket extends Stream<RawSocketEvent>
     }
     if (isStatedChanged && _closedRead && _closedWrite) {
       _streamController.add(RawSocketEvent.closed);
-      await internallyCloseBoth();
+      await didShutdown();
     }
   }
 }

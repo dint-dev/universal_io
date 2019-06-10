@@ -201,7 +201,7 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
     if (_addStreamFuture != null) {
       throw StateError("StreamSink is bound to a stream");
     }
-    internallyAdd(event);
+    didAdd(event);
   }
 
   @override
@@ -221,7 +221,7 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
       throw StateError("StreamSink is bound to a stream");
     }
     final future = stream.listen((item) {
-      internallyAdd(item);
+      didAdd(item);
     }, onError: (error) {
       addError(error);
     }, cancelOnError: true).asFuture(null);
@@ -244,7 +244,7 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
       }
 
       // Close
-      final result = await internallyClose();
+      final result = await didClose();
 
       // Complete future
       _completer.complete(result);
@@ -258,10 +258,10 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
   }
 
   @protected
-  void internallyAdd(List<int> data);
+  void didAdd(List<int> data);
 
   @protected
-  Future<HttpClientResponse> internallyClose();
+  Future<HttpClientResponse> didClose();
 
   static bool _httpMethodSupportsBody(String method) {
     switch (method) {
@@ -293,13 +293,16 @@ abstract class BaseHttpClientResponse extends Stream<List<int>>
   @override
   int get contentLength => -1;
 
+  List<Cookie> _cookies;
   @override
   List<Cookie> get cookies {
-    final cookies = <Cookie>[];
-    for (String value in this.headers[HttpHeaders.setCookieHeader]) {
-      cookies.add(Cookie.fromSetCookieValue(value));
+    if (_cookies == null) {
+      final _cookies = <Cookie>[];
+      for (var value in headers[HttpHeaders.setCookieHeader]) {
+        _cookies.add(Cookie.fromSetCookieValue(value));
+      }
     }
-    return cookies;
+    return _cookies;
   }
 
   @override

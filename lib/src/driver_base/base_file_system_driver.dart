@@ -243,93 +243,12 @@ class BaseFileSystemDriver extends FileSystemDriver {
   }
 
   @override
-  Directory getSystemTempDirectory() {
+  Directory get currentDirectory {
     throw UnimplementedError();
   }
 
   @override
-  Future<bool> isDirectory(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<bool> isFile(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Directory newDirectory(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  File newFile(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Link newLink(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Stream<FileSystemEvent> watch(String path,
-      {int events = FileSystemEvent.all, bool recursive = false}) {
-    throw UnimplementedError();
-  }
-
-  @override
-  FileStat statSync(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<FileStat> stat(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void setCurrentDirectory(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Link newLinkFromRawPath(Uint8List path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  File newFileFromRawPath(Uint8List path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Directory newDirectoryFromRawPath(Uint8List path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  bool isLinkSync(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<bool> isLink(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  bool isFileSync(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  bool isDirectorySync(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  bool identicalPathsSync(String path0, String path1) {
+  Directory get systemTempDirectory {
     throw UnimplementedError();
   }
 
@@ -339,7 +258,82 @@ class BaseFileSystemDriver extends FileSystemDriver {
   }
 
   @override
-  FileSystemEntityType typeSync(String path, {bool followLinks}) {
+  bool identicalPathsSync(String path0, String path1) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> isDirectory(String path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  bool isDirectorySync(String path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> isFile(String path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  bool isFileSync(String path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> isLink(String path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  bool isLinkSync(String path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Directory newDirectory(String path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Directory newDirectoryFromRawPath(Uint8List path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  File newFile(String path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  File newFileFromRawPath(Uint8List path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Link newLink(String path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Link newLinkFromRawPath(Uint8List path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  set currentDirectory(Directory path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<FileStat> stat(String path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  FileStat statSync(String path) {
     throw UnimplementedError();
   }
 
@@ -349,7 +343,13 @@ class BaseFileSystemDriver extends FileSystemDriver {
   }
 
   @override
-  Directory getCurrentDirectory() {
+  FileSystemEntityType typeSync(String path, {bool followLinks}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Stream<FileSystemEvent> watch(String path,
+      {int events = FileSystemEvent.all, bool recursive = false}) {
     throw UnimplementedError();
   }
 }
