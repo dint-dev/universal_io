@@ -125,14 +125,27 @@ abstract class HttpClientDriver {
 }
 
 /// Implements static members of [HttpServer].
+///
+/// Note that [HttpServer] constructor uses Dart SDK implementation
+/// (requires socket drivers) if driver is not available.
 abstract class HttpServerDriver {
   const HttpServerDriver();
 
-  Future<HttpServer> bindHttpServer(
+  Future<HttpServer> bind(
     address,
     int port, {
     int backlog = 0,
     bool v6Only = false,
+    bool shared = false,
+  });
+
+  Future<HttpServer> bindSecure(
+    address,
+    int port,
+    SecurityContext context, {
+    int backlog = 0,
+    bool v6Only = false,
+    bool requestClientCertificate = false,
     bool shared = false,
   });
 }
@@ -296,8 +309,6 @@ class PlatformDriver {
 
 /// Implements static members of [Process].
 abstract class ProcessDriver {
-  static ProcessDriver get current => IODriver.current.processDriver;
-
   const ProcessDriver();
 
   /// For [Process.run].
@@ -376,10 +387,13 @@ abstract class RawDatagramSocketDriver {
   });
 }
 
-/// Implements static members of [RawSecureServerSocket].
-abstract class RawSecureServerSocketDriver {
+class RawSecureServerSocketDriver {
   const RawSecureServerSocketDriver();
 
+  /// Used by [RawSecureServerSocket].
+  ///
+  /// Default implementation returns a class that uses [RawServerSocket] and
+  /// [RawSecureSocket.secureServer].
   Future<RawSecureServerSocket> bind(
     address,
     int port,
@@ -390,12 +404,28 @@ abstract class RawSecureServerSocketDriver {
     bool requireClientCertificate = false,
     List<String> supportedProtocols,
     bool shared = false,
-  });
+  }) async {
+    final socket = await RawServerSocket.bind(
+      address,
+      port,
+      backlog: backlog,
+      v6Only: v6Only,
+    );
+    return _RawSecureServerSocket(
+      socket,
+      context,
+      requestClientCertificate: requestClientCertificate,
+      requireClientCertificate: requireClientCertificate,
+      supportedProtocols: supportedProtocols,
+    );
+  }
 }
 
 /// Implements static members of [RawSecureSocket].
 abstract class RawSecureSocketDriver {
   const RawSecureSocketDriver();
+
+  SecurityContext get defaultSecurityContext => const _SecurityContextImpl();
 
   /// For [RawSecureSocket.connect].
   Future<RawSecureSocket> connect(
@@ -420,6 +450,14 @@ abstract class RawSecureSocketDriver {
       connectionTask.cancel();
       throw TimeoutException("RawSecureSocket.connect(...) timeout");
     });
+  }
+
+  /// Used by [SecurityContext].
+  ///
+  /// Default implementation returns a [SecurityContext] that will throw
+  /// if used.
+  SecurityContext newSecurityContext({bool withTrustedRoots = false}) {
+    return const _SecurityContextImpl();
   }
 
   /// For [RawSecureSocket.secure].
@@ -531,5 +569,113 @@ class _ConnectionTask<S> implements ConnectionTask<S> {
   @override
   void cancel() {
     _onCancel();
+  }
+}
+
+/// Implements [RawSecureServerSocket] using [RawSecureSocket.secureServer].
+class _RawSecureServerSocket extends Stream<RawSecureSocket>
+    implements RawSecureServerSocket {
+  final RawServerSocket _socket;
+  final SecurityContext _context;
+
+  @override
+  final bool requestClientCertificate;
+
+  @override
+  final bool requireClientCertificate;
+
+  @override
+  final List<String> supportedProtocols;
+
+  _RawSecureServerSocket(
+    this._socket,
+    this._context, {
+    @required this.requestClientCertificate,
+    @required this.requireClientCertificate,
+    @required this.supportedProtocols,
+  });
+
+  @override
+  InternetAddress get address => _socket.address;
+
+  @override
+  int get port => _socket.port;
+
+  @override
+  Future<RawSecureServerSocket> close() async {
+    await _socket.close();
+    return this;
+  }
+
+  @override
+  StreamSubscription<RawSecureSocket> listen(
+      void onData(RawSecureSocket socket),
+      {Function onError,
+      void onDone(),
+      bool cancelOnError}) {
+    return _socket.asyncMap((rawSocket) {
+      return RawSecureSocket.secureServer(
+        rawSocket,
+        _context,
+        requireClientCertificate: requireClientCertificate,
+        requestClientCertificate: requestClientCertificate,
+        supportedProtocols: supportedProtocols,
+      );
+    }).listen(
+      onData,
+      onError: onError,
+      onDone: onDone,
+      cancelOnError: cancelOnError,
+    );
+  }
+}
+
+/// Implements [SecurityContext] that throws when any method is used.
+class _SecurityContextImpl implements SecurityContext {
+  const _SecurityContextImpl();
+
+  @override
+  void setAlpnProtocols(List<String> protocols, bool isServer) {
+    throw UnimplementedError();
+  }
+
+  @override
+  void setClientAuthorities(String file, {String password}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  void setClientAuthoritiesBytes(List<int> authCertBytes, {String password}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  void setTrustedCertificates(String file, {String password}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  void setTrustedCertificatesBytes(List<int> certBytes, {String password}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  void useCertificateChain(String file, {String password}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  void useCertificateChainBytes(List<int> chainBytes, {String password}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  void usePrivateKey(String file, {String password}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  void usePrivateKeyBytes(List<int> keyBytes, {String password}) {
+    throw UnimplementedError();
   }
 }

@@ -44,6 +44,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Copyright (c) 2015, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+import 'package:universal_io/src/driver/drivers_in_js.dart';
+
+import '../io.dart';
+
 /// The object containing the certificates to trust when making
 /// a secure client connection, and the certificate chain and
 /// private key to serve from a secure server.
@@ -58,19 +66,6 @@
 /// implemented. However, the platform's built-in trusted certificates can
 /// be used, by way of [SecurityContext.defaultContext].
 abstract class SecurityContext {
-  /// Secure networking classes with an optional `context` parameter
-  /// use the [defaultContext] object if the parameter is omitted.
-  /// This object can also be accessed, and modified, directly.
-  /// Each isolate has a different [defaultContext] object.
-  /// The [defaultContext] object uses a list of well-known trusted
-  /// certificate authorities as its trusted roots. On Linux and Windows, this
-  /// list is taken from Mozilla, who maintains it as part of Firefox. On,
-  /// MacOS, iOS, and Android, this list comes from the trusted certificates
-  /// stores built in to the platforms.
-  static SecurityContext get defaultContext {
-    throw UnimplementedError();
-  }
-
   /// Creates a new [SecurityContext].
   ///
   /// By default, the created [SecurityContext] contains no keys or certificates.
@@ -84,43 +79,53 @@ abstract class SecurityContext {
   /// root certificates must be modified per-connection, then `withTrustedRoots`
   /// should be used.
   factory SecurityContext({bool withTrustedRoots = false}) {
-    throw UnimplementedError();
+    final driver = IODriver.current.rawSecureSocketDriver;
+    if (driver == null) {
+      throw UnimplementedError();
+    }
+    return driver.newSecurityContext(withTrustedRoots: withTrustedRoots);
   }
 
-  /// Sets the list of application-level protocols supported by a client
-  /// connection or server connection. The ALPN (application level protocol
-  /// negotiation) extension to TLS allows a client to send a list of
-  /// protocols in the TLS client hello message, and the server to pick
-  /// one and send the selected one back in its server hello message.
-  ///
-  /// Separate lists of protocols can be sent for client connections and
-  /// for server connections, using the same SecurityContext.  The [isServer]
-  /// boolean argument specifies whether to set the list for server connections
-  /// or client connections.
-  void setAlpnProtocols(List<String> protocols, bool isServer);
+  /// Secure networking classes with an optional `context` parameter
+  /// use the [defaultContext] object if the parameter is omitted.
+  /// This object can also be accessed, and modified, directly.
+  /// Each isolate has a different [defaultContext] object.
+  /// The [defaultContext] object uses a list of well-known trusted
+  /// certificate authorities as its trusted roots. On Linux and Windows, this
+  /// list is taken from Mozilla, who maintains it as part of Firefox. On,
+  /// MacOS, iOS, and Android, this list comes from the trusted certificates
+  /// stores built in to the platforms.
+  static SecurityContext get defaultContext {
+    final driver = IODriver.current.rawSecureSocketDriver;
+    if (driver == null) {
+      throw UnimplementedError();
+    }
+    return driver.defaultSecurityContext;
+  }
 
-  /// Sets the list of authority names that a [SecureServerSocket] will advertise
-  /// as accepted when requesting a client certificate from a connecting
-  /// client.
+  /// Sets the private key for a server certificate or client certificate.
   ///
-  /// [file] is a PEM or PKCS12 file containing the accepted signing
-  /// authority certificates - the authority names are extracted from the
-  /// certificates. For PKCS12 files, [password] is the password for the file.
-  /// For PEM files, [password] is ignored. Assuming it is well-formatted, all
-  /// other contents of [file] are ignored.
+  /// A secure connection using this SecurityContext will use this key with
+  /// the server or client certificate to sign and decrypt messages.
+  /// [file] is the path to a PEM or PKCS12 file containing an encrypted
+  /// private key, encrypted with [password]. Assuming it is well-formatted, all
+  /// other contents of [file] are ignored. An unencrypted file can be used,
+  /// but this is not usual.
   ///
   /// NB: This function calls [File.readAsBytesSync], and will block on file IO.
-  /// Prefer using [setClientAuthoritiesBytes].
+  /// Prefer using [usePrivateKeyBytes].
   ///
-  /// iOS note: This call is not supported.
-  void setClientAuthorities(String file, {String password});
+  /// iOS note: Only PKCS12 data is supported. It should contain both the private
+  /// key and the certificate chain. On iOS one call to [usePrivateKey] with this
+  /// data is used instead of two calls to [useCertificateChain] and
+  /// [usePrivateKey].
+  void usePrivateKey(String file, {String password});
 
-  /// Sets the list of authority names that a [SecureServerSocket] will advertise
-  /// as accepted, when requesting a client certificate from a connecting
-  /// client.
+  /// Sets the private key for a server certificate or client certificate.
   ///
-  /// Like [setClientAuthorities] but takes the contents of the file.
-  void setClientAuthoritiesBytes(List<int> authCertBytes, {String password});
+  /// Like [usePrivateKey], but takes the contents of the file as a list
+  /// of bytes.
+  void usePrivateKeyBytes(List<int> keyBytes, {String password});
 
   /// Sets the set of trusted X509 certificates used by [SecureSocket]
   /// client connections, when connecting to a secure server.
@@ -172,27 +177,43 @@ abstract class SecurityContext {
   /// Like [useCertificateChain] but takes the contents of the file.
   void useCertificateChainBytes(List<int> chainBytes, {String password});
 
-  /// Sets the private key for a server certificate or client certificate.
+  /// Sets the list of authority names that a [SecureServerSocket] will advertise
+  /// as accepted when requesting a client certificate from a connecting
+  /// client.
   ///
-  /// A secure connection using this SecurityContext will use this key with
-  /// the server or client certificate to sign and decrypt messages.
-  /// [file] is the path to a PEM or PKCS12 file containing an encrypted
-  /// private key, encrypted with [password]. Assuming it is well-formatted, all
-  /// other contents of [file] are ignored. An unencrypted file can be used,
-  /// but this is not usual.
+  /// [file] is a PEM or PKCS12 file containing the accepted signing
+  /// authority certificates - the authority names are extracted from the
+  /// certificates. For PKCS12 files, [password] is the password for the file.
+  /// For PEM files, [password] is ignored. Assuming it is well-formatted, all
+  /// other contents of [file] are ignored.
   ///
   /// NB: This function calls [File.readAsBytesSync], and will block on file IO.
-  /// Prefer using [usePrivateKeyBytes].
+  /// Prefer using [setClientAuthoritiesBytes].
   ///
-  /// iOS note: Only PKCS12 data is supported. It should contain both the private
-  /// key and the certificate chain. On iOS one call to [usePrivateKey] with this
-  /// data is used instead of two calls to [useCertificateChain] and
-  /// [usePrivateKey].
-  void usePrivateKey(String file, {String password});
+  /// iOS note: This call is not supported.
+  void setClientAuthorities(String file, {String password});
 
-  /// Sets the private key for a server certificate or client certificate.
+  /// Sets the list of authority names that a [SecureServerSocket] will advertise
+  /// as accepted, when requesting a client certificate from a connecting
+  /// client.
   ///
-  /// Like [usePrivateKey], but takes the contents of the file as a list
-  /// of bytes.
-  void usePrivateKeyBytes(List<int> keyBytes, {String password});
+  /// Like [setClientAuthorities] but takes the contents of the file.
+  void setClientAuthoritiesBytes(List<int> authCertBytes, {String password});
+
+  /// Whether the platform supports ALPN. This always returns true and will be
+  /// removed in a future release.
+  @deprecated
+  static bool get alpnSupported => true;
+
+  /// Sets the list of application-level protocols supported by a client
+  /// connection or server connection. The ALPN (application level protocol
+  /// negotiation) extension to TLS allows a client to send a list of
+  /// protocols in the TLS client hello message, and the server to pick
+  /// one and send the selected one back in its server hello message.
+  ///
+  /// Separate lists of protocols can be sent for client connections and
+  /// for server connections, using the same SecurityContext.  The [isServer]
+  /// boolean argument specifies whether to set the list for server connections
+  /// or client connections.
+  void setAlpnProtocols(List<String> protocols, bool isServer);
 }

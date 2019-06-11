@@ -19,8 +19,9 @@ import 'http_server.dart';
 import 'platform.dart';
 import 'process.dart';
 import 'raw_datagram_socket.dart';
-import 'raw_server_socket.dart';
-import 'raw_socket.dart';
+import 'secure_socket.dart';
+import 'server_socket.dart';
+import 'socket.dart';
 
 export 'http_client.dart';
 export 'http_server.dart';
@@ -28,8 +29,9 @@ export 'internet_address.dart';
 export 'platform.dart';
 export 'process.dart';
 export 'raw_datagram_socket.dart';
-export 'raw_server_socket.dart';
-export 'raw_socket.dart';
+export 'secure_socket.dart';
+export 'server_socket.dart';
+export 'socket.dart';
 
 void testAll({bool isBrowser = false, bool hybrid = false}) {
   testPlatform();
@@ -41,17 +43,25 @@ void testAll({bool isBrowser = false, bool hybrid = false}) {
 
 void testSockets({
   bool rawDatagramSocket = true,
-  bool rawServerSocket = true,
-  bool rawSocket = true,
+  bool serverSocket = true,
+  bool socket = true,
+  bool secureServerSocket = true,
+  bool secureSocket = true,
   int times = 1,
 }) {
-  if (rawDatagramSocket || rawSocket || rawServerSocket) {
+  if (rawDatagramSocket || socket || serverSocket || secureSocket || secureServerSocket) {
     final f = () {
-      testRawDatagramSocket();
-      testRawServerSocket();
-      testRawSocket();
-      if (rawSocket && rawServerSocket) {
-        testRawSocketAndRawServerSocket();
+      if (rawDatagramSocket) {
+        testRawDatagramSocket();
+      }
+      if (serverSocket) {
+        testRawServerSocket();
+      }
+      if (socket) {
+        testRawSocket(serverSocket: serverSocket);
+      }
+      if (secureSocket) {
+        testSecureSocket(secureServerSocket: secureServerSocket);
       }
     };
     if (times == 1) {

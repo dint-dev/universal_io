@@ -50,6 +50,22 @@ void testHttpServer({bool httpClient = true}) {
       expect(await server.toList(), []);
     });
 
+    test(
+        "HttpServer.bindSecure(InternetAddress.loopbackIPv6, 0, context) should succeed",
+        () async {
+      final context = SecurityContext.defaultContext;
+      final server = await HttpServer.bindSecure(
+        InternetAddress.loopbackIPv6,
+        0,
+        context,
+      );
+      expect(server, isNotNull);
+      expect(server.port, greaterThan(0));
+      // ignore: unawaited_futures
+      server.close();
+      expect(await server.toList(), []);
+    });
+
     if (httpClient) {
       test("Should respond to HttpClient", () async {
         final server = await HttpServer.bind("127.0.0.1", 0);

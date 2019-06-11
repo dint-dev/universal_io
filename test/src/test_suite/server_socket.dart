@@ -13,7 +13,7 @@
 // limitations under the License.
 
 @Timeout(Duration(seconds: 2))
-library raw_server_socket_test;
+library server_socket_test;
 
 import 'package:test/test.dart';
 import 'package:universal_io/io.dart';

@@ -12,6 +12,7 @@ export 'io/link.dart';
 export 'io/overrides.dart';
 export 'io/platform.dart';
 export 'io/process.dart';
+export 'io/secure_server_socket.dart';
 export 'io/secure_socket.dart';
 export 'io/security_context.dart';
 export 'io/socket.dart';

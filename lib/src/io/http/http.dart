@@ -722,7 +722,7 @@ abstract class HttpClient {
 /// Represents credentials for basic authentication.
 abstract class HttpClientBasicCredentials extends HttpClientCredentials {
   factory HttpClientBasicCredentials(String username, String password) =>
-      _HttpClientBasicCredentials(username, password);
+      HttpClientBasicCredentialsImpl(username, password);
 }
 
 abstract class HttpClientCredentials {}
@@ -1784,8 +1784,25 @@ abstract class HttpServer implements Stream<HttpRequest> {
   /// distributed over multiple isolates this way.
   static Future<HttpServer> bind(address, int port,
       {int backlog = 0, bool v6Only = false, bool shared = false}) {
-    return IODriver.current.httpServerDriver.bindHttpServer(address, port,
-        backlog: backlog, v6Only: v6Only, shared: shared);
+    final driver = IODriver.current.httpServerDriver;
+    if (driver != null) {
+      return driver.bind(
+        address,
+        port,
+        backlog: backlog,
+        v6Only: v6Only,
+        shared: shared,
+      );
+    }
+
+    // No driver exists, so we use Dart SDK implementation.
+    return HttpServerImpl.bind(
+      address,
+      port,
+      backlog,
+      v6Only,
+      shared,
+    );
   }
 
   /// The [address] can either be a [String] or an
@@ -1827,13 +1844,35 @@ abstract class HttpServer implements Stream<HttpRequest> {
   /// distributed over multiple isolates this way.
 
   static Future<HttpServer> bindSecure(
-          address, int port, SecurityContext context,
-          {int backlog = 0,
-          bool v6Only = false,
-          bool requestClientCertificate = false,
-          bool shared = false}) =>
-      HttpServerImpl.bindSecure(address, port, context, backlog, v6Only,
-          requestClientCertificate, shared);
+      address, int port, SecurityContext context,
+      {int backlog = 0,
+      bool v6Only = false,
+      bool requestClientCertificate = false,
+      bool shared = false}) {
+    final driver = IODriver.current.httpServerDriver;
+    if (driver != null) {
+      return driver.bindSecure(
+        address,
+        port,
+        context,
+        backlog: backlog,
+        v6Only: v6Only,
+        requestClientCertificate: requestClientCertificate,
+        shared: shared,
+      );
+    }
+
+    // If no driver exists, we use Dart SDK implementation.
+    return HttpServerImpl.bindSecure(
+      address,
+      port,
+      context,
+      backlog,
+      v6Only,
+      requestClientCertificate,
+      shared,
+    );
+  }
 }
 
 abstract class HttpSession implements Map {

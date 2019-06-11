@@ -333,7 +333,11 @@ abstract class Process {
       bool runInShell = false,
       Encoding stdoutEncoding = systemEncoding,
       Encoding stderrEncoding = systemEncoding}) {
-    return ProcessDriver.current.run(
+    final driver =IODriver.current.processDriver;
+    if (driver==null) {
+      throw new UnimplementedError();
+    }
+    return driver.run(
       executable,
       arguments,
       workingDirectory: workingDirectory,
@@ -352,7 +356,11 @@ abstract class Process {
       bool runInShell = false,
       Encoding stdoutEncoding = systemEncoding,
       Encoding stderrEncoding = systemEncoding}) {
-    return ProcessDriver.current.runSync(
+    final driver =IODriver.current.processDriver;
+    if (driver==null) {
+      throw new UnimplementedError();
+    }
+    return driver.runSync(
       executable,
       arguments,
       workingDirectory: workingDirectory,
@@ -428,7 +436,11 @@ abstract class Process {
       bool includeParentEnvironment = true,
       bool runInShell = false,
       ProcessStartMode mode = ProcessStartMode.normal}) {
-    return ProcessDriver.current.start(
+    final driver =IODriver.current.processDriver;
+    if (driver==null) {
+      throw new UnimplementedError();
+    }
+    return driver.start(
       executable,
       arguments,
       workingDirectory: workingDirectory,

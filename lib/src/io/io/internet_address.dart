@@ -142,7 +142,11 @@ class InternetAddress {
   /// Perform a reverse dns lookup on the [address], creating a new
   /// [InternetAddress] where the host field set to the result.
   Future<InternetAddress> reverse() {
-    return IODriver.current.internetAddressDriver.reverseLookup(this);
+    final driver =IODriver.current.internetAddressDriver;
+    if (driver==null) {
+      throw new UnimplementedError();
+    }
+    return driver.reverseLookup(this);
   }
 
   /// Lookup a host, returning a Future of a list of
@@ -154,7 +158,11 @@ class InternetAddress {
   /// change over time.
   static Future<List<InternetAddress>> lookup(String host,
       {InternetAddressType type = InternetAddressType.any}) {
-    return IODriver.current.internetAddressDriver.lookup(host, type: type);
+    final driver =IODriver.current.internetAddressDriver;
+    if (driver==null) {
+      throw new UnimplementedError();
+    }
+    return driver.lookup(host, type: type);
   }
 
   @override

@@ -16,8 +16,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-/// A buffer that can be.
-///
 /// This was implemented because classes in 'package:typed_data/buffer.dart' are
 /// append-only.
 class Uint8ListBuffer implements Sink<List<int>>, StreamConsumer<List<int>> {

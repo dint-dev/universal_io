@@ -18,7 +18,7 @@ import 'dart:typed_data';
 
 import 'package:universal_io/driver_base.dart';
 import 'package:universal_io/io.dart';
-import 'package:universal_io/utils.dart';
+import 'package:universal_io/driver_base.dart' show Uint8ListBuffer;
 
 import 'browser_http_client.dart';
 import 'browser_http_client_exception.dart';
@@ -26,8 +26,6 @@ import 'browser_http_client_response.dart';
 
 /// Used by [BrowserHttpClient].
 class BrowserHttpClientRequest extends BaseHttpClientRequest {
-  final HttpClient client;
-
   final Completer<HttpClientResponse> _completer =
       Completer<HttpClientResponse>();
 
@@ -36,8 +34,7 @@ class BrowserHttpClientRequest extends BaseHttpClientRequest {
   final _buffer = Uint8ListBuffer();
 
   BrowserHttpClientRequest(String method, Uri uri, {BrowserHttpClient client})
-      : this.client = client ?? BrowserHttpClient(),
-        super(method, uri);
+      : super(client ?? BrowserHttpClient(), method, uri);
 
   @override
   HttpConnectionInfo get connectionInfo => null;
@@ -54,6 +51,11 @@ class BrowserHttpClientRequest extends BaseHttpClientRequest {
   }
 
   void _send() {
+    if (cookies.isNotEmpty) {
+      throw new StateError(
+        "Attempted to send cookies, but XMLHttpRequest does not support them.",
+      );
+    }
     try {
       final xhr = html.HttpRequest();
 
@@ -70,15 +72,19 @@ class BrowserHttpClientRequest extends BaseHttpClientRequest {
         xhr.timeout = timeout.inMilliseconds;
       }
 
-      // Do we have credentials enabled?
-      // Or are we are trying to send cross-origin cookies?
+      // Do we have credentials mode enabled?
       final origin = html.window.origin;
-      var corsCredentialsMode = this.useCorsCredentials ||
-          (BrowserHttpClient.isCrossOriginUrl(uriString, origin: origin) &&
-              this.cookies.isNotEmpty);
+      var corsCredentialsMode = this.useCorsCredentials;
+
+      // If we don't have credentials mode and the request is cross-origin...
+      if (!corsCredentialsMode &&
+          BrowserHttpClient.isCrossOriginUrl(uriString, origin: origin)) {
+        // Enable credentials mode if we are sending cookies or authorization
+        corsCredentialsMode =
+            headers.value(HttpHeaders.authorizationHeader) != null;
+      }
 
       if (corsCredentialsMode) {
-        // Yes
         xhr.withCredentials = true;
       }
 
@@ -106,10 +112,10 @@ class BrowserHttpClientRequest extends BaseHttpClientRequest {
 
         // Create HttpClientResponse
         final httpClientResponse = BrowserHttpClientResponse(
+          client,
+          this,
           xhr,
           body,
-          client: client,
-          request: this,
         );
 
         // Complete the future
@@ -130,6 +136,7 @@ class BrowserHttpClientRequest extends BaseHttpClientRequest {
           method: method,
           url: uriString,
           origin: origin,
+          headers: headers,
           corsCredentialsMode: corsCredentialsMode,
         );
 

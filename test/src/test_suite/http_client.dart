@@ -19,7 +19,7 @@ import 'package:meta/meta.dart';
 import 'package:test/test.dart';
 import 'package:universal_io/io.dart';
 
-import 'test_http_server.dart';
+import 'example_http_server.dart';
 
 void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
   group("HttpClient:", () {
@@ -63,6 +63,54 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
         status: 404,
         hybrid: hybrid,
       );
+    });
+
+    test("Receives cookies (except in browser)", () async {
+      final response = await _testClient(
+        method: "GET",
+        path: "/set_cookie",
+        requestHeaders: {
+          "Cookie": Cookie("x", "v").toString(),
+        },
+        hybrid: hybrid,
+      );
+
+      expect(response.statusCode, HttpStatus.ok);
+      if (isBrowser) {
+        expect(response.cookies, []);
+      } else {
+        expect(response.cookies, hasLength(1));
+        expect(response.cookies.single.name, "x");
+        expect(response.cookies.single.value, "y");
+      }
+    });
+
+    test("Sends cookies (except in browser)", () async {
+      var status = HttpStatus.ok;
+      if (isBrowser) {
+        status = HttpStatus.unauthorized;
+      }
+      await _testClient(
+        method: "GET",
+        path: "/expect_cookie",
+        requestHeaders: {
+          "Cookie": Cookie("expectedCookie", "value").toString(),
+        },
+        status: status,
+        hybrid: hybrid,
+      );
+    });
+
+    test("Sends 'Authorization' header", () async {
+      final response = await _testClient(
+        method: "POST",
+        path: "/expect_authorization",
+        requestHeaders: {
+          HttpHeaders.authorizationHeader: "expectedAuthorization",
+        },
+        hybrid: hybrid,
+      );
+      expect(response.statusCode, HttpStatus.ok);
     });
 
     // ------
@@ -197,7 +245,7 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
     });
 
     test("TLS connection to a self-signed server fails", () async {
-      final server = await TestHttpServer.bind(hybrid: hybrid);
+      final server = await ExampleHttpServer.bind(hybrid: hybrid);
       addTearDown(() {
         server.close();
       });
@@ -218,7 +266,8 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
       test(
           "TLS connection to a self-signed server succeeds with"
           " the help of 'badCertificateCallback'", () async {
-        final server = await TestHttpServer.bind(secure: true, hybrid: hybrid);
+        final server =
+            await ExampleHttpServer.bind(secure: true, hybrid: hybrid);
         addTearDown(() {
           server.close();
         });
@@ -236,14 +285,33 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
   });
 }
 
-Future _testClient({
+Future<HttpClientResponse> _testClient({
+  /// Request method
   @required String method,
+
+  /// Request path
   @required String path,
+
+  /// Request headers
+  Map<String, String> requestHeaders = const <String, String>{},
+
+  /// Request body
   String requestBody,
+
+  /// Expected status
   int status = 200,
+
+  /// Expected response body.
   String responseBody,
+
+  /// Function for opening HTTP request
   Future<HttpClientRequest> openUrl(HttpClient client, Uri uri),
+
+  /// Use hybrid server?
   @required bool hybrid,
+
+  /// Are we expecting XMLHttpRequest error?
+  bool xmlHttpRequestError = false,
 }) async {
   if (method == null) {
     throw ArgumentError.notNull("method");
@@ -253,7 +321,7 @@ Future _testClient({
   }
 
   // Wait for the server to be listening
-  final server = await TestHttpServer.bind(hybrid: hybrid);
+  final server = await ExampleHttpServer.bind(hybrid: hybrid);
   addTearDown(() {
     server.close();
   });
@@ -267,8 +335,10 @@ Future _testClient({
   if (openUrl != null) {
     // Use a custom method
     // (we test their correctness)
-    request =
-        await openUrl(client, uri).timeout(const Duration(milliseconds: 500));
+    request = await openUrl(
+      client,
+      uri,
+    ).timeout(const Duration(milliseconds: 500));
   } else {
     // Use 'openUrl'
     request = await client
@@ -276,10 +346,21 @@ Future _testClient({
         .timeout(const Duration(milliseconds: 500));
   }
 
+  // Set headers
+  requestHeaders.forEach((name, value) {
+    request.headers.set(name, value);
+  });
+
   // If HTTP method supports a request body,
   // write it.
   if (requestBody != null) {
     request.write(requestBody);
+  }
+
+  // Do we expect XMLHttpRequest error?
+  if (xmlHttpRequestError) {
+    expect(() => request.close(), throwsA(TypeMatcher<SocketException>()));
+    return null;
   }
 
   // Close HTTP request
@@ -293,12 +374,15 @@ Future _testClient({
   expect(response, isNotNull);
   expect(response.statusCode, status);
 
+  // Check response headers
+  expect(response.headers.value("X-Response-Header"), "value");
+
   // Check response body
   if (responseBody != null) {
     expect(actualResponseBody, responseBody);
   }
 
-  // Check request
+  // Check the request that the server received
   expect(
       await server.requestsQueue.hasNext
           .timeout(const Duration(milliseconds: 200)),
@@ -308,18 +392,22 @@ Future _testClient({
   expect(requestInfo.uri, "$path");
   expect(requestInfo.body, requestBody ?? "");
 
-  // Check response headers
-  expect(response.headers.value("X-Response-Header"), "value");
+  return response;
 }
+
+typedef Future<HttpClientRequest> OpenUrlFunction(
+  HttpClient client,
+  String host,
+  int port,
+  String path,
+);
 
 /// Tests methods like 'client.get(host,port,path)'.
 ///
 /// These should default to TLS.
 Future _testClientMethodWithoutUri({
   @required String method,
-  @required
-      Future<HttpClientRequest> openUrl(
-          HttpClient client, String host, int port, String path),
+  @required OpenUrlFunction openUrl,
   @required bool hybrid,
 }) async {
   if (method == null) {
@@ -327,7 +415,7 @@ Future _testClientMethodWithoutUri({
   }
 
   // Wait for the server to be listening
-  final server = await TestHttpServer.bind(hybrid: hybrid);
+  final server = await ExampleHttpServer.bind(hybrid: hybrid);
   addTearDown(() {
     server.close();
   });

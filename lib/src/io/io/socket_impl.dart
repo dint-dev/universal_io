@@ -52,30 +52,6 @@ import 'package:universal_io/driver_base.dart' show BaseIOSink;
 import '../io.dart';
 import 'socket.dart';
 
-/// Internal [SecureSocket] implementation that uses [RawSecureSocket].
-class SecureSocketImpl<T extends RawSecureSocket> extends SocketImpl<T>
-    implements SecureSocket {
-  SecureSocketImpl(T rawSocket) : super(rawSocket);
-
-  @override
-  X509Certificate get peerCertificate => rawSocket.peerCertificate;
-
-  @override
-  String get selectedProtocol => rawSocket.selectedProtocol;
-
-  @override
-  void renegotiate(
-      {bool useSessionCache = true,
-      bool requestClientCertificate = false,
-      bool requireClientCertificate = false}) {
-    return rawSocket.renegotiate(
-      useSessionCache: useSessionCache,
-      requestClientCertificate: requestClientCertificate,
-      requireClientCertificate: requestClientCertificate,
-    );
-  }
-}
-
 /// Internal [Socket] implementation that uses [RawSocket].
 class SocketImpl<T extends RawSocket> extends Stream<List<int>>
     with BaseIOSink
@@ -93,7 +69,7 @@ class SocketImpl<T extends RawSocket> extends Stream<List<int>>
             _streamController.add(rawSocket.read());
           }
         },
-        onError: addError,
+        onError: _streamController.addError,
         onDone: _streamController.close,
       );
       _streamController.onPause = subscription.pause;
@@ -204,6 +180,7 @@ class _ConnectionTask<S> implements ConnectionTask<S> {
         this.socket = socket,
         this._onCancel = onCancel;
 
+  @override
   void cancel() {
     _onCancel();
   }

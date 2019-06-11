@@ -128,7 +128,11 @@ abstract class NetworkInterface {
       {bool includeLoopback = false,
       bool includeLinkLocal = false,
       InternetAddressType type = InternetAddressType.any}) {
-    return IODriver.current.networkInterfaceDriver.listNetworkInterfaces(
+    final driver = IODriver.current.networkInterfaceDriver;
+    if (driver == null) {
+      throw new UnimplementedError();
+    }
+    return driver.listNetworkInterfaces(
         includeLoopback: includeLoopback,
         includeLinkLocal: includeLinkLocal,
         type: type);
@@ -236,7 +240,11 @@ abstract class RawDatagramSocket extends Stream<RawSocketEvent> {
   /// port.
   static Future<RawDatagramSocket> bind(host, int port,
       {bool reuseAddress = true, bool reusePort = false, int ttl = 1}) async {
-    return IODriver.current.rawDatagramSocketDriver.bind(
+    final driver = IODriver.current.rawDatagramSocketDriver;
+    if (driver == null) {
+      throw new UnimplementedError();
+    }
+    return driver.bind(
       host,
       port,
       reuseAddress: reuseAddress,
@@ -410,7 +418,11 @@ abstract class RawSocket implements Stream<RawSocketEvent> {
   /// connection attempts to [host] are cancelled.
   static Future<RawSocket> connect(host, int port,
       {sourceAddress, Duration timeout}) {
-    return IODriver.current.rawSocketDriver.connect(
+    final driver = IODriver.current.rawSocketDriver;
+    if (driver == null) {
+      throw new UnimplementedError();
+    }
+    return driver.connect(
       host,
       port,
       sourceAddress: sourceAddress,
@@ -423,8 +435,11 @@ abstract class RawSocket implements Stream<RawSocketEvent> {
   /// longer needed.
   static Future<ConnectionTask<RawSocket>> startConnect(host, int port,
       {sourceAddress}) {
-    return IODriver.current.rawSocketDriver
-        .startConnect(host, port, sourceAddress: sourceAddress);
+    final driver = IODriver.current.rawSocketDriver;
+    if (driver == null) {
+      throw new UnimplementedError();
+    }
+    return driver.startConnect(host, port, sourceAddress: sourceAddress);
   }
 }
 

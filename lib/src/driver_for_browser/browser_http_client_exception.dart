@@ -18,14 +18,19 @@ import 'package:universal_io/io.dart';
 import 'browser_http_client.dart';
 
 class BrowserHttpClientException implements SocketException {
+  /// Can be used to disable verbose messages.
+  static bool verbose = true;
+
   static final Set<String> _corsSimpleMethods = Set<String>.from(const [
     "GET",
     "HEAD",
     "POST",
   ]);
+
   final String method;
   final String url;
   final String origin;
+  final HttpHeaders headers;
 
   final bool corsCredentialsMode;
 
@@ -41,14 +46,19 @@ class BrowserHttpClientException implements SocketException {
   @override
   final int port = null;
 
-  BrowserHttpClientException(
-      {@required this.method,
-      @required this.url,
-      @required this.origin,
-      @required this.corsCredentialsMode});
+  BrowserHttpClientException({
+    @required this.method,
+    @required this.url,
+    @required this.origin,
+    @required this.headers,
+    @required this.corsCredentialsMode,
+  });
 
   @override
   String toString() {
+    if (!verbose) {
+      return "XMLHttpRequest error";
+    }
     final sb = StringBuffer();
     for (var i = 0; i < 80; i++) {
       sb.write("-");
@@ -67,6 +77,12 @@ reason for the error).\n""");
       sb.write("\n");
     }
 
+    final headerNames = <String>[];
+    headers.forEach((name, values) {
+      headerNames.add(name);
+    });
+    headerNames.sort();
+
     addEntry("HTTP method: ", method);
     addEntry("URL: ", url);
     addEntry("Origin: ", origin);
@@ -76,27 +92,44 @@ reason for the error).\n""");
         corsCredentialsMode) {
       sb.write("\n");
       sb.write("Cross-origin request!\n");
-      sb.write("'CORS credentials mode' is ");
+      sb.write("'CORS 'credentials' mode' is ");
       if (corsCredentialsMode) {
-        sb.write("enabled (cookies will be supported).\n");
+        sb.write("enabled.\n");
       } else {
-        sb.write("disabled (cookies will NOT be supported).\n");
-      }
-      sb.write("\n");
-      sb.write("""
-If the URL is correct and the server actually responded, did the response
-include the following required CORS headers?\n""");
+        sb.write("disabled.\n");
+        sb.write("""
+This means that the browser will not send authentication (cookies, etc.) to the server.
 
-      sb.write("  * Access-Control-Allow-Origin: $origin\n");
-      if (corsCredentialsMode) {
-        sb.write(
-            "    * Wildcard '*' is not allowed because of credentials mode!\n");
-        sb.write("  * Access-Control-Allow-Credentials: true\n");
-      } else {
-        sb.write("    * Wildcard '*' is also acceptable.\n");
+Want to enable credentials mode?
+Enable it with: request.headers.set('Authorization', null)""");
       }
-      if (!_corsSimpleMethods.contains(method)) {
+      sb.write("\nDid the server send the following mandatory headers?\n");
+
+      // Access-Control-Allow-Credentials
+      if (corsCredentialsMode) {
+        sb.write("  * Access-Control-Allow-Credentials: true\n");
+        sb.write("  * Access-Control-Allow-Origin: $origin\n");
+        sb.write("    * In credentials mode, '*' would fail!\n");
         sb.write("  * Access-Control-Allow-Methods: $method\n");
+        sb.write("    * In credentials mode, '*' would fail!\n");
+        if (headerNames.isNotEmpty) {
+          final joined = headerNames.join(', ');
+          sb.write("  * Access-Control-Allow-Headers: $joined\n");
+          sb.write("    * In credentials mode, '*' would fail!\n");
+        }
+      } else {
+        sb.write("  * Access-Control-Allow-Credentials: true\n");
+        sb.write("  * Access-Control-Allow-Origin: $origin\n");
+        sb.write("    * OR '*'\n");
+        if (!_corsSimpleMethods.contains(method)) {
+          sb.write("  * Access-Control-Allow-Methods: $method\n");
+          sb.write("    * OR '*'\n");
+        }
+        if (headerNames.isNotEmpty) {
+          final joined = headerNames.join(', ');
+          sb.write("  * Access-Control-Allow-Headers: $joined\n");
+          sb.write("    * OR '*'\n");
+        }
       }
     }
     // Write a line

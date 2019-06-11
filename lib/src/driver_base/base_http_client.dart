@@ -38,22 +38,24 @@ abstract class BaseHttpClient implements HttpClient {
   String userAgent;
 
   @override
-  set authenticate(Future<bool> f(Uri url, String scheme, String realm)) {}
+  Future<bool> Function(Uri url, String scheme, String realm) authenticate;
 
   @override
-  set authenticateProxy(
-      Future<bool> f(String host, int port, String scheme, String realm)) {}
+  Future<bool> Function(String host, int port, String scheme, String realm)
+      authenticateProxy;
 
   @override
-  set badCertificateCallback(
-      bool callback(X509Certificate cert, String host, int port)) {}
+  bool Function(X509Certificate cert, String host, int port)
+      badCertificateCallback;
 
   @override
   set findProxy(String f(Uri url)) {}
 
   @override
   void addCredentials(
-      Uri url, String realm, HttpClientCredentials credentials) {}
+      Uri url, String realm, HttpClientCredentials credentials) {
+    throw new UnimplementedError();
+  }
 
   @override
   void addProxyCredentials(
@@ -142,9 +144,17 @@ abstract class BaseHttpClient implements HttpClient {
   Future<HttpClientRequest> putUrl(Uri url) {
     return openUrl("PUT", url);
   }
+
+  void _prepareRequest(HttpClientRequest request) {
+    if (userAgent != null) {
+      request.headers.set(HttpHeaders.userAgentHeader, userAgent);
+    }
+  }
 }
 
 abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
+  final BaseHttpClient client;
+
   @override
   final String method;
 
@@ -152,7 +162,7 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
   final Uri uri;
 
   @override
-  final HttpHeaders headers = HttpHeadersImpl("1.0");
+  final HttpHeaders headers = HttpHeadersImpl("1.1");
 
   final Completer<HttpClientResponse> _completer =
       Completer<HttpClientResponse>();
@@ -164,7 +174,7 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
 
   final bool _supportsBody;
 
-  BaseHttpClientRequest(this.method, this.uri)
+  BaseHttpClientRequest(this.client, this.method, this.uri)
       : this._supportsBody = _httpMethodSupportsBody(method) {
     if (method == null) {
       throw ArgumentError.notNull("method");
@@ -172,6 +182,7 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
     if (uri == null) {
       throw ArgumentError.notNull("uri");
     }
+    client._prepareRequest(this);
   }
 
   @override
@@ -280,12 +291,17 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
 abstract class BaseHttpClientResponse extends Stream<List<int>>
     implements HttpClientResponse {
   @override
-  final HttpHeaders headers = HttpHeadersImpl("1.0");
+  final HttpHeaders headers = HttpHeadersImpl("1.1");
+
+  final BaseHttpClient client;
+
+  final BaseHttpClientRequest request;
+  List<Cookie> _cookies;
+
+  BaseHttpClientResponse(this.client, this.request);
 
   @override
   X509Certificate get certificate => null;
-
-  HttpClient get client;
 
   @override
   HttpConnectionInfo get connectionInfo => null;
@@ -293,16 +309,18 @@ abstract class BaseHttpClientResponse extends Stream<List<int>>
   @override
   int get contentLength => -1;
 
-  List<Cookie> _cookies;
   @override
   List<Cookie> get cookies {
-    if (_cookies == null) {
-      final _cookies = <Cookie>[];
-      for (var value in headers[HttpHeaders.setCookieHeader]) {
-        _cookies.add(Cookie.fromSetCookieValue(value));
+    var cookies = this._cookies;
+    if (cookies == null) {
+      cookies = <Cookie>[];
+      final headerValues = headers[HttpHeaders.setCookieHeader] ?? <String>[];
+      for (var headerValue in headerValues) {
+        _cookies.add(Cookie.fromSetCookieValue(headerValue));
       }
+      this._cookies = cookies;
     }
-    return _cookies;
+    return cookies;
   }
 
   @override
@@ -318,8 +336,6 @@ abstract class BaseHttpClientResponse extends Stream<List<int>>
 
   @override
   List<RedirectInfo> get redirects => const <RedirectInfo>[];
-
-  HttpClientRequest get request;
 
   int get statusCode;
 

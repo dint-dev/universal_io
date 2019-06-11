@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:test/test.dart';
-import 'package:universal_io/utils.dart';
+import 'package:universal_io/driver_base.dart' show Uint8ListBuffer;
 
 void main() {
   group("Uint8ListBuffer", () {

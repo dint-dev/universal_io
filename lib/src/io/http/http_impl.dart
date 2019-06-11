@@ -583,7 +583,7 @@ class _CopyingBytesBuilder implements BytesBuilder {
 }
 
 abstract class _Credentials {
-  _HttpClientCredentials credentials;
+  HttpClientCredentialsImpl credentials;
   String realm;
   bool used = false;
 
@@ -1073,12 +1073,12 @@ class _HttpClient implements HttpClient {
   }
 }
 
-class _HttpClientBasicCredentials extends _HttpClientCredentials
+class HttpClientBasicCredentialsImpl extends HttpClientCredentialsImpl
     implements HttpClientBasicCredentials {
   String username;
   String password;
 
-  _HttpClientBasicCredentials(this.username, this.password);
+  HttpClientBasicCredentialsImpl(this.username, this.password);
 
   _AuthenticationScheme get scheme => _AuthenticationScheme.BASIC;
 
@@ -1371,13 +1371,13 @@ class _HttpClientConnection {
 //
 // Most notable is the GZip compression, that uses a double-buffering system,
 // one before gzip (_gzipBuffer) and one after (_buffer).
-abstract class _HttpClientCredentials implements HttpClientCredentials {
+abstract class HttpClientCredentialsImpl implements HttpClientCredentials {
   _AuthenticationScheme get scheme;
   void authorize(_Credentials credentials, HttpClientRequest request);
   void authorizeProxy(_ProxyCredentials credentials, HttpClientRequest request);
 }
 
-class _HttpClientDigestCredentials extends _HttpClientCredentials
+class _HttpClientDigestCredentials extends HttpClientCredentialsImpl
     implements HttpClientDigestCredentials {
   String username;
   String password;
@@ -3004,7 +3004,7 @@ class _ProxyCredentials extends _Credentials {
   String host;
   int port;
 
-  _ProxyCredentials(this.host, this.port, realm, _HttpClientCredentials creds)
+  _ProxyCredentials(this.host, this.port, realm, HttpClientCredentialsImpl creds)
       : super(creds, realm);
 
   bool applies(_Proxy proxy, _AuthenticationScheme scheme) {
@@ -3053,7 +3053,7 @@ abstract class _ServiceObject {
 class _SiteCredentials extends _Credentials {
   Uri uri;
 
-  _SiteCredentials(this.uri, realm, _HttpClientCredentials creds)
+  _SiteCredentials(this.uri, realm, HttpClientCredentialsImpl creds)
       : super(creds, realm);
 
   bool applies(Uri uri, _AuthenticationScheme scheme) {

@@ -165,13 +165,30 @@ class VMHttpServerDriver implements HttpServerDriver {
   const VMHttpServerDriver();
 
   @override
-  Future<HttpServer> bindHttpServer(address, int port,
+  Future<HttpServer> bind(address, int port,
       {int backlog = 0, bool v6Only = false, bool shared = false}) {
     return HttpServer.bind(
       address,
       port,
       backlog: backlog,
       v6Only: v6Only,
+      shared: shared,
+    );
+  }
+
+  @override
+  Future<HttpServer> bindSecure(address, int port, SecurityContext context,
+      {int backlog = 0,
+      bool v6Only = false,
+      bool requestClientCertificate = false,
+      bool shared = false}) {
+    return HttpServer.bindSecure(
+      address,
+      port,
+      context,
+      backlog: backlog,
+      v6Only: v6Only,
+      requestClientCertificate: requestClientCertificate,
       shared: shared,
     );
   }

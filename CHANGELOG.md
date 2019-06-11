@@ -1,3 +1,7 @@
+# 0.7.1
+  * Fixed various bugs.
+  * Improved the test suite.
+  
 # 0.7.0
   * Improved driver base classes and the test suite.
   

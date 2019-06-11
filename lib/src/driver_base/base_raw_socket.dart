@@ -17,7 +17,7 @@ import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
 import 'package:universal_io/io.dart';
-import 'package:universal_io/utils.dart';
+import 'package:universal_io/driver_base.dart' show Uint8ListBuffer;
 
 abstract class BaseRawSocket extends Stream<RawSocketEvent>
     implements RawSocket {

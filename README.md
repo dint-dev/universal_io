@@ -18,7 +18,7 @@ code files that were derived from Dart SDK).
 In `pubspec.yaml`:
 ```yaml
 dependencies:
-  universal_io: '>=0.7.0 <2.0.0'
+  universal_io: '>=0.7.1 <2.0.0'
 ```
 
 ## 2. Choose a driver (optional)
@@ -75,13 +75,19 @@ possible issues like missing cross-origin headers. The error messages look like:
     Origin:        http://source.com
     
     Cross-origin request!
-    CORS credentials mode' is disabled (cookies will NOT be supported).
+    CORS 'credentials' mode is disabled.
+    This means that the browser will not send authentication (cookies, etc.) to the server.
     
-    If the URL is correct and the server actually responded, did the response
-    include the following required CORS headers?
+    Want to enable credentials mode? You can do it by setting:
+      * request.headers.set('Authorization', "someValue")
+    
+    Did the server send the following mandatory headers?
       * Access-Control-Allow-Origin: http://source.com
-        * Wildcard '*' is also acceptable.
+        * OR '*'
       * Access-Control-Allow-Methods: PUT
+
+### HttpServer
+  * Requires sockets.
 
 ### Platform
   * In browser, variables are determined by browser APIs such as _navigator.userAgent_.
@@ -90,7 +96,7 @@ possible issues like missing cross-origin headers. The error messages look like:
 ### Files
   * Any attempt to use these APIs will throw _UnimplementedError_.
 
-### Socket classes and HttpServer
+### Sockets
   * Any attempt to use these APIs will throw _UnimplementedError_.
 
 ## Writing your own driver?
@@ -106,5 +112,5 @@ void main() {
 /// Let's change 'Platform' implementation (in browser).
 final exampleIODriver = IODriver(
   platformDriver: PlatformDriver(localeName:"en-US"),
-).fillMissingFieldsFrom(defaultIODriver);
+).fillMissingFeaturesFrom(defaultIODriver);
 ```

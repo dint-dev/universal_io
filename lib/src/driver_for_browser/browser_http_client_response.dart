@@ -15,42 +15,30 @@
 import 'dart:async';
 import 'dart:html' as html;
 
-import 'package:meta/meta.dart';
 import 'package:universal_io/driver_base.dart';
-import 'package:universal_io/io.dart';
 
 import 'browser_http_client.dart';
+import 'browser_http_client_request.dart';
 
 /// Used by [BrowserHttpClient].
 class BrowserHttpClientResponse extends BaseHttpClientResponse {
-  final HttpClient client;
-  final HttpClientRequest request;
-  final html.HttpRequest browserResponse;
+  final html.HttpRequest _xhr;
   final Stream<List<int>> _body;
 
-  @override
-  final HttpHeaders headers = HttpHeadersImpl("1.0");
-
-  BrowserHttpClientResponse(this.browserResponse, this._body,
-      {@required this.client, @required this.request})
-      : assert(browserResponse != null) {
+  BrowserHttpClientResponse(BrowserHttpClient client, BrowserHttpClientRequest request, this._xhr, this._body)
+      : assert(_xhr != null), super(client, request) {
     final headers = this.headers;
-    browserResponse.responseHeaders.forEach((k, v) {
-      headers.add(k, v);
+    _xhr.responseHeaders.forEach((name, value) {
+      headers.add(name, value);
     });
   }
 
   @override
-  bool get isRedirect =>
-      HttpStatus.temporaryRedirect == statusCode ||
-      HttpStatus.movedPermanently == statusCode;
-
-  @override
   String get reasonPhrase {
-    return browserResponse.statusText;
+    return _xhr.statusText;
   }
 
-  int get statusCode => browserResponse.status;
+  int get statusCode => _xhr.status;
 
   @override
   StreamSubscription<List<int>> listen(void onData(List<int> event),
@@ -61,19 +49,5 @@ class BrowserHttpClientResponse extends BaseHttpClientResponse {
       onDone: onDone,
       cancelOnError: cancelOnError,
     );
-  }
-
-  @override
-  Future<HttpClientResponse> redirect(
-      [String method, Uri url, bool followLoops]) {
-    final newUrl =
-        url ?? Uri.parse(this.headers.value(HttpHeaders.locationHeader));
-    return client.openUrl(method ?? request.method, newUrl).then((newRequest) {
-      request.headers.forEach((name, value) {
-        newRequest.headers.add(name, value);
-      });
-      newRequest.followRedirects = true;
-      return newRequest.close();
-    });
   }
 }

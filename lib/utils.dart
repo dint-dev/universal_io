@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// Various utilities.
+@Deprecated("Use 'package:universal_io/driver_base.dart' instead")
 library universal_io.utils;
 
-export 'src/utils/buffer.dart';
+export 'src/driver_base/buffer.dart';
