@@ -1,3 +1,6 @@
+# 0.7.2
+  * Small fixes.
+  
 # 0.7.1
   * Fixed various bugs.
   * Improved the test suite.

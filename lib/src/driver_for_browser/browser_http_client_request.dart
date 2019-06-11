@@ -112,7 +112,6 @@ class BrowserHttpClientRequest extends BaseHttpClientRequest {
 
         // Create HttpClientResponse
         final httpClientResponse = BrowserHttpClientResponse(
-          client,
           this,
           xhr,
           body,

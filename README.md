@@ -18,7 +18,7 @@ code files that were derived from Dart SDK).
 In `pubspec.yaml`:
 ```yaml
 dependencies:
-  universal_io: '>=0.7.1 <2.0.0'
+  universal_io: '>=0.7.2 <2.0.0'
 ```
 
 ## 2. Choose a driver (optional)
@@ -35,12 +35,6 @@ dependencies:
 ### Chrome OS App?
   * [universal_io_driver_chrome_os](https://github.com/terrier989/dart-universal_io_driver_chrome_os)
 
-### Node.JS?
-  * [universal_io_driver_node](https://github.com/terrier989/dart-universal_io_driver_node)
-
-### GRPC messaging?
-  * [universal_io_driver_grpc](https://github.com/terrier989/dart-universal_io_driver_grpc)
-
 ## 3. Use
 
 ```dart
@@ -52,7 +46,6 @@ void main() async {
   final request = await httpClient.getUrl(Uri.parse("http://google.com"));
   final response = await request.close();
 }
-
 ```
 
 # Manual
@@ -75,11 +68,8 @@ possible issues like missing cross-origin headers. The error messages look like:
     Origin:        http://source.com
     
     Cross-origin request!
-    CORS 'credentials' mode is disabled.
-    This means that the browser will not send authentication (cookies, etc.) to the server.
-    
-    Want to enable credentials mode? You can do it by setting:
-      * request.headers.set('Authorization', "someValue")
+    CORS 'credentials' mode is disabled (the browser will not send authentication like cookies).
+    You can enable 'credentials' mode with: request.headers.set('Authorization', "someValue")
     
     Did the server send the following mandatory headers?
       * Access-Control-Allow-Origin: http://source.com

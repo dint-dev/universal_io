@@ -98,10 +98,9 @@ reason for the error).\n""");
       } else {
         sb.write("disabled.\n");
         sb.write("""
-This means that the browser will not send authentication (cookies, etc.) to the server.
-
-Want to enable credentials mode?
-Enable it with: request.headers.set('Authorization', null)""");
+CORS 'credentials' mode is disabled (the browser will not send authentication like cookies).
+You can enable 'credentials' mode with: request.headers.set('Authorization', "someValue")
+""");
       }
       sb.write("\nDid the server send the following mandatory headers?\n");
 

@@ -25,8 +25,8 @@ class BrowserHttpClientResponse extends BaseHttpClientResponse {
   final html.HttpRequest _xhr;
   final Stream<List<int>> _body;
 
-  BrowserHttpClientResponse(BrowserHttpClient client, BrowserHttpClientRequest request, this._xhr, this._body)
-      : assert(_xhr != null), super(client, request) {
+  BrowserHttpClientResponse(BrowserHttpClientRequest request, this._xhr, this._body)
+      : assert(_xhr != null), super(request) {
     final headers = this.headers;
     _xhr.responseHeaders.forEach((name, value) {
       headers.add(name, value);

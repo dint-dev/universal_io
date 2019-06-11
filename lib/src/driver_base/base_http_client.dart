@@ -292,13 +292,11 @@ abstract class BaseHttpClientResponse extends Stream<List<int>>
     implements HttpClientResponse {
   @override
   final HttpHeaders headers = HttpHeadersImpl("1.1");
-
-  final BaseHttpClient client;
-
-  final BaseHttpClientRequest request;
+  BaseHttpClient get client => request.client;
+  BaseHttpClientRequest request;
   List<Cookie> _cookies;
 
-  BaseHttpClientResponse(this.client, this.request);
+  BaseHttpClientResponse(this.request);
 
   @override
   X509Certificate get certificate => null;
