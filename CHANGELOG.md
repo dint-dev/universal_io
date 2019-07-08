@@ -1,3 +1,6 @@
+# 0.7.3
+  * Fixed the following error thrown by the Dart build system in some cases: "Unsupported conditional import of dart:io found in universal_io|lib/io.dart".
+  
 # 0.7.2
   * Small fixes.
   

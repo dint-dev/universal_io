@@ -15,4 +15,4 @@
 /// Cross-platform implementation of 'dart:io'.
 library universal_io;
 
-export 'src/io/io.dart' if (dart.library.io) 'dart:io';
+export 'src/io/io.dart' if (dart.library.io) 'src/sdk_io.dart';
