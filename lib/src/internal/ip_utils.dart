@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 /// Parses IPv4/IPv6 address.
-List<int> parseIp(String source) {
+Uint8List parseIp(String source) {
   if (source == null) {
     throw ArgumentError.notNull();
   }
@@ -20,12 +20,12 @@ List<int> parseIp(String source) {
 }
 
 /// Parses IPv4 addresses such as "127.0.0.1"
-List<int> _parseIp4(String source) {
+Uint8List _parseIp4(String source) {
   final bytes = source.split(".").map((number) => int.parse(number)).toList();
   if (bytes.length != 4) {
     throw ArgumentError.value(source);
   }
-  return bytes;
+  return Uint8List.fromList(bytes);
 }
 
 /// Parses IPv6 addresses such as:
@@ -33,7 +33,7 @@ List<int> _parseIp4(String source) {
 ///    * "1::2"
 ///    * "1:2:3:4:5:6:7:8"
 ///    * "0123:4567:89AB:CDEF:0123:4567:89AB:CDEF"
-List<int> _parseIp6(String source) {
+Uint8List _parseIp6(String source) {
   final result = Uint8List(16);
 
   // Find '::' (a shorthand for a sequence of zeroes)
@@ -98,7 +98,7 @@ List<int> _parseIp6(String source) {
   return result;
 }
 
-String stringFromIp(List<int> bytes) {
+String stringFromIp(Uint8List bytes) {
   if (bytes == null) {
     throw ArgumentError.notNull();
   }
@@ -112,7 +112,7 @@ String stringFromIp(List<int> bytes) {
   }
 }
 
-String _stringFromIp6(List<int> bytes) {
+String _stringFromIp6(Uint8List bytes) {
   // ---------------------------
   // Find longest span of zeroes
   // ---------------------------

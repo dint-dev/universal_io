@@ -49,7 +49,11 @@ void testSockets({
   bool secureSocket = true,
   int times = 1,
 }) {
-  if (rawDatagramSocket || socket || serverSocket || secureSocket || secureServerSocket) {
+  if (rawDatagramSocket ||
+      socket ||
+      serverSocket ||
+      secureSocket ||
+      secureServerSocket) {
     final f = () {
       if (rawDatagramSocket) {
         testRawDatagramSocket();

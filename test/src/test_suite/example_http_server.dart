@@ -183,7 +183,7 @@ void _handleHttpRequest(HttpRequest request) async {
       case "/set_cookie":
         // Not tested in browser
         response.statusCode = HttpStatus.ok;
-        response.cookies.add(new Cookie("x", "y"));
+        response.cookies.add(Cookie("x", "y"));
         break;
 
       case "/expect_cookie":

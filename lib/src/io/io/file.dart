@@ -211,7 +211,7 @@ class FileLock {
 ///
 ///     main() {
 ///       final file = new File('file.txt');
-///       Stream<List<int>> inputStream = file.openRead();
+///       Stream<Uint8List> inputStream = file.openRead();
 ///
 ///       inputStream
 ///         .transform(utf8.decoder)       // Decode bytes to UTF-8.
@@ -482,7 +482,7 @@ abstract class File implements FileSystemEntity {
   /// In order to make sure that system resources are freed, the stream
   /// must be read to completion or the subscription on the stream must
   /// be cancelled.
-  Stream<List<int>> openRead([int start, int end]);
+  Stream<Uint8List> openRead([int start, int end]);
 
   /// Creates a new independent [IOSink] for the file. The
   /// [IOSink] must be closed when no longer used, to free
@@ -501,14 +501,14 @@ abstract class File implements FileSystemEntity {
   IOSink openWrite({FileMode mode = FileMode.write, Encoding encoding = utf8});
 
   /// Read the entire file contents as a list of bytes. Returns a
-  /// `Future<List<int>>` that completes with the list of bytes that
+  /// `Future<Uint8List>` that completes with the list of bytes that
   /// is the contents of the file.
-  Future<List<int>> readAsBytes();
+  Future<Uint8List> readAsBytes();
 
   /// Synchronously read the entire file contents as a list of bytes.
   ///
   /// Throws a [FileSystemException] if the operation fails.
-  List<int> readAsBytesSync();
+  Uint8List readAsBytesSync();
 
   /// Read the entire file contents as a string using the given
   /// [Encoding].
@@ -645,13 +645,13 @@ abstract class RandomAccessFile {
   int readByteSync();
 
   /// Reads [bytes] bytes from a file and returns the result as a list of bytes.
-  Future<List<int>> read(int bytes);
+  Future<Uint8List> read(int bytes);
 
   /// Synchronously reads a maximum of [bytes] bytes from a file and
   /// returns the result in a list of bytes.
   ///
   /// Throws a [FileSystemException] if the operation fails.
-  List<int> readSync(int bytes);
+  Uint8List readSync(int bytes);
 
   /// Reads into an existing [List<int>] from the file. If [start] is present,
   /// the bytes will be filled into [buffer] from at index [start], otherwise

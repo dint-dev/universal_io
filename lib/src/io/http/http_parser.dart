@@ -47,23 +47,6 @@
 part of universal_io.http;
 
 // Global constants.
-class _CharCode {
-  static const int HT = 9;
-  static const int LF = 10;
-  static const int CR = 13;
-  static const int SP = 32;
-  static const int AMPERSAND = 38;
-  static const int COMMA = 44;
-  static const int DASH = 45;
-  static const int SLASH = 47;
-  static const int ZERO = 48;
-  static const int ONE = 49;
-  static const int COLON = 58;
-  static const int SEMI_COLON = 59;
-  static const int EQUAL = 61;
-}
-
-// Frequently used character codes.
 class _Const {
   // Bytes for "HTTP".
   static const HTTP = [72, 84, 84, 80];
@@ -92,34 +75,72 @@ class _Const {
   ];
 }
 
+// Frequently used character codes.
+class _CharCode {
+  static const int HT = 9;
+  static const int LF = 10;
+  static const int CR = 13;
+  static const int SP = 32;
+  static const int AMPERSAND = 38;
+  static const int COMMA = 44;
+  static const int DASH = 45;
+  static const int SLASH = 47;
+  static const int ZERO = 48;
+  static const int ONE = 49;
+  static const int COLON = 58;
+  static const int SEMI_COLON = 59;
+  static const int EQUAL = 61;
+}
+
 // States of the HTTP parser state machine.
-class _HttpDetachedIncoming extends Stream<List<int>> {
-  final StreamSubscription<List<int>> subscription;
-  final List<int> bufferedData;
+class _State {
+  static const int START = 0;
+  static const int METHOD_OR_RESPONSE_HTTP_VERSION = 1;
+  static const int RESPONSE_HTTP_VERSION = 2;
+  static const int REQUEST_LINE_METHOD = 3;
+  static const int REQUEST_LINE_URI = 4;
+  static const int REQUEST_LINE_HTTP_VERSION = 5;
+  static const int REQUEST_LINE_ENDING = 6;
+  static const int RESPONSE_LINE_STATUS_CODE = 7;
+  static const int RESPONSE_LINE_REASON_PHRASE = 8;
+  static const int RESPONSE_LINE_ENDING = 9;
+  static const int HEADER_START = 10;
+  static const int HEADER_FIELD = 11;
+  static const int HEADER_VALUE_START = 12;
+  static const int HEADER_VALUE = 13;
+  static const int HEADER_VALUE_FOLDING_OR_ENDING = 14;
+  static const int HEADER_VALUE_FOLD_OR_END = 15;
+  static const int HEADER_ENDING = 16;
 
-  _HttpDetachedIncoming(this.subscription, this.bufferedData);
+  static const int CHUNK_SIZE_STARTING_CR = 17;
+  static const int CHUNK_SIZE_STARTING_LF = 18;
+  static const int CHUNK_SIZE = 19;
+  static const int CHUNK_SIZE_EXTENSION = 20;
+  static const int CHUNK_SIZE_ENDING = 21;
+  static const int CHUNKED_BODY_DONE_CR = 22;
+  static const int CHUNKED_BODY_DONE_LF = 23;
+  static const int BODY = 24;
+  static const int CLOSED = 25;
+  static const int UPGRADED = 26;
+  static const int FAILURE = 27;
 
-  StreamSubscription<List<int>> listen(void onData(List<int> event),
-      {Function onError, void onDone(), bool cancelOnError}) {
-    if (subscription != null) {
-      subscription
-        ..onData(onData)
-        ..onError(onError)
-        ..onDone(onDone);
-      if (bufferedData == null) {
-        return subscription..resume();
-      }
-      return _HttpDetachedStreamSubscription(subscription, bufferedData, onData)
-        ..resume();
-    } else {
-      // TODO(26379): add test for this branch.
-      return Stream<List<int>>.fromIterable([bufferedData]).listen(onData,
-          onError: onError, onDone: onDone, cancelOnError: cancelOnError);
-    }
-  }
+  static const int FIRST_BODY_STATE = CHUNK_SIZE_STARTING_CR;
 }
 
 // HTTP version of the request or response being parsed.
+class _HttpVersion {
+  static const int UNDETERMINED = 0;
+  static const int HTTP10 = 1;
+  static const int HTTP11 = 2;
+}
+
+// States of the HTTP parser state machine.
+class _MessageType {
+  static const int UNDETERMINED = 0;
+  static const int REQUEST = 1;
+  static const int RESPONSE = 0;
+}
+
 /// The _HttpDetachedStreamSubscription takes a subscription and some extra data,
 /// and makes it possible to "inject" the data in from of other data events
 /// from the subscription.
@@ -127,9 +148,9 @@ class _HttpDetachedIncoming extends Stream<List<int>> {
 /// It does so by overriding pause/resume, so that once the
 /// _HttpDetachedStreamSubscription is resumed, it'll deliver the data before
 /// resuming the underlaying subscription.
-class _HttpDetachedStreamSubscription implements StreamSubscription<List<int>> {
-  StreamSubscription<List<int>> _subscription;
-  List<int> _injectData;
+class _HttpDetachedStreamSubscription implements StreamSubscription<Uint8List> {
+  StreamSubscription<Uint8List> _subscription;
+  Uint8List _injectData;
   bool _isCanceled = false;
   int _pauseCount = 1;
   Function _userOnData;
@@ -149,7 +170,7 @@ class _HttpDetachedStreamSubscription implements StreamSubscription<List<int>> {
     return _subscription.cancel();
   }
 
-  void onData(void handleData(List<int> data)) {
+  void onData(void handleData(Uint8List data)) {
     _userOnData = handleData;
     _subscription.onData(handleData);
   }
@@ -201,7 +222,32 @@ class _HttpDetachedStreamSubscription implements StreamSubscription<List<int>> {
   }
 }
 
-// States of the HTTP parser state machine.
+class _HttpDetachedIncoming extends Stream<Uint8List> {
+  final StreamSubscription<Uint8List> subscription;
+  final Uint8List bufferedData;
+
+  _HttpDetachedIncoming(this.subscription, this.bufferedData);
+
+  StreamSubscription<Uint8List> listen(void onData(Uint8List event),
+      {Function onError, void onDone(), bool cancelOnError}) {
+    if (subscription != null) {
+      subscription
+        ..onData(onData)
+        ..onError(onError)
+        ..onDone(onDone);
+      if (bufferedData == null) {
+        return subscription..resume();
+      }
+      return _HttpDetachedStreamSubscription(subscription, bufferedData, onData)
+        ..resume();
+    } else {
+      // TODO(26379): add test for this branch.
+      return Stream<Uint8List>.fromIterable([bufferedData]).listen(onData,
+          onError: onError, onDone: onDone, cancelOnError: cancelOnError);
+    }
+  }
+}
+
 /// HTTP parser which parses the data stream given to [consume].
 ///
 /// If an HTTP parser error occurs, the parser will signal an error to either
@@ -252,11 +298,11 @@ class _HttpParser extends Stream<_HttpIncoming> {
 
   // The current incoming connection.
   _HttpIncoming _incoming;
-  StreamSubscription<List<int>> _socketSubscription;
+  StreamSubscription<Uint8List> _socketSubscription;
   bool _paused = true;
   bool _bodyPaused = false;
   StreamController<_HttpIncoming> _controller;
-  StreamController<List<int>> _bodyController;
+  StreamController<Uint8List> _bodyController;
 
   factory _HttpParser.requestParser() {
     return _HttpParser._(true);
@@ -288,18 +334,94 @@ class _HttpParser extends Stream<_HttpIncoming> {
     _reset();
   }
 
-  set isHead(bool value) {
-    if (value) _noMessageBody = true;
+  StreamSubscription<_HttpIncoming> listen(void onData(_HttpIncoming event),
+      {Function onError, void onDone(), bool cancelOnError}) {
+    return _controller.stream.listen(onData,
+        onError: onError, onDone: onDone, cancelOnError: cancelOnError);
   }
 
-  int get messageType => _messageType;
+  void listenToStream(Stream<Uint8List> stream) {
+    // Listen to the stream and handle data accordingly. When a
+    // _HttpIncoming is created, _dataPause, _dataResume, _dataDone is
+    // given to provide a way of controlling the parser.
+    // TODO(ajohnsen): Remove _dataPause, _dataResume and _dataDone and clean up
+    // how the _HttpIncoming signals the parser.
+    _socketSubscription =
+        stream.listen(_onData, onError: _controller.addError, onDone: _onDone);
+  }
 
-  bool get persistentConnection => _persistentConnection;
+  void _parse() {
+    try {
+      _doParse();
+    } catch (e, s) {
+      _state = _State.FAILURE;
+      _reportError(e, s);
+    }
+  }
 
   // Process end of headers. Returns true if the parser should stop
   // parsing and return. This will be in case of either an upgrade
   // request or a request or response with an empty body.
-  int get transferLength => _transferLength;
+  bool _headersEnd() {
+    _headers._mutable = false;
+
+    _transferLength = _headers.contentLength;
+    // Ignore the Content-Length header if Transfer-Encoding
+    // is chunked (RFC 2616 section 4.4)
+    if (_chunked) _transferLength = -1;
+
+    // If a request message has neither Content-Length nor
+    // Transfer-Encoding the message must not have a body (RFC
+    // 2616 section 4.3).
+    if (_messageType == _MessageType.REQUEST &&
+        _transferLength < 0 &&
+        _chunked == false) {
+      _transferLength = 0;
+    }
+    if (_connectionUpgrade) {
+      _state = _State.UPGRADED;
+      _transferLength = 0;
+    }
+    _createIncoming(_transferLength);
+    if (_requestParser) {
+      _incoming.method = String.fromCharCodes(_method);
+      _incoming.uri = Uri.parse(String.fromCharCodes(_uri_or_reason_phrase));
+    } else {
+      _incoming.statusCode = _statusCode;
+      _incoming.reasonPhrase = String.fromCharCodes(_uri_or_reason_phrase);
+    }
+    _method.clear();
+    _uri_or_reason_phrase.clear();
+    if (_connectionUpgrade) {
+      _incoming.upgraded = true;
+      _parserCalled = false;
+      var tmp = _incoming;
+      _closeIncoming();
+      _controller.add(tmp);
+      return true;
+    }
+    if (_transferLength == 0 ||
+        (_messageType == _MessageType.RESPONSE && _noMessageBody)) {
+      _reset();
+      var tmp = _incoming;
+      _closeIncoming();
+      _controller.add(tmp);
+      return false;
+    } else if (_chunked) {
+      _state = _State.CHUNK_SIZE;
+      _remainingContent = 0;
+    } else if (_transferLength > 0) {
+      _remainingContent = _transferLength;
+      _state = _State.BODY;
+    } else {
+      // Neither chunked nor content length. End of body
+      // indicated by close.
+      _state = _State.BODY;
+    }
+    _parserCalled = false;
+    _controller.add(_incoming);
+    return true;
+  }
 
   // From RFC 2616.
   // generic-message = start-line
@@ -310,109 +432,6 @@ class _HttpParser extends Stream<_HttpIncoming> {
   // Request-Line    = Method SP Request-URI SP HTTP-Version CRLF
   // Status-Line     = HTTP-Version SP Status-Code SP Reason-Phrase CRLF
   // message-header  = field-name ":" [ field-value ]
-  bool get upgrade => _connectionUpgrade && _state == _State.UPGRADED;
-
-  String get version {
-    switch (_httpVersion) {
-      case _HttpVersion.HTTP10:
-        return "1.0";
-      case _HttpVersion.HTTP11:
-        return "1.1";
-    }
-    return null;
-  }
-
-  _HttpDetachedIncoming detachIncoming() {
-    // Simulate detached by marking as upgraded.
-    _state = _State.UPGRADED;
-    return _HttpDetachedIncoming(_socketSubscription, readUnparsedData());
-  }
-
-  StreamSubscription<_HttpIncoming> listen(void onData(_HttpIncoming event),
-      {Function onError, void onDone(), bool cancelOnError}) {
-    return _controller.stream.listen(onData,
-        onError: onError, onDone: onDone, cancelOnError: cancelOnError);
-  }
-
-  void listenToStream(Stream<List<int>> stream) {
-    // Listen to the stream and handle data accordingly. When a
-    // _HttpIncoming is created, _dataPause, _dataResume, _dataDone is
-    // given to provide a way of controlling the parser.
-    // TODO(ajohnsen): Remove _dataPause, _dataResume and _dataDone and clean up
-    // how the _HttpIncoming signals the parser.
-    _socketSubscription =
-        stream.listen(_onData, onError: _controller.addError, onDone: _onDone);
-  }
-
-  List<int> readUnparsedData() {
-    if (_buffer == null) return null;
-    if (_index == _buffer.length) return null;
-    var result = _buffer.sublist(_index);
-    _releaseBuffer();
-    return result;
-  }
-
-  bool _caseInsensitiveCompare(List<int> expected, List<int> value) {
-    if (expected.length != value.length) return false;
-    for (int i = 0; i < expected.length; i++) {
-      if (expected[i] != _toLowerCaseByte(value[i])) return false;
-    }
-    return true;
-  }
-
-  void _closeIncoming([bool closing = false]) {
-    // Ignore multiple close (can happen in re-entrance).
-    if (_incoming == null) return;
-    var tmp = _incoming;
-    tmp.close(closing);
-    _incoming = null;
-    if (_bodyController != null) {
-      _bodyController.close();
-      _bodyController = null;
-    }
-    _bodyPaused = false;
-    _pauseStateChanged();
-  }
-
-  void _createIncoming(int transferLength) {
-    assert(_incoming == null);
-    assert(_bodyController == null);
-    assert(!_bodyPaused);
-    var incoming;
-    _bodyController = StreamController<List<int>>(
-        sync: true,
-        onListen: () {
-          if (incoming != _incoming) return;
-          assert(_bodyPaused);
-          _bodyPaused = false;
-          _pauseStateChanged();
-        },
-        onPause: () {
-          if (incoming != _incoming) return;
-          assert(!_bodyPaused);
-          _bodyPaused = true;
-          _pauseStateChanged();
-        },
-        onResume: () {
-          if (incoming != _incoming) return;
-          assert(_bodyPaused);
-          _bodyPaused = false;
-          _pauseStateChanged();
-        },
-        onCancel: () {
-          if (incoming != _incoming) return;
-          if (_socketSubscription != null) {
-            _socketSubscription.cancel();
-          }
-          _closeIncoming(true);
-          _controller.close();
-        });
-    incoming = _incoming =
-        _HttpIncoming(_headers, transferLength, _bodyController.stream);
-    _bodyPaused = true;
-    _pauseStateChanged();
-  }
-
   void _doParse() {
     assert(!_parserCalled);
     _parserCalled = true;
@@ -779,7 +798,7 @@ class _HttpParser extends Stream<_HttpIncoming> {
           // Always present the data as a view. This way we can handle all
           // cases like this, and the user will not experience different data
           // typed (which could lead to polymorphic user code).
-          List<int> data = Uint8List.view(
+          Uint8List data = Uint8List.view(
               _buffer.buffer, _buffer.offsetInBytes + _index, dataAvailable);
           _bodyController.add(data);
           if (_remainingContent != -1) {
@@ -819,86 +838,7 @@ class _HttpParser extends Stream<_HttpIncoming> {
     }
   }
 
-  void _expect(int val1, int val2) {
-    if (val1 != val2) {
-      throw HttpException("Failed to parse HTTP");
-    }
-  }
-
-  int _expectHexDigit(int byte) {
-    if (0x30 <= byte && byte <= 0x39) {
-      return byte - 0x30; // 0 - 9
-    } else if (0x41 <= byte && byte <= 0x46) {
-      return byte - 0x41 + 10; // A - F
-    } else if (0x61 <= byte && byte <= 0x66) {
-      return byte - 0x61 + 10; // a - f
-    } else {
-      throw HttpException("Failed to parse HTTP");
-    }
-  }
-
-  bool _headersEnd() {
-    _headers._mutable = false;
-
-    _transferLength = _headers.contentLength;
-    // Ignore the Content-Length header if Transfer-Encoding
-    // is chunked (RFC 2616 section 4.4)
-    if (_chunked) _transferLength = -1;
-
-    // If a request message has neither Content-Length nor
-    // Transfer-Encoding the message must not have a body (RFC
-    // 2616 section 4.3).
-    if (_messageType == _MessageType.REQUEST &&
-        _transferLength < 0 &&
-        _chunked == false) {
-      _transferLength = 0;
-    }
-    if (_connectionUpgrade) {
-      _state = _State.UPGRADED;
-      _transferLength = 0;
-    }
-    _createIncoming(_transferLength);
-    if (_requestParser) {
-      _incoming.method = String.fromCharCodes(_method);
-      _incoming.uri = Uri.parse(String.fromCharCodes(_uri_or_reason_phrase));
-    } else {
-      _incoming.statusCode = _statusCode;
-      _incoming.reasonPhrase = String.fromCharCodes(_uri_or_reason_phrase);
-    }
-    _method.clear();
-    _uri_or_reason_phrase.clear();
-    if (_connectionUpgrade) {
-      _incoming.upgraded = true;
-      _parserCalled = false;
-      var tmp = _incoming;
-      _closeIncoming();
-      _controller.add(tmp);
-      return true;
-    }
-    if (_transferLength == 0 ||
-        (_messageType == _MessageType.RESPONSE && _noMessageBody)) {
-      _reset();
-      var tmp = _incoming;
-      _closeIncoming();
-      _controller.add(tmp);
-      return false;
-    } else if (_chunked) {
-      _state = _State.CHUNK_SIZE;
-      _remainingContent = 0;
-    } else if (_transferLength > 0) {
-      _remainingContent = _transferLength;
-      _state = _State.BODY;
-    } else {
-      // Neither chunked nor content length. End of body
-      // indicated by close.
-      _state = _State.BODY;
-    }
-    _parserCalled = false;
-    _controller.add(_incoming);
-    return true;
-  }
-
-  void _onData(List<int> buffer) {
+  void _onData(Uint8List buffer) {
     _socketSubscription.pause();
     assert(_buffer == null);
     _buffer = buffer;
@@ -959,38 +899,37 @@ class _HttpParser extends Stream<_HttpIncoming> {
     _controller.close();
   }
 
-  void _parse() {
-    try {
-      _doParse();
-    } catch (e, s) {
-      _state = _State.FAILURE;
-      _reportError(e, s);
+  String get version {
+    switch (_httpVersion) {
+      case _HttpVersion.HTTP10:
+        return "1.0";
+      case _HttpVersion.HTTP11:
+        return "1.1";
     }
+    return null;
   }
 
-  void _pauseStateChanged() {
-    if (_incoming != null) {
-      if (!_bodyPaused && !_parserCalled) {
-        _parse();
-      }
-    } else {
-      if (!_paused && !_parserCalled) {
-        _parse();
-      }
-    }
+  int get messageType => _messageType;
+  int get transferLength => _transferLength;
+  bool get upgrade => _connectionUpgrade && _state == _State.UPGRADED;
+  bool get persistentConnection => _persistentConnection;
+
+  set isHead(bool value) {
+    if (value) _noMessageBody = true;
   }
 
-  // expected should already be lowercase.
-  void _releaseBuffer() {
-    _buffer = null;
-    _index = null;
+  _HttpDetachedIncoming detachIncoming() {
+    // Simulate detached by marking as upgraded.
+    _state = _State.UPGRADED;
+    return _HttpDetachedIncoming(_socketSubscription, readUnparsedData());
   }
 
-  void _reportError(error, [stackTrace]) {
-    if (_socketSubscription != null) _socketSubscription.cancel();
-    _state = _State.FAILURE;
-    _controller.addError(error, stackTrace);
-    _controller.close();
+  Uint8List readUnparsedData() {
+    if (_buffer == null) return null;
+    if (_index == _buffer.length) return null;
+    var result = _buffer.sublist(_index);
+    _releaseBuffer();
+    return result;
   }
 
   void _reset() {
@@ -1015,6 +954,11 @@ class _HttpParser extends Stream<_HttpIncoming> {
     _remainingContent = -1;
 
     _headers = null;
+  }
+
+  void _releaseBuffer() {
+    _buffer = null;
+    _index = null;
   }
 
   static bool _isTokenChar(int byte) {
@@ -1052,50 +996,103 @@ class _HttpParser extends Stream<_HttpIncoming> {
     //  -  0x20 is the delta between lower and upper chars.
     return (((x - 0x41) & 0x7f) < 26) ? (x | 0x20) : x;
   }
-}
 
-class _HttpVersion {
-  static const int UNDETERMINED = 0;
-  static const int HTTP10 = 1;
-  static const int HTTP11 = 2;
-}
+  // expected should already be lowercase.
+  bool _caseInsensitiveCompare(List<int> expected, List<int> value) {
+    if (expected.length != value.length) return false;
+    for (int i = 0; i < expected.length; i++) {
+      if (expected[i] != _toLowerCaseByte(value[i])) return false;
+    }
+    return true;
+  }
 
-class _MessageType {
-  static const int UNDETERMINED = 0;
-  static const int REQUEST = 1;
-  static const int RESPONSE = 0;
-}
+  void _expect(int val1, int val2) {
+    if (val1 != val2) {
+      throw HttpException("Failed to parse HTTP");
+    }
+  }
 
-class _State {
-  static const int START = 0;
-  static const int METHOD_OR_RESPONSE_HTTP_VERSION = 1;
-  static const int RESPONSE_HTTP_VERSION = 2;
-  static const int REQUEST_LINE_METHOD = 3;
-  static const int REQUEST_LINE_URI = 4;
-  static const int REQUEST_LINE_HTTP_VERSION = 5;
-  static const int REQUEST_LINE_ENDING = 6;
-  static const int RESPONSE_LINE_STATUS_CODE = 7;
-  static const int RESPONSE_LINE_REASON_PHRASE = 8;
-  static const int RESPONSE_LINE_ENDING = 9;
-  static const int HEADER_START = 10;
-  static const int HEADER_FIELD = 11;
-  static const int HEADER_VALUE_START = 12;
-  static const int HEADER_VALUE = 13;
-  static const int HEADER_VALUE_FOLDING_OR_ENDING = 14;
-  static const int HEADER_VALUE_FOLD_OR_END = 15;
-  static const int HEADER_ENDING = 16;
+  int _expectHexDigit(int byte) {
+    if (0x30 <= byte && byte <= 0x39) {
+      return byte - 0x30; // 0 - 9
+    } else if (0x41 <= byte && byte <= 0x46) {
+      return byte - 0x41 + 10; // A - F
+    } else if (0x61 <= byte && byte <= 0x66) {
+      return byte - 0x61 + 10; // a - f
+    } else {
+      throw HttpException("Failed to parse HTTP");
+    }
+  }
 
-  static const int CHUNK_SIZE_STARTING_CR = 17;
-  static const int CHUNK_SIZE_STARTING_LF = 18;
-  static const int CHUNK_SIZE = 19;
-  static const int CHUNK_SIZE_EXTENSION = 20;
-  static const int CHUNK_SIZE_ENDING = 21;
-  static const int CHUNKED_BODY_DONE_CR = 22;
-  static const int CHUNKED_BODY_DONE_LF = 23;
-  static const int BODY = 24;
-  static const int CLOSED = 25;
-  static const int UPGRADED = 26;
-  static const int FAILURE = 27;
+  void _createIncoming(int transferLength) {
+    assert(_incoming == null);
+    assert(_bodyController == null);
+    assert(!_bodyPaused);
+    var incoming;
+    _bodyController = StreamController<Uint8List>(
+        sync: true,
+        onListen: () {
+          if (incoming != _incoming) return;
+          assert(_bodyPaused);
+          _bodyPaused = false;
+          _pauseStateChanged();
+        },
+        onPause: () {
+          if (incoming != _incoming) return;
+          assert(!_bodyPaused);
+          _bodyPaused = true;
+          _pauseStateChanged();
+        },
+        onResume: () {
+          if (incoming != _incoming) return;
+          assert(_bodyPaused);
+          _bodyPaused = false;
+          _pauseStateChanged();
+        },
+        onCancel: () {
+          if (incoming != _incoming) return;
+          if (_socketSubscription != null) {
+            _socketSubscription.cancel();
+          }
+          _closeIncoming(true);
+          _controller.close();
+        });
+    incoming = _incoming =
+        _HttpIncoming(_headers, transferLength, _bodyController.stream);
+    _bodyPaused = true;
+    _pauseStateChanged();
+  }
 
-  static const int FIRST_BODY_STATE = CHUNK_SIZE_STARTING_CR;
+  void _closeIncoming([bool closing = false]) {
+    // Ignore multiple close (can happen in re-entrance).
+    if (_incoming == null) return;
+    var tmp = _incoming;
+    tmp.close(closing);
+    _incoming = null;
+    if (_bodyController != null) {
+      _bodyController.close();
+      _bodyController = null;
+    }
+    _bodyPaused = false;
+    _pauseStateChanged();
+  }
+
+  void _pauseStateChanged() {
+    if (_incoming != null) {
+      if (!_bodyPaused && !_parserCalled) {
+        _parse();
+      }
+    } else {
+      if (!_paused && !_parserCalled) {
+        _parse();
+      }
+    }
+  }
+
+  void _reportError(error, [stackTrace]) {
+    if (_socketSubscription != null) _socketSubscription.cancel();
+    _state = _State.FAILURE;
+    _controller.addError(error, stackTrace);
+    _controller.close();
+  }
 }

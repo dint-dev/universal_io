@@ -132,22 +132,22 @@ abstract class HttpServerDriver {
   const HttpServerDriver();
 
   Future<HttpServer> bind(
-      address,
-      int port, {
-        int backlog = 0,
-        bool v6Only = false,
-        bool shared = false,
-      });
+    address,
+    int port, {
+    int backlog = 0,
+    bool v6Only = false,
+    bool shared = false,
+  });
 
   Future<HttpServer> bindSecure(
-      address,
-      int port,
-      SecurityContext context, {
-        int backlog = 0,
-        bool v6Only = false,
-        bool requestClientCertificate = false,
-        bool shared = false,
-      });
+    address,
+    int port,
+    SecurityContext context, {
+    int backlog = 0,
+    bool v6Only = false,
+    bool requestClientCertificate = false,
+    bool shared = false,
+  });
 }
 
 /// Implements:
@@ -157,9 +157,9 @@ abstract class InternetAddressDriver {
   const InternetAddressDriver();
 
   Future<List<InternetAddress>> lookup(
-      String host, {
-        InternetAddressType type = InternetAddressType.any,
-      });
+    String host, {
+    InternetAddressType type = InternetAddressType.any,
+  });
 
   Future<InternetAddress> reverseLookup(InternetAddress address);
 }
@@ -235,20 +235,20 @@ class IODriver {
       httpClientDriver: httpClientDriver ?? driver.httpClientDriver,
       httpServerDriver: httpServerDriver ?? driver.httpServerDriver,
       internetAddressDriver:
-      internetAddressDriver ?? driver.internetAddressDriver,
+          internetAddressDriver ?? driver.internetAddressDriver,
       platformDriver: platformDriver ?? driver.platformDriver,
       processDriver: processDriver ?? driver.processDriver,
       networkInterfaceDriver:
-      networkInterfaceDriver ?? driver.networkInterfaceDriver,
+          networkInterfaceDriver ?? driver.networkInterfaceDriver,
       rawDatagramSocketDriver:
-      rawDatagramSocketDriver ?? driver.rawDatagramSocketDriver,
+          rawDatagramSocketDriver ?? driver.rawDatagramSocketDriver,
       rawSocketDriver: rawSocketDriver ?? driver.rawSocketDriver,
       rawServerSocketDriver:
-      rawServerSocketDriver ?? driver.rawServerSocketDriver,
+          rawServerSocketDriver ?? driver.rawServerSocketDriver,
       rawSecureSocketDriver:
-      rawSecureSocketDriver ?? driver.rawSecureSocketDriver,
+          rawSecureSocketDriver ?? driver.rawSecureSocketDriver,
       rawSecureServerSocketDriver:
-      rawSecureServerSocketDriver ?? driver.rawSecureServerSocketDriver,
+          rawSecureServerSocketDriver ?? driver.rawSecureServerSocketDriver,
     );
   }
 }
@@ -314,11 +314,11 @@ abstract class ProcessDriver {
   /// For [Process.run].
   Future<ProcessResult> run(String executable, List<String> arguments,
       {String workingDirectory,
-        Map<String, String> environment,
-        bool includeParentEnvironment = true,
-        bool runInShell = false,
-        Encoding stdoutEncoding = systemEncoding,
-        Encoding stderrEncoding = systemEncoding}) async {
+      Map<String, String> environment,
+      bool includeParentEnvironment = true,
+      bool runInShell = false,
+      Encoding stdoutEncoding = systemEncoding,
+      Encoding stderrEncoding = systemEncoding}) async {
     final process = await start(
       executable,
       arguments,
@@ -354,11 +354,11 @@ abstract class ProcessDriver {
   /// For [Process.runSync].
   ProcessResult runSync(String executable, List<String> arguments,
       {String workingDirectory,
-        Map<String, String> environment,
-        bool includeParentEnvironment = true,
-        bool runInShell = false,
-        Encoding stdoutEncoding = systemEncoding,
-        Encoding stderrEncoding = systemEncoding}) {
+      Map<String, String> environment,
+      bool includeParentEnvironment = true,
+      bool runInShell = false,
+      Encoding stdoutEncoding = systemEncoding,
+      Encoding stderrEncoding = systemEncoding}) {
     throw UnsupportedError(
       "Sync 'dart:io' APIs are not supported in the browser.",
     );
@@ -367,10 +367,10 @@ abstract class ProcessDriver {
   /// For [Process.start].
   Future<Process> start(String executable, List<String> arguments,
       {String workingDirectory,
-        Map<String, String> environment,
-        bool includeParentEnvironment = true,
-        bool runInShell = false,
-        ProcessStartMode mode = ProcessStartMode.normal});
+      Map<String, String> environment,
+      bool includeParentEnvironment = true,
+      bool runInShell = false,
+      ProcessStartMode mode = ProcessStartMode.normal});
 }
 
 /// Implements static members of [RawDatagramSocket].
@@ -379,12 +379,12 @@ abstract class RawDatagramSocketDriver {
 
   /// For [RawDatagramSocket.bind].
   Future<RawDatagramSocket> bind(
-      host,
-      int port, {
-        bool reuseAddress = true,
-        bool reusePort = false,
-        int ttl = 1,
-      });
+    host,
+    int port, {
+    bool reuseAddress = true,
+    bool reusePort = false,
+    int ttl = 1,
+  });
 }
 
 class RawSecureServerSocketDriver {
@@ -395,16 +395,16 @@ class RawSecureServerSocketDriver {
   /// Default implementation returns a class that uses [RawServerSocket] and
   /// [RawSecureSocket.secureServer].
   Future<RawSecureServerSocket> bind(
-      address,
-      int port,
-      SecurityContext context, {
-        int backlog = 0,
-        bool v6Only = false,
-        bool requestClientCertificate = false,
-        bool requireClientCertificate = false,
-        List<String> supportedProtocols,
-        bool shared = false,
-      }) async {
+    address,
+    int port,
+    SecurityContext context, {
+    int backlog = 0,
+    bool v6Only = false,
+    bool requestClientCertificate = false,
+    bool requireClientCertificate = false,
+    List<String> supportedProtocols,
+    bool shared = false,
+  }) async {
     final socket = await RawServerSocket.bind(
       address,
       port,
@@ -429,13 +429,13 @@ abstract class RawSecureSocketDriver {
 
   /// For [RawSecureSocket.connect].
   Future<RawSecureSocket> connect(
-      host,
-      int port, {
-        SecurityContext context,
-        bool onBadCertificate(X509Certificate certificate),
-        List<String> supportedProtocols,
-        Duration timeout,
-      }) async {
+    host,
+    int port, {
+    SecurityContext context,
+    bool onBadCertificate(X509Certificate certificate),
+    List<String> supportedProtocols,
+    Duration timeout,
+  }) async {
     final connectionTask = await startConnect(
       host,
       port,
@@ -462,33 +462,33 @@ abstract class RawSecureSocketDriver {
 
   /// For [RawSecureSocket.secure].
   Future<RawSecureSocket> secure(
-      RawSocket socket, {
-        StreamSubscription<RawSocketEvent> subscription,
-        host,
-        SecurityContext context,
-        bool onBadCertificate(X509Certificate certificate),
-        List<String> supportedProtocols,
-      });
+    RawSocket socket, {
+    StreamSubscription<RawSocketEvent> subscription,
+    host,
+    SecurityContext context,
+    bool onBadCertificate(X509Certificate certificate),
+    List<String> supportedProtocols,
+  });
 
   /// For [RawSecureSocket.secureServer].
   Future<RawSecureSocket> secureServer(
-      RawSocket socket,
-      SecurityContext context, {
-        StreamSubscription<RawSocketEvent> subscription,
-        List<int> bufferedData,
-        bool requestClientCertificate = false,
-        bool requireClientCertificate = false,
-        List<String> supportedProtocols,
-      });
+    RawSocket socket,
+    SecurityContext context, {
+    StreamSubscription<RawSocketEvent> subscription,
+    List<int> bufferedData,
+    bool requestClientCertificate = false,
+    bool requireClientCertificate = false,
+    List<String> supportedProtocols,
+  });
 
   /// For [RawSecureSocket.startConnect].
   Future<ConnectionTask<RawSecureSocket>> startConnect(
-      host,
-      int port, {
-        SecurityContext context,
-        bool onBadCertificate(X509Certificate certificate),
-        List<String> supportedProtocols,
-      }) async {
+    host,
+    int port, {
+    SecurityContext context,
+    bool onBadCertificate(X509Certificate certificate),
+    List<String> supportedProtocols,
+  }) async {
     final socketConnectionTask = await RawSocket.startConnect(host, port);
     final secureSocketFuture = socketConnectionTask.socket.then((rawSocket) {
       return secure(
@@ -514,12 +514,12 @@ abstract class RawServerSocketDriver {
 
   /// For [RawServerSocket.bind].
   Future<RawServerSocket> bind(
-      address,
-      int port, {
-        int backlog = 0,
-        bool v6Only = false,
-        bool shared = false,
-      });
+    address,
+    int port, {
+    int backlog = 0,
+    bool v6Only = false,
+    bool shared = false,
+  });
 }
 
 /// Implements static members of [RawSocket] and [Socket].
@@ -528,11 +528,11 @@ abstract class RawSocketDriver {
 
   /// For [RawSocket.connect].
   Future<RawSocket> connect(
-      host,
-      int port, {
-        sourceAddress,
-        Duration timeout,
-      }) async {
+    host,
+    int port, {
+    sourceAddress,
+    Duration timeout,
+  }) async {
     final connectionTask = await startConnect(
       host,
       port,
@@ -549,10 +549,10 @@ abstract class RawSocketDriver {
 
   /// For [RawSocket.startConnect].
   Future<ConnectionTask<RawSocket>> startConnect(
-      host,
-      int port, {
-        sourceAddress,
-      });
+    host,
+    int port, {
+    sourceAddress,
+  });
 }
 
 class _ConnectionTask<S> implements ConnectionTask<S> {
@@ -588,12 +588,12 @@ class _RawSecureServerSocket extends Stream<RawSecureSocket>
   final List<String> supportedProtocols;
 
   _RawSecureServerSocket(
-      this._socket,
-      this._context, {
-        @required this.requestClientCertificate,
-        @required this.requireClientCertificate,
-        @required this.supportedProtocols,
-      });
+    this._socket,
+    this._context, {
+    @required this.requestClientCertificate,
+    @required this.requireClientCertificate,
+    @required this.supportedProtocols,
+  });
 
   @override
   InternetAddress get address => _socket.address;
@@ -611,8 +611,8 @@ class _RawSecureServerSocket extends Stream<RawSecureSocket>
   StreamSubscription<RawSecureSocket> listen(
       void onData(RawSecureSocket socket),
       {Function onError,
-        void onDone(),
-        bool cancelOnError}) {
+      void onDone(),
+      bool cancelOnError}) {
     return _socket.asyncMap((rawSocket) {
       return RawSecureSocket.secureServer(
         rawSocket,

@@ -45,6 +45,7 @@
 // limitations under the License.
 
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:universal_io/src/driver/drivers_in_js.dart';
 import 'package:universal_io/src/internal/ip_utils.dart' as ip_utils;
@@ -126,7 +127,7 @@ class InternetAddress {
   /// Get the raw address of this [InternetAddress]. The result is either a
   /// 4 or 16 byte long list. The returned list is a copy, making it possible
   /// to change the list without modifying the [InternetAddress].
-  final List<int> rawAddress;
+  final Uint8List rawAddress;
 
   /// The [type] of the [InternetAddress] specified what IP protocol.
   InternetAddressType get type {
@@ -142,9 +143,9 @@ class InternetAddress {
   /// Perform a reverse dns lookup on the [address], creating a new
   /// [InternetAddress] where the host field set to the result.
   Future<InternetAddress> reverse() {
-    final driver =IODriver.current.internetAddressDriver;
-    if (driver==null) {
-      throw new UnimplementedError();
+    final driver = IODriver.current.internetAddressDriver;
+    if (driver == null) {
+      throw UnimplementedError();
     }
     return driver.reverseLookup(this);
   }
@@ -158,9 +159,9 @@ class InternetAddress {
   /// change over time.
   static Future<List<InternetAddress>> lookup(String host,
       {InternetAddressType type = InternetAddressType.any}) {
-    final driver =IODriver.current.internetAddressDriver;
-    if (driver==null) {
-      throw new UnimplementedError();
+    final driver = IODriver.current.internetAddressDriver;
+    if (driver == null) {
+      throw UnimplementedError();
     }
     return driver.lookup(host, type: type);
   }

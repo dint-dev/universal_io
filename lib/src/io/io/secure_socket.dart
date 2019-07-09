@@ -132,7 +132,7 @@ abstract class RawSecureSocket implements RawSocket {
       Duration timeout}) {
     final driver = IODriver.current.rawSecureSocketDriver;
     if (driver == null) {
-      throw new UnimplementedError();
+      throw UnimplementedError();
     }
     return driver.connect(
       host,
@@ -180,7 +180,7 @@ abstract class RawSecureSocket implements RawSocket {
     socket.writeEventsEnabled = false;
     final driver = IODriver.current.rawSecureSocketDriver;
     if (driver == null) {
-      throw new UnimplementedError();
+      throw UnimplementedError();
     }
     return driver.secure(
       socket,
@@ -224,7 +224,7 @@ abstract class RawSecureSocket implements RawSocket {
     socket.writeEventsEnabled = false;
     final driver = IODriver.current.rawSecureSocketDriver;
     if (driver == null) {
-      throw new UnimplementedError();
+      throw UnimplementedError();
     }
     return driver.secureServer(
       socket,
@@ -246,7 +246,7 @@ abstract class RawSecureSocket implements RawSocket {
       List<String> supportedProtocols}) {
     final driver = IODriver.current.rawSecureSocketDriver;
     if (driver == null) {
-      throw new UnimplementedError();
+      throw UnimplementedError();
     }
     return driver.startConnect(
       host,
@@ -262,7 +262,7 @@ abstract class RawSecureSocket implements RawSocket {
 /// TLS and SSL. The [SecureSocket] exposes both a [Stream] and an
 /// [IOSink] interface, making it ideal for using together with
 /// other [Stream]s.
-abstract class SecureSocket extends Stream<List<int>> implements Socket {
+abstract class SecureSocket extends Stream<Uint8List> implements Socket {
   /// Get the peer certificate for a connected SecureSocket.  If this
   /// SecureSocket is the server end of a secure socket connection,
   /// [peerCertificate] will return the client certificate, or null, if no

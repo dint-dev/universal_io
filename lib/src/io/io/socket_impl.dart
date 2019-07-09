@@ -53,7 +53,7 @@ import '../io.dart';
 import 'socket.dart';
 
 /// Internal [Socket] implementation that uses [RawSocket].
-class SocketImpl<T extends RawSocket> extends Stream<List<int>>
+class SocketImpl<T extends RawSocket> extends Stream<Uint8List>
     with BaseIOSink
     implements Socket {
   final T rawSocket;
@@ -122,7 +122,7 @@ class SocketImpl<T extends RawSocket> extends Stream<List<int>>
       rawSocket.getRawOption(option);
 
   @override
-  StreamSubscription<List<int>> listen(void onData(List<int> data),
+  StreamSubscription<Uint8List> listen(void onData(Uint8List data),
       {Function onError, void onDone(), bool cancelOnError}) {
     return _streamController.stream.listen(
       onData,

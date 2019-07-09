@@ -14,6 +14,7 @@
 
 import 'dart:async';
 import 'dart:html' as html;
+import 'dart:typed_data';
 
 import 'package:universal_io/driver_base.dart';
 
@@ -23,10 +24,12 @@ import 'browser_http_client_request.dart';
 /// Used by [BrowserHttpClient].
 class BrowserHttpClientResponse extends BaseHttpClientResponse {
   final html.HttpRequest _xhr;
-  final Stream<List<int>> _body;
+  final Stream<Uint8List> _body;
 
-  BrowserHttpClientResponse(BrowserHttpClientRequest request, this._xhr, this._body)
-      : assert(_xhr != null), super(request) {
+  BrowserHttpClientResponse(
+      BrowserHttpClientRequest request, this._xhr, this._body)
+      : assert(_xhr != null),
+        super(request) {
     final headers = this.headers;
     _xhr.responseHeaders.forEach((name, value) {
       headers.add(name, value);
@@ -41,7 +44,7 @@ class BrowserHttpClientResponse extends BaseHttpClientResponse {
   int get statusCode => _xhr.status;
 
   @override
-  StreamSubscription<List<int>> listen(void onData(List<int> event),
+  StreamSubscription<Uint8List> listen(void onData(Uint8List event),
       {Function onError, void onDone(), bool cancelOnError}) {
     return _body.listen(
       onData,

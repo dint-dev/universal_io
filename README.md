@@ -18,7 +18,7 @@ code files that were derived from Dart SDK).
 In `pubspec.yaml`:
 ```yaml
 dependencies:
-  universal_io: '>=0.7.2 <2.0.0'
+  universal_io: '>=0.8.0 <2.0.0'
 ```
 
 ## 2. Choose a driver (optional)

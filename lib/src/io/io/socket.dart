@@ -130,7 +130,7 @@ abstract class NetworkInterface {
       InternetAddressType type = InternetAddressType.any}) {
     final driver = IODriver.current.networkInterfaceDriver;
     if (driver == null) {
-      throw new UnimplementedError();
+      throw UnimplementedError();
     }
     return driver.listNetworkInterfaces(
         includeLoopback: includeLoopback,
@@ -242,7 +242,7 @@ abstract class RawDatagramSocket extends Stream<RawSocketEvent> {
       {bool reuseAddress = true, bool reusePort = false, int ttl = 1}) async {
     final driver = IODriver.current.rawDatagramSocketDriver;
     if (driver == null) {
-      throw new UnimplementedError();
+      throw UnimplementedError();
     }
     return driver.bind(
       host,
@@ -420,7 +420,7 @@ abstract class RawSocket implements Stream<RawSocketEvent> {
       {sourceAddress, Duration timeout}) {
     final driver = IODriver.current.rawSocketDriver;
     if (driver == null) {
-      throw new UnimplementedError();
+      throw UnimplementedError();
     }
     return driver.connect(
       host,
@@ -437,7 +437,7 @@ abstract class RawSocket implements Stream<RawSocketEvent> {
       {sourceAddress}) {
     final driver = IODriver.current.rawSocketDriver;
     if (driver == null) {
-      throw new UnimplementedError();
+      throw UnimplementedError();
     }
     return driver.startConnect(host, port, sourceAddress: sourceAddress);
   }
@@ -644,7 +644,7 @@ class ServerSocket extends Stream<Socket> {
 ///
 /// The [Socket] exposes both a [Stream] and a [IOSink] interface, making it
 /// ideal for using together with other [Stream]s.
-abstract class Socket implements Stream<List<int>>, IOSink {
+abstract class Socket implements Stream<Uint8List>, IOSink {
   /// Returns the [InternetAddress] used to connect this socket.
   InternetAddress get address;
 

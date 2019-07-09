@@ -129,9 +129,7 @@ class SecureServerSocket extends Stream<SecureSocket> {
 
   StreamSubscription<SecureSocket> listen(void onData(SecureSocket socket),
       {Function onError, void onDone(), bool cancelOnError}) {
-    return _socket
-        .asyncMap((rawSocket) => new SecureSocketImpl(rawSocket))
-        .listen(
+    return _socket.asyncMap((rawSocket) => SecureSocketImpl(rawSocket)).listen(
           onData,
           onError: onError,
           onDone: onDone,

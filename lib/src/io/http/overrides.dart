@@ -100,7 +100,7 @@ abstract class HttpOverrides {
   /// When this override is installed, this function overrides the behavior of
   /// `HttpClient.findProxyFromEnvironment`.
   String findProxyFromEnvironment(Uri url, Map<String, String> environment) {
-    return _HttpClient._findProxyFromEnvironment(url, environment);
+    return HttpClientImpl._findProxyFromEnvironment(url, environment);
   }
 
   /// Runs [body] in a fresh [Zone] using the overrides found in [overrides].

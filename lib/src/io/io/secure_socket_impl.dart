@@ -62,8 +62,8 @@ class SecureSocketImpl<T extends RawSecureSocket> extends SocketImpl<T>
   @override
   void renegotiate(
       {bool useSessionCache = true,
-        bool requestClientCertificate = false,
-        bool requireClientCertificate = false}) {
+      bool requestClientCertificate = false,
+      bool requireClientCertificate = false}) {
     return rawSocket.renegotiate(
       useSessionCache: useSessionCache,
       requestClientCertificate: requestClientCertificate,

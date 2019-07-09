@@ -135,7 +135,7 @@ class BaseFile extends BaseFileSystemEntity implements File {
   }
 
   @override
-  Stream<List<int>> openRead([int start, int end]) {
+  Stream<Uint8List> openRead([int start, int end]) {
     throw BaseFileSystemEntity._notFoundException(path);
   }
 
@@ -150,12 +150,12 @@ class BaseFile extends BaseFileSystemEntity implements File {
   }
 
   @override
-  Future<List<int>> readAsBytes() {
+  Future<Uint8List> readAsBytes() {
     throw BaseFileSystemEntity._notFoundException(path);
   }
 
   @override
-  List<int> readAsBytesSync() {
+  Uint8List readAsBytesSync() {
     throw UnimplementedError();
   }
 

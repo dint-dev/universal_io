@@ -367,7 +367,7 @@ Future<HttpClientResponse> _testClient({
   final response =
       await request.close().timeout(const Duration(milliseconds: 500));
   final actualResponseBody = await utf8
-      .decodeStream(response)
+      .decodeStream(response.cast<List<int>>())
       .timeout(const Duration(milliseconds: 500));
 
   // Check response status code
@@ -395,7 +395,7 @@ Future<HttpClientResponse> _testClient({
   return response;
 }
 
-typedef Future<HttpClientRequest> OpenUrlFunction(
+typedef OpenUrlFunction = Future<HttpClientRequest> Function(
   HttpClient client,
   String host,
   int port,
@@ -437,6 +437,6 @@ Future _testClientMethodWithoutUri({
 
   // Close request
   final response = await request.close();
-  await utf8.decodeStream(response);
+  await utf8.decodeStream(response.cast<List<int>>());
   expect(response.statusCode, 200);
 }

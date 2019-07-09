@@ -1,3 +1,8 @@
+# 0.8.0
+  * Updated classes to Dart 2.5. See [Dart SDK documentation about the changes](https://github.com/dart-lang/sdk/blob/master/CHANGELOG.md).
+    * Various APIs now return `Uint8List` instead of `List<int>`. Examples: `File`, `Socket`, `HttpClientResponse`.
+    * Various other breaking changes such as `Cookie` constructor.
+
 # 0.7.3
   * Fixed the following error thrown by the Dart build system in some cases: "Unsupported conditional import of dart:io found in universal_io|lib/io.dart".
   

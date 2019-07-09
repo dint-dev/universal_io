@@ -333,9 +333,9 @@ abstract class Process {
       bool runInShell = false,
       Encoding stdoutEncoding = systemEncoding,
       Encoding stderrEncoding = systemEncoding}) {
-    final driver =IODriver.current.processDriver;
-    if (driver==null) {
-      throw new UnimplementedError();
+    final driver = IODriver.current.processDriver;
+    if (driver == null) {
+      throw UnimplementedError();
     }
     return driver.run(
       executable,
@@ -356,9 +356,9 @@ abstract class Process {
       bool runInShell = false,
       Encoding stdoutEncoding = systemEncoding,
       Encoding stderrEncoding = systemEncoding}) {
-    final driver =IODriver.current.processDriver;
-    if (driver==null) {
-      throw new UnimplementedError();
+    final driver = IODriver.current.processDriver;
+    if (driver == null) {
+      throw UnimplementedError();
     }
     return driver.runSync(
       executable,
@@ -436,9 +436,9 @@ abstract class Process {
       bool includeParentEnvironment = true,
       bool runInShell = false,
       ProcessStartMode mode = ProcessStartMode.normal}) {
-    final driver =IODriver.current.processDriver;
-    if (driver==null) {
-      throw new UnimplementedError();
+    final driver = IODriver.current.processDriver;
+    if (driver == null) {
+      throw UnimplementedError();
     }
     return driver.start(
       executable,

@@ -17,8 +17,8 @@ import 'dart:html' as html;
 import 'dart:typed_data';
 
 import 'package:universal_io/driver_base.dart';
-import 'package:universal_io/io.dart';
 import 'package:universal_io/driver_base.dart' show Uint8ListBuffer;
+import 'package:universal_io/io.dart';
 
 import 'browser_http_client.dart';
 import 'browser_http_client_exception.dart';
@@ -52,7 +52,7 @@ class BrowserHttpClientRequest extends BaseHttpClientRequest {
 
   void _send() {
     if (cookies.isNotEmpty) {
-      throw new StateError(
+      throw StateError(
         "Attempted to send cookies, but XMLHttpRequest does not support them.",
       );
     }
@@ -155,19 +155,19 @@ class BrowserHttpClientRequest extends BaseHttpClientRequest {
     }
   }
 
-  static Stream<List<int>> _readResponseBody(
+  static Stream<Uint8List> _readResponseBody(
       String method, Uri uri, html.HttpRequest request) {
     final blob = request.response;
     if (blob == null) {
       // No body
-      return Stream<List<int>>.empty();
+      return Stream<Uint8List>.empty();
     }
 
     // Read response with FileReader
     final controller = StreamController<Uint8List>();
     var fileReader = html.FileReader();
     fileReader.onLoad.first.then((html.ProgressEvent event) {
-      var body = fileReader.result as Uint8List;
+      final body = fileReader.result as Uint8List;
       controller.add(body);
       controller.close();
     });

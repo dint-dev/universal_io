@@ -22,7 +22,7 @@ import 'package:async/async.dart';
 import 'package:test/test.dart';
 import 'package:universal_io/io.dart';
 
-void testRawSocket({bool serverSocket=true}) {
+void testRawSocket({bool serverSocket = true}) {
   group("RawSocket", () {
     test("RawSocket.connect('localhost', badPort) should fail", () {
       expect(

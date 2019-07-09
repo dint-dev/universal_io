@@ -16,8 +16,8 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
-import 'package:universal_io/io.dart';
 import 'package:universal_io/driver_base.dart' show Uint8ListBuffer;
+import 'package:universal_io/io.dart';
 
 abstract class BaseRawSocket extends Stream<RawSocketEvent>
     implements RawSocket {

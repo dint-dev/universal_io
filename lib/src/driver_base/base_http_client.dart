@@ -14,6 +14,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
 import 'package:universal_io/io.dart';
@@ -23,7 +24,7 @@ import 'http_headers_impl.dart';
 
 abstract class BaseHttpClient implements HttpClient {
   @override
-  Duration idleTimeout;
+  Duration idleTimeout = Duration(seconds: 15);
 
   @override
   Duration connectionTimeout;
@@ -32,7 +33,7 @@ abstract class BaseHttpClient implements HttpClient {
   int maxConnectionsPerHost;
 
   @override
-  bool autoUncompress;
+  bool autoUncompress = true;
 
   @override
   String userAgent;
@@ -49,20 +50,24 @@ abstract class BaseHttpClient implements HttpClient {
       badCertificateCallback;
 
   @override
-  set findProxy(String f(Uri url)) {}
+  String Function(Uri url) findProxy;
 
   @override
   void addCredentials(
       Uri url, String realm, HttpClientCredentials credentials) {
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   @override
   void addProxyCredentials(
       String host, int port, String realm, HttpClientCredentials credentials) {}
 
+      bool _isClosed = false;
+
   @override
-  void close({bool force = false}) {}
+  void close({bool force = false}) {
+    _isClosed = true;
+  }
 
   @override
   Future<HttpClientRequest> delete(String host, int port, String path) {
@@ -144,12 +149,6 @@ abstract class BaseHttpClient implements HttpClient {
   Future<HttpClientRequest> putUrl(Uri url) {
     return openUrl("PUT", url);
   }
-
-  void _prepareRequest(HttpClientRequest request) {
-    if (userAgent != null) {
-      request.headers.set(HttpHeaders.userAgentHeader, userAgent);
-    }
-  }
 }
 
 abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
@@ -176,13 +175,21 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
 
   BaseHttpClientRequest(this.client, this.method, this.uri)
       : this._supportsBody = _httpMethodSupportsBody(method) {
+    if (client._isClosed) {
+      throw StateError("HTTP client is closed");
+    }
     if (method == null) {
       throw ArgumentError.notNull("method");
     }
     if (uri == null) {
       throw ArgumentError.notNull("uri");
     }
-    client._prepareRequest(this);
+
+    // Add "User-Agent" header
+    final userAgent = client.userAgent;
+    if (userAgent != null) {
+      headers.set(HttpHeaders.userAgentHeader, userAgent);
+    }
   }
 
   @override
@@ -268,6 +275,7 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
     }
   }
 
+  /// Called by [add] after it has validated the operation.
   @protected
   void didAdd(List<int> data);
 
@@ -288,11 +296,10 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
   }
 }
 
-abstract class BaseHttpClientResponse extends Stream<List<int>>
+abstract class BaseHttpClientResponse extends Stream<Uint8List>
     implements HttpClientResponse {
   @override
   final HttpHeaders headers = HttpHeadersImpl("1.1");
-  BaseHttpClient get client => request.client;
   BaseHttpClientRequest request;
   List<Cookie> _cookies;
 
@@ -300,6 +307,13 @@ abstract class BaseHttpClientResponse extends Stream<List<int>>
 
   @override
   X509Certificate get certificate => null;
+
+  BaseHttpClient get client => request.client;
+
+  @override
+  HttpClientResponseCompressionState get compressionState {
+    return HttpClientResponseCompressionState.decompressed;
+  }
 
   @override
   HttpConnectionInfo get connectionInfo => null;
@@ -343,7 +357,7 @@ abstract class BaseHttpClientResponse extends Stream<List<int>>
   }
 
   @override
-  StreamSubscription<List<int>> listen(void onData(List<int> event),
+  StreamSubscription<Uint8List> listen(void onData(Uint8List event),
       {Function onError, void onDone(), bool cancelOnError});
 
   @override
