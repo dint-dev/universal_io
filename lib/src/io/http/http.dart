@@ -1321,7 +1321,7 @@ abstract class HttpClient {
     HttpOverrides overrides = HttpOverrides.current;
     if (overrides == null) {
       final driver = HttpClientDriver.current;
-      if (driver==null) {
+      if (driver == null) {
         throw UnimplementedError();
       }
       return driver.newHttpClient(context: context);

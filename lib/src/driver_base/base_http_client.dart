@@ -52,6 +52,8 @@ abstract class BaseHttpClient implements HttpClient {
   @override
   String Function(Uri url) findProxy;
 
+  bool _isClosed = false;
+
   @override
   void addCredentials(
       Uri url, String realm, HttpClientCredentials credentials) {
@@ -61,8 +63,6 @@ abstract class BaseHttpClient implements HttpClient {
   @override
   void addProxyCredentials(
       String host, int port, String realm, HttpClientCredentials credentials) {}
-
-      bool _isClosed = false;
 
   @override
   void close({bool force = false}) {
@@ -78,6 +78,12 @@ abstract class BaseHttpClient implements HttpClient {
   Future<HttpClientRequest> deleteUrl(Uri url) {
     return openUrl("DELETE", url);
   }
+
+  /// A protected method only for implementations.
+  ///
+  /// This method is called after the operation has been validated.
+  @protected
+  Future<HttpClientRequest> didOpenUrl(String method, Uri url);
 
   @override
   Future<HttpClientRequest> get(String host, int port, String path) {
@@ -108,16 +114,23 @@ abstract class BaseHttpClient implements HttpClient {
       query = path.substring(i + 1);
       path = path.substring(0, i);
     }
-    return openUrl(
-        method,
-        Uri(
-          scheme: "http",
-          host: host,
-          port: port,
-          path: path,
-          query: query,
-          fragment: null,
-        ));
+    final uri = Uri(
+      scheme: "http",
+      host: host,
+      port: port,
+      path: path,
+      query: query,
+      fragment: null,
+    );
+    return openUrl(method, uri);
+  }
+
+  @protected
+  Future<HttpClientRequest> openUrl(String method, Uri url) {
+    if (_isClosed) {
+      throw StateError("HTTP client is closed");
+    }
+    return didOpenUrl(method, url);
   }
 
   @override
@@ -175,9 +188,6 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
 
   BaseHttpClientRequest(this.client, this.method, this.uri)
       : this._supportsBody = _httpMethodSupportsBody(method) {
-    if (client._isClosed) {
-      throw StateError("HTTP client is closed");
-    }
     if (method == null) {
       throw ArgumentError.notNull("method");
     }
@@ -255,11 +265,8 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
       return _completer.future;
     }
     try {
-      // Wait for added stream
-      if (_addStreamFuture != null) {
-        await _addStreamFuture;
-        _addStreamFuture = null;
-      }
+      // Flush
+      await flush();
 
       // Close
       final result = await didClose();
@@ -275,12 +282,27 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
     }
   }
 
-  /// Called by [add] after it has validated the operation.
+  /// A protected method only for implementations.
+  ///
+  /// This method is called after the operation has been validated.
   @protected
   void didAdd(List<int> data);
 
+  /// A protected method only for implementations.
+  ///
+  /// Method [close] first waits writes to complete before calling this method.
   @protected
   Future<HttpClientResponse> didClose();
+
+  @override
+  Future flush() async {
+    // Wait for added stream
+    if (_addStreamFuture != null) {
+      await _addStreamFuture;
+      _addStreamFuture = null;
+    }
+    return Future.value(null);
+  }
 
   static bool _httpMethodSupportsBody(String method) {
     switch (method) {

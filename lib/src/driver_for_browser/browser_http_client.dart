@@ -24,8 +24,21 @@ import 'browser_http_client_request.dart';
 class BrowserHttpClient extends BaseHttpClient {
   BrowserHttpClient();
 
+  /// Tells whether the request is cross-origin.
+  static bool isCrossOriginUrl(String url, {String origin}) {
+    origin ??= html.window.origin;
+
+    // Add '/' so 'http://example.com' and 'http://example.com.other.com'
+    // will be different.
+    if (!origin.endsWith("/")) {
+      origin = "$origin/";
+    }
+
+    return !url.startsWith(origin);
+  }
+
   @override
-  Future<HttpClientRequest> openUrl(String method, Uri url) async {
+  Future<HttpClientRequest> didOpenUrl(String method, Uri url) {
     if (url.host == null) {
       throw ArgumentError.value(url, "url", "Host can't be null");
     }
@@ -62,19 +75,6 @@ class BrowserHttpClient extends BaseHttpClient {
     if (userAgent != null) {
       request.headers.add("User-Agent", userAgent);
     }
-    return request;
-  }
-
-  /// Tells whether the request is cross-origin.
-  static bool isCrossOriginUrl(String url, {String origin}) {
-    origin ??= html.window.origin;
-
-    // Add '/' so 'http://example.com' and 'http://example.com.other.com'
-    // will be different.
-    if (!origin.endsWith("/")) {
-      origin = "$origin/";
-    }
-
-    return !url.startsWith(origin);
+    return Future<HttpClientRequest>.value(request);
   }
 }

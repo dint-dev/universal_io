@@ -33,6 +33,8 @@ class BrowserHttpClientRequest extends BaseHttpClientRequest {
 
   final _buffer = Uint8ListBuffer();
 
+  bool _isSent = false;
+
   BrowserHttpClientRequest(String method, Uri uri, {BrowserHttpClient client})
       : super(client ?? BrowserHttpClient(), method, uri);
 
@@ -51,6 +53,10 @@ class BrowserHttpClientRequest extends BaseHttpClientRequest {
   }
 
   void _send() {
+    if (_isSent) {
+      return;
+    }
+    _isSent = true;
     if (cookies.isNotEmpty) {
       throw StateError(
         "Attempted to send cookies, but XMLHttpRequest does not support them.",
