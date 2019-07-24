@@ -6,14 +6,14 @@ homepage: https://github.com/terrier989/dart-universal_io
 author: terrier989 <terrier989@gmail.com>
 
 environment:
-  sdk: '>=2.5.0 <3.0.0'
+  sdk: '>=2.5.0-dev.1.0 <3.0.0'
 
 dependencies:
-  meta: ^1.1.7
+  meta: '>=1.1.7 <2.0.0'
   zone_local: '>=0.1.1 <2.0.0'
 
 dev_dependencies:
-  async: ^2.2.0
+  async: ^2.3.0
   pedantic: '>=1.8.0 <2.0.0'
   stream_channel: ^2.0.0
   test: ^1.6.5

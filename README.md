@@ -1,3 +1,4 @@
+[![Pub Package](https://img.shields.io/pub/v/universal_io.svg)](https://pub.dartlang.org/packages/universal_io)
 # Introduction
 A cross-platform _dart:io_ that works in VM/Flutter, browsers, and elsewhere.
 

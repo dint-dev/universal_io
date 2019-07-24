@@ -119,7 +119,7 @@ abstract class BaseRawSocket extends Stream<RawSocketEvent>
   }
 
   @override
-  List<int> read([int len]) {
+  Uint8List read([int len]) {
     return _buffer.read(maxLength: len);
   }
 
