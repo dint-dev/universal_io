@@ -7,6 +7,11 @@ Much of the source code was adopted from the original 'dart:io' in [Dart SDK](ht
 which was licensed under a BSD-style license (license terms of Dart SDK can be found in the source
 code files that were derived from Dart SDK).
 
+## Dart SDK 2.5
+  * Upcoming Dart SDK 2.5 has major breaking changes in _dart:io_. Supporting them means that we had
+    to introduce breaking changes in this package.
+  * If you use Dart SDK 2.4 or less, you should use version constraint ^0.7.3.
+
 ## Issues
   * Found issues? Report them at the [Github issue tracker](https://github.com/terrier989/dart-universal_io/issues).
   * Have a fix? [Create a pull request](https://github.com/terrier989/dart-universal_io/pull/new/master)!
@@ -16,10 +21,18 @@ code files that were derived from Dart SDK).
 
 # Getting started
 ## 1.Add a dependency
+### Dart SDK 2.5.0-dev-1.0 and above
 In `pubspec.yaml`:
 ```yaml
 dependencies:
-  universal_io: '>=0.8.0 <2.0.0'
+  universal_io: ^0.8.1
+```
+
+### Dart SDK 2.4.x
+In `pubspec.yaml`:
+```yaml
+dependencies:
+  universal_io: ^0.7.3
 ```
 
 ## 2. Choose a driver (optional)

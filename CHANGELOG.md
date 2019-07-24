@@ -1,3 +1,6 @@
+# 0.8.1
+  * Fixed pubspec.yaml and documented Dart SDK 2.5 breaking changes.
+
 # 0.8.0
   * Updated classes to Dart 2.5. See [Dart SDK documentation about the changes](https://github.com/dart-lang/sdk/blob/master/CHANGELOG.md).
     * Various APIs now return `Uint8List` instead of `List<int>`. Examples: `File`, `Socket`, `HttpClientResponse`.
