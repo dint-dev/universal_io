@@ -1,4 +1,6 @@
 [![Pub Package](https://img.shields.io/pub/v/universal_io.svg)](https://pub.dartlang.org/packages/universal_io)
+[![Build Status](https://travis-ci.org/gohilla/universal_io.svg?branch=master)](https://travis-ci.org/gohilla/universal_io)
+
 # Introduction
 A cross-platform _dart:io_ that works in VM/Flutter, browsers, and elsewhere.
 
