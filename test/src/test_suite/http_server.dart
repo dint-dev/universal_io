@@ -48,7 +48,7 @@ void testHttpServer({bool httpClient = true}) {
       // ignore: unawaited_futures
       server.close();
       expect(await server.toList(), []);
-    });
+    }, tags: ["ipv6"]);
 
     test(
         "HttpServer.bindSecure(InternetAddress.loopbackIPv6, 0, context) should succeed",
@@ -64,7 +64,7 @@ void testHttpServer({bool httpClient = true}) {
       // ignore: unawaited_futures
       server.close();
       expect(await server.toList(), []);
-    });
+    }, tags: ["ipv6"]);
 
     if (httpClient) {
       test("Should respond to HttpClient", () async {

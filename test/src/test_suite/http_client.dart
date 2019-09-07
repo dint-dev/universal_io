@@ -338,12 +338,11 @@ Future<HttpClientResponse> _testClient({
     request = await openUrl(
       client,
       uri,
-    ).timeout(const Duration(milliseconds: 500));
+    ).timeout(const Duration(seconds: 5));
   } else {
     // Use 'openUrl'
-    request = await client
-        .openUrl(method, uri)
-        .timeout(const Duration(milliseconds: 500));
+    request =
+        await client.openUrl(method, uri).timeout(const Duration(seconds: 5));
   }
 
   // Set headers
@@ -368,7 +367,7 @@ Future<HttpClientResponse> _testClient({
       await request.close().timeout(const Duration(milliseconds: 500));
   final actualResponseBody = await utf8
       .decodeStream(response.cast<List<int>>())
-      .timeout(const Duration(milliseconds: 500));
+      .timeout(const Duration(seconds: 5));
 
   // Check response status code
   expect(response, isNotNull);

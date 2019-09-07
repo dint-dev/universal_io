@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@Timeout(Duration(seconds: 2))
-library raw_datagram_socket_test;
-
 import 'dart:async';
 import 'dart:convert';
 
@@ -42,7 +39,7 @@ void testRawDatagramSocket() {
       final socket = await RawDatagramSocket.bind(
         'localhost',
         12345,
-      ).timeout(Duration(seconds: 1));
+      ).timeout(Duration(seconds: 5));
       addTearDown(() {
         socket.close();
       });
@@ -58,7 +55,7 @@ void testRawDatagramSocket() {
       final socket = await RawDatagramSocket.bind(
         InternetAddress.loopbackIPv4,
         0,
-      ).timeout(Duration(seconds: 1));
+      ).timeout(Duration(seconds: 5));
       addTearDown(() {
         socket.close();
       });
@@ -74,7 +71,7 @@ void testRawDatagramSocket() {
       final socket = await RawDatagramSocket.bind(
         InternetAddress.loopbackIPv4,
         0,
-      ).timeout(Duration(seconds: 1));
+      ).timeout(Duration(seconds: 5));
       addTearDown(() {
         socket.close();
       });
@@ -90,7 +87,7 @@ void testRawDatagramSocket() {
       final socket = await RawDatagramSocket.bind(
         InternetAddress.loopbackIPv6,
         12345,
-      ).timeout(Duration(seconds: 1));
+      ).timeout(Duration(seconds: 5));
       addTearDown(() {
         socket.close();
       });
@@ -98,7 +95,7 @@ void testRawDatagramSocket() {
       expect(socket.port, 12345);
       socket.close();
       expect(await socket.toList(), [RawSocketEvent.closed]);
-    });
+    }, tags: ["ipv6"]);
 
     test(
         "RawDatagramSocket.bind(InternetAddress.loopbackIPv6, 0) should succeed",
@@ -106,7 +103,7 @@ void testRawDatagramSocket() {
       final socket = await RawDatagramSocket.bind(
         InternetAddress.loopbackIPv6,
         0,
-      ).timeout(Duration(seconds: 1));
+      ).timeout(Duration(seconds: 5));
       addTearDown(() {
         socket.close();
       });
@@ -114,7 +111,7 @@ void testRawDatagramSocket() {
       expect(socket.port, greaterThan(0));
       socket.close();
       expect(await socket.toList(), [RawSocketEvent.closed]);
-    });
+    }, tags: ["ipv6"]);
 
     test("Two sockets communicate with each other", () async {
       // ----------------
@@ -123,7 +120,7 @@ void testRawDatagramSocket() {
       final socket0 = await RawDatagramSocket.bind(
         InternetAddress.loopbackIPv4,
         0,
-      ).timeout(Duration(seconds: 1));
+      ).timeout(Duration(seconds: 5));
       addTearDown(() {
         socket0.close();
       });
@@ -131,7 +128,7 @@ void testRawDatagramSocket() {
       final socket1 = await RawDatagramSocket.bind(
         InternetAddress.loopbackIPv4,
         0,
-      ).timeout(Duration(seconds: 1));
+      ).timeout(Duration(seconds: 5));
       ;
       addTearDown(() {
         socket1.close();
@@ -237,5 +234,5 @@ void testRawDatagramSocket() {
         socket1Done,
       ]);
     });
-  }, timeout: Timeout(Duration(seconds: 1)));
+  });
 }

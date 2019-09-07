@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@Timeout(Duration(seconds: 2))
-library server_socket_test;
-
 import 'package:test/test.dart';
 import 'package:universal_io/io.dart';
 
@@ -79,8 +76,8 @@ void testRawServerSocket() {
       // ignore: unawaited_futures
       server.close();
       expect(await server.toList(), []);
-    });
-  }, timeout: Timeout(Duration(seconds: 1)));
+    }, tags: ["ipv6"]);
+  });
 
   group("ServerSocket", () {
     test("ServerSocket.bind(null, 12345) should fail", () async {
@@ -133,6 +130,6 @@ void testRawServerSocket() {
       // ignore: unawaited_futures
       server.close();
       expect(await server.toList(), []);
-    });
-  }, timeout: Timeout(Duration(seconds: 1)));
+    }, tags: ["ipv6"]);
+  });
 }

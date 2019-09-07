@@ -13,8 +13,7 @@ which was obtained under the BSD-style license of Dart SDK.
 ## Dart SDK 2.5 breaking changes
   * Dart SDK 2.5 (currently in the Dart SDK 'dev' channel) has various breaking changes in
     _dart:io_. Consequently this package has breaking changes too.
-  * If you don't use the __latest 'dev' channel Dart SDK__, see dependency constraint
-    recommendations below.
+  * If you don't use the 2.5.0-dev-2.0 or later, see dependency constraint recommendations below.
 
 ## Issues
   * Found issues? Report them at the [Github issue tracker](https://github.com/terrier989/dart-universal_io/issues).

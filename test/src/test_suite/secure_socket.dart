@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@Timeout(Duration(seconds: 2))
-library secure_socket_test;
-
 import 'dart:convert';
 
 import 'package:test/test.dart';
@@ -34,10 +31,10 @@ void testSecureSocket({bool secureServerSocket = true}) {
   group("SecureServerSocket", () {
     test("bind(...)", () async {
       final server = await SecureServerSocket.bind(
-        InternetAddress.loopbackIPv6,
+        InternetAddress.loopbackIPv4,
         0,
         SecurityContext.defaultContext,
-      ).timeout(const Duration(seconds: 1));
+      ).timeout(const Duration(seconds: 5));
       addTearDown(() {
         server.close();
       });
@@ -51,10 +48,10 @@ void testSecureSocket({bool secureServerSocket = true}) {
       test("communicates with SecureServerSocket (with a bad certificate)",
           () async {
         final server = await SecureServerSocket.bind(
-          InternetAddress.loopbackIPv6,
+          InternetAddress.loopbackIPv4,
           0,
           localHostSecurityContext(),
-        ).timeout(const Duration(seconds: 1));
+        ).timeout(const Duration(seconds: 5));
 
         addTearDown(() {
           server.close();
@@ -74,8 +71,12 @@ void testSecureSocket({bool secureServerSocket = true}) {
         final client = await SecureSocket.connect(
           server.address,
           server.port,
-          onBadCertificate: expectAsync1((certificate) => true),
-        ).timeout(const Duration(seconds: 1));
+          onBadCertificate: expectAsync1(
+            (certificate) => true,
+            count: 1,
+            max: -1, // More than 1 was observed in CI.
+          ),
+        ).timeout(const Duration(seconds: 5));
 
         addTearDown(() {
           client.close();

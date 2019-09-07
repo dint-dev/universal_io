@@ -5,3 +5,6 @@ dart:
 
 branches:
   only: [master]
+
+dart_task:
+  - test: --exclude-tags "ipv6"

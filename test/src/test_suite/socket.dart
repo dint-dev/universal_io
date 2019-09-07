@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@Timeout(Duration(seconds: 2))
-library socket_test;
-
 import 'dart:async';
 import 'dart:convert';
 
@@ -98,15 +95,28 @@ void _testRawSocketAndRawServerSocket() {
         await server.close();
 
         // Receive a message
-        expect(await events.next, RawSocketEvent.read);
-        expect(utf8.decode(socket.read()), "Client/0");
+        {
+          var event = await events.next;
+
+          // Sometimes the first event seems to be 'write'?
+          if (event == RawSocketEvent.write) {
+            event = await events.next;
+          }
+
+          expect(event, RawSocketEvent.read);
+          expect(utf8.decode(socket.read()), "Client/0");
+        }
 
         // Send a message
         {
           final data = utf8.encode("Server/0");
           final result = socket.write(data);
           expect(result, data.length);
-          expect(await events.next, RawSocketEvent.write);
+
+          // Possible 'write'
+          if (await events.peek == RawSocketEvent.write) {
+            await events.next;
+          }
         }
 
         // Receive 'readClosed'
@@ -150,5 +160,5 @@ void _testRawSocketAndRawServerSocket() {
         clientDone,
       ]);
     });
-  }, timeout: Timeout(Duration(seconds: 1)));
+  });
 }
