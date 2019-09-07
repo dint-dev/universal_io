@@ -437,9 +437,9 @@ class _IOOverridesScope extends IOOverrides {
 
   @override
   void setCurrentDirectory(String path) {
-    if (_setCurrentDirectory != null)
+    if (_setCurrentDirectory != null) {
       _setCurrentDirectory(path);
-    else if (_previous != null) {
+    } else if (_previous != null) {
       _previous.setCurrentDirectory(path);
     } else {
       super.setCurrentDirectory(path);

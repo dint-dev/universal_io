@@ -318,7 +318,7 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
   }
 }
 
-abstract class BaseHttpClientResponse extends Stream<Uint8List>
+abstract class BaseHttpClientResponse extends Stream<List<int>>
     implements HttpClientResponse {
   @override
   final HttpHeaders headers = HttpHeadersImpl("1.1");

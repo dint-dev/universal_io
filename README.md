@@ -2,17 +2,19 @@
 [![Build Status](https://travis-ci.org/gohilla/universal_io.svg?branch=master)](https://travis-ci.org/gohilla/universal_io)
 
 # Introduction
-A cross-platform _dart:io_ that works in VM/Flutter, browsers, and elsewhere.
+A cross-platform _dart:io_ that works in browsers, Flutter, and VM.
 
+## License
 Licensed under the [Apache License 2.0](LICENSE).
-Much of the source code was adopted from the original 'dart:io' in [Dart SDK](https://github.com/dart-lang/sdk),
-which was licensed under a BSD-style license (license terms of Dart SDK can be found in the source
-code files that were derived from Dart SDK).
 
-## Dart SDK 2.5
-  * Upcoming Dart SDK 2.5 has major breaking changes in _dart:io_. Supporting them means that we had
-    to introduce breaking changes in this package.
-  * If you use Dart SDK 2.4 or less, you should use version constraint ^0.7.3.
+Much of the source code in this project is from Dart SDK ([github.com/dart-lang/sdk/tree/master/sdk/lib/io](https://github.com/dart-lang/sdk/tree/master/sdk/lib/io)),
+which was obtained under the BSD-style license of Dart SDK.
+
+## Dart SDK 2.5 breaking changes
+  * Dart SDK 2.5 (currently in the Dart SDK 'dev' channel) has various breaking changes in
+    _dart:io_. Consequently this package has breaking changes too.
+  * If you don't use the __latest 'dev' channel Dart SDK__, see dependency constraint
+    recommendations below.
 
 ## Issues
   * Found issues? Report them at the [Github issue tracker](https://github.com/terrier989/dart-universal_io/issues).
@@ -23,18 +25,18 @@ code files that were derived from Dart SDK).
 
 # Getting started
 ## 1.Add a dependency
-### Dart SDK 2.5.0-dev-1.0 and above
+### Dart SDK 2.5.0-dev-2.0 and above
 In `pubspec.yaml`:
 ```yaml
 dependencies:
-  universal_io: ^0.8.1
+  universal_io: '^0.8.2'
 ```
 
 ### Dart SDK 2.4.x
 In `pubspec.yaml`:
 ```yaml
 dependencies:
-  universal_io: ^0.7.3
+  universal_io: '>=0.7.3 <0.8.0'
 ```
 
 ## 2. Choose a driver (optional)

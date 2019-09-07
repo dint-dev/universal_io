@@ -231,6 +231,23 @@ abstract class _HttpInboundMessage extends Stream<Uint8List> {
   bool get persistentConnection => headers.persistentConnection;
 }
 
+abstract class _HttpInboundMessageListInt extends Stream<List<int>> {
+  final _HttpIncoming _incoming;
+  List<Cookie> _cookies;
+
+  _HttpInboundMessageListInt(this._incoming);
+
+  List<Cookie> get cookies {
+    if (_cookies != null) return _cookies;
+    return _cookies = headers._parseCookies();
+  }
+
+  HttpHeadersImpl get headers => _incoming.headers;
+  String get protocolVersion => headers.protocolVersion;
+  int get contentLength => headers.contentLength;
+  bool get persistentConnection => headers.persistentConnection;
+}
+
 class _HttpRequest extends _HttpInboundMessage implements HttpRequest {
   final HttpResponse response;
 
@@ -324,7 +341,7 @@ class _HttpRequest extends _HttpInboundMessage implements HttpRequest {
   }
 }
 
-class _HttpClientResponse extends _HttpInboundMessage
+class _HttpClientResponse extends _HttpInboundMessageListInt
     implements HttpClientResponse {
   List<RedirectInfo> get redirects => _httpRequest._responseRedirects;
 

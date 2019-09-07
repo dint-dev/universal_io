@@ -1,13 +1,15 @@
 name: universal_io
-version: 0.8.1
+version: 0.8.2
 description:
-  Cross-platform 'dart:io' that works in VM/Flutter, browsers, and elsewhere.
+  Cross-platform 'dart:io' that works in browsers, Flutter, and VM.
 homepage: https://github.com/terrier989/dart-universal_io
 author: terrier989 <terrier989@gmail.com>
 
 environment:
-  # This package is not actually 2.4.x compatible, but publishing would partially fail if you used
-  # 2.5.0-dev-1.0.
+  # This package is not actually 2.4.x compatible!
+  #
+  # Unfortunately, if we use 2.5.0-dev-2.1, pub.dev/packages/universal_io would show big red
+  # warnings to potential users of this package.
   sdk: '>=2.4.0 <3.0.0'
 
 dependencies:
