@@ -1,5 +1,8 @@
 # 0.8.2
-  # Fixed problems introduced by Dart SDK 2.5.0-dev-2.0.
+  #* Fixed missing HTTP status codes.
+
+# 0.8.2
+  #* Fixed problems introduced by Dart SDK 2.5.0-dev-2.0.
 
 # 0.8.1
   * Fixed pubspec.yaml and documented Dart SDK 2.5 breaking changes.

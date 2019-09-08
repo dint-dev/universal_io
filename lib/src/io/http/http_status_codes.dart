@@ -108,5 +108,95 @@ abstract class HttpStatus {
   static const int loopDetected = 508;
   static const int notExtended = 510;
   static const int networkAuthenticationRequired = 511;
+
+  // Client generated status code.
   static const int networkConnectTimeoutError = 599;
+
+  @Deprecated("Use continue_ instead")
+  static const int CONTINUE = continue_;
+  @Deprecated("Use switchingProtocols instead")
+  static const int SWITCHING_PROTOCOLS = switchingProtocols;
+  @Deprecated("Use ok instead")
+  static const int OK = ok;
+  @Deprecated("Use created instead")
+  static const int CREATED = created;
+  @Deprecated("Use accepted instead")
+  static const int ACCEPTED = accepted;
+  @Deprecated("Use nonAuthoritativeInformation instead")
+  static const int NON_AUTHORITATIVE_INFORMATION = nonAuthoritativeInformation;
+  @Deprecated("Use noContent instead")
+  static const int NO_CONTENT = noContent;
+  @Deprecated("Use resetContent instead")
+  static const int RESET_CONTENT = resetContent;
+  @Deprecated("Use partialContent instead")
+  static const int PARTIAL_CONTENT = partialContent;
+  @Deprecated("Use multipleChoices instead")
+  static const int MULTIPLE_CHOICES = multipleChoices;
+  @Deprecated("Use movedPermanently instead")
+  static const int MOVED_PERMANENTLY = movedPermanently;
+  @Deprecated("Use found instead")
+  static const int FOUND = found;
+  @Deprecated("Use movedTemporarily instead")
+  static const int MOVED_TEMPORARILY = movedTemporarily;
+  @Deprecated("Use seeOther instead")
+  static const int SEE_OTHER = seeOther;
+  @Deprecated("Use notModified instead")
+  static const int NOT_MODIFIED = notModified;
+  @Deprecated("Use useProxy instead")
+  static const int USE_PROXY = useProxy;
+  @Deprecated("Use temporaryRedirect instead")
+  static const int TEMPORARY_REDIRECT = temporaryRedirect;
+  @Deprecated("Use badRequest instead")
+  static const int BAD_REQUEST = badRequest;
+  @Deprecated("Use unauthorized instead")
+  static const int UNAUTHORIZED = unauthorized;
+  @Deprecated("Use paymentRequired instead")
+  static const int PAYMENT_REQUIRED = paymentRequired;
+  @Deprecated("Use forbidden instead")
+  static const int FORBIDDEN = forbidden;
+  @Deprecated("Use notFound instead")
+  static const int NOT_FOUND = notFound;
+  @Deprecated("Use methodNotAllowed instead")
+  static const int METHOD_NOT_ALLOWED = methodNotAllowed;
+  @Deprecated("Use notAcceptable instead")
+  static const int NOT_ACCEPTABLE = notAcceptable;
+  @Deprecated("Use proxyAuthenticationRequired instead")
+  static const int PROXY_AUTHENTICATION_REQUIRED = proxyAuthenticationRequired;
+  @Deprecated("Use requestTimeout instead")
+  static const int REQUEST_TIMEOUT = requestTimeout;
+  @Deprecated("Use conflict instead")
+  static const int CONFLICT = conflict;
+  @Deprecated("Use gone instead")
+  static const int GONE = gone;
+  @Deprecated("Use lengthRequired instead")
+  static const int LENGTH_REQUIRED = lengthRequired;
+  @Deprecated("Use preconditionFailed instead")
+  static const int PRECONDITION_FAILED = preconditionFailed;
+  @Deprecated("Use requestEntityTooLarge instead")
+  static const int REQUEST_ENTITY_TOO_LARGE = requestEntityTooLarge;
+  @Deprecated("Use requestUriTooLong instead")
+  static const int REQUEST_URI_TOO_LONG = requestUriTooLong;
+  @Deprecated("Use unsupportedMediaType instead")
+  static const int UNSUPPORTED_MEDIA_TYPE = unsupportedMediaType;
+  @Deprecated("Use requestedRangeNotSatisfiable instead")
+  static const int REQUESTED_RANGE_NOT_SATISFIABLE =
+      requestedRangeNotSatisfiable;
+  @Deprecated("Use expectationFailed instead")
+  static const int EXPECTATION_FAILED = expectationFailed;
+  @Deprecated("Use upgradeRequired instead")
+  static const int UPGRADE_REQUIRED = upgradeRequired;
+  @Deprecated("Use internalServerError instead")
+  static const int INTERNAL_SERVER_ERROR = internalServerError;
+  @Deprecated("Use notImplemented instead")
+  static const int NOT_IMPLEMENTED = notImplemented;
+  @Deprecated("Use badGateway instead")
+  static const int BAD_GATEWAY = badGateway;
+  @Deprecated("Use serviceUnavailable instead")
+  static const int SERVICE_UNAVAILABLE = serviceUnavailable;
+  @Deprecated("Use gatewayTimeout instead")
+  static const int GATEWAY_TIMEOUT = gatewayTimeout;
+  @Deprecated("Use httpVersionNotSupported instead")
+  static const int HTTP_VERSION_NOT_SUPPORTED = httpVersionNotSupported;
+  @Deprecated("Use networkConnectTimeoutError instead")
+  static const int NETWORK_CONNECT_TIMEOUT_ERROR = networkConnectTimeoutError;
 }
