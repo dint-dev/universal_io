@@ -1,4 +1,4 @@
-# 0.8.2
+# 0.8.3
   * Replaced IP address parsing with the new Uri.parseIPv4Address / Uri.parseIPv6Address.
   * Fixed missing HTTP status codes.
 
