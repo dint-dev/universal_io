@@ -12,4 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/// {@nodoc}
+library universal_io.prefer_universal.io;
+
 export '../src/io/io.dart' if (dart.library.io) '../src/sdk_io.dart';
