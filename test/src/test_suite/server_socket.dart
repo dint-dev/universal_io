@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import 'package:test/test.dart';
-import 'package:universal_io/io.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 
 void testRawServerSocket() {
   group("RawServerSocket", () {

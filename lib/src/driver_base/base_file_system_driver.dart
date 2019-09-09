@@ -17,7 +17,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:universal_io/driver.dart';
-import 'package:universal_io/io.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 
 class BaseDirectory extends BaseFileSystemEntity implements Directory {
   BaseDirectory(String path) : super(path);

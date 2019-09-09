@@ -15,7 +15,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:universal_io/io.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 
 /// An internal helper for [IOSink] subclasses.
 abstract class BaseIOSink implements IOSink {

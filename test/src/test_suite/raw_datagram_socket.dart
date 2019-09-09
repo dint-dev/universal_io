@@ -17,7 +17,7 @@ import 'dart:convert';
 
 import 'package:async/async.dart';
 import 'package:test/test.dart';
-import 'package:universal_io/io.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 
 void testRawDatagramSocket() {
   group("RawDatagramSocket", () {

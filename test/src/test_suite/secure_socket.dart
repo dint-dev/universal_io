@@ -15,7 +15,7 @@
 import 'dart:convert';
 
 import 'package:test/test.dart';
-import 'package:universal_io/io.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 
 import 'localhost_certificate.dart';
 

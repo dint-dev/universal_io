@@ -16,7 +16,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:universal_io/driver_base.dart';
-import 'package:universal_io/io.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 
 class BaseStdout extends BaseIOSink implements Stdout {
   @override

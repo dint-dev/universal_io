@@ -15,7 +15,7 @@
 import 'dart:async';
 
 import 'package:meta/meta.dart';
-import 'package:universal_io/io.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 
 abstract class BaseRawServerSocket extends Stream<RawSocket>
     implements RawServerSocket {

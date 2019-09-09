@@ -17,7 +17,7 @@ import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
-import 'package:universal_io/io.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 
 abstract class BaseRawDatagramSocket extends Stream<RawSocketEvent>
     implements RawDatagramSocket {

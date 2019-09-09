@@ -1,4 +1,4 @@
-import 'package:universal_io/io.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 
 var testSuitePath = "test/src/test_suite";
 

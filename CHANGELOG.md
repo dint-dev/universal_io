@@ -1,3 +1,8 @@
+# 0.8.4
+  * Added 'prefer_sdk/io.dart' and 'prefer_universal/io.dart' libraries for dealing with conditional
+    export issues.
+  * Library 'package:universal_io/io.dart' now exports SDK version by default.
+
 # 0.8.3
   * Replaced IP address parsing with the new Uri.parseIPv4Address / Uri.parseIPv6Address.
   * Fixed missing HTTP status codes.

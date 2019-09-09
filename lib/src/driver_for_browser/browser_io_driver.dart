@@ -15,7 +15,7 @@
 import 'dart:html' as html;
 
 import 'package:universal_io/driver.dart';
-import 'package:universal_io/io.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 
 import 'browser_http_client.dart';
 

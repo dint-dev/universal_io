@@ -17,7 +17,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
-import 'package:universal_io/io.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 
 import 'base_io_sink.dart';
 import 'http_headers_impl.dart';

@@ -1,4 +1,4 @@
-import 'package:universal_io/io.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 
 void main() async {
   // Use 'dart:io' HttpClient API.

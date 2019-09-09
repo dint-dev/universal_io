@@ -19,7 +19,7 @@ import 'package:async/async.dart';
 import 'package:meta/meta.dart';
 import 'package:stream_channel/stream_channel.dart';
 import 'package:test/test.dart';
-import 'package:universal_io/io.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 
 import 'localhost_certificate.dart';
 

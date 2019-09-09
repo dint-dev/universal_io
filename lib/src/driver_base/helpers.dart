@@ -14,7 +14,7 @@
 
 import 'dart:async';
 
-import 'package:universal_io/io.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 
 /// Driver implementation can use this method to evaluate parameters of type
 /// "a string or [InternetAddress]" (e.g. [RawSocket.connect]) into

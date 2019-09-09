@@ -28,7 +28,7 @@ which was obtained under the BSD-style license of Dart SDK.
 In `pubspec.yaml`:
 ```yaml
 dependencies:
-  universal_io: '^0.8.2'
+  universal_io: ^0.8.4
 ```
 
 ### Dart SDK 2.4.x
@@ -55,7 +55,7 @@ dependencies:
 ## 3. Use
 
 ```dart
-import 'package:universal_io/io.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 
 void main() async {
   // Use 'dart:io' HttpClient API.
@@ -64,6 +64,11 @@ void main() async {
   final response = await request.close();
 }
 ```
+
+In some situations, Dart development tools (your IDE) may give warnings, but your application
+will compile fine. You can try to eliminate warnings by importing
+"package:universal_io/prefer_universal/io.dart' instead of the library above.
+
 
 # Manual
 ## Default driver behavior
@@ -108,7 +113,7 @@ possible issues like missing cross-origin headers. The error messages look like:
 
 ## Writing your own driver?
 ```dart
-import 'package:universal_io/io.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 import 'package:universal_io/driver.dart';
 import 'package:universal_io/driver_base.dart';
 

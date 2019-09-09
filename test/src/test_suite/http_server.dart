@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:meta/meta.dart';
 import 'package:test/test.dart';
-import 'package:universal_io/io.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 
 void testHttpServer({bool httpClient = true}) {
   group("HttpServer", () {
