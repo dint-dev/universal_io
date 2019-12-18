@@ -1,3 +1,7 @@
+# 0.8.5
+  * Raised minimum SDK to 2.6 and upgraded dependencies.
+  * Improved analysis and test settings.
+
 # 0.8.4
   * Added 'prefer_sdk/io.dart' and 'prefer_universal/io.dart' libraries for dealing with conditional
     export issues.

@@ -1,5 +1,5 @@
 [![Pub Package](https://img.shields.io/pub/v/universal_io.svg)](https://pub.dartlang.org/packages/universal_io)
-[![Build Status](https://travis-ci.org/gohilla/universal_io.svg?branch=master)](https://travis-ci.org/gohilla/universal_io)
+[![Github Actions CI](https://github.com/dart-io-packages/universal_io/workflows/Dart%20CI/badge.svg)](https://github.com/dart-io-packages/universal_io/actions?query=workflow%3A%22Dart+CI%22)
 
 # Introduction
 A cross-platform _dart:io_ that works in browsers, Flutter, and VM.
@@ -10,11 +10,6 @@ Licensed under the [Apache License 2.0](LICENSE).
 Much of the source code in this project is from Dart SDK ([github.com/dart-lang/sdk/tree/master/sdk/lib/io](https://github.com/dart-lang/sdk/tree/master/sdk/lib/io)),
 which was obtained under the BSD-style license of Dart SDK.
 
-## Dart SDK 2.5 breaking changes
-  * Dart SDK 2.5 (currently in the Dart SDK 'dev' channel) has various breaking changes in
-    _dart:io_. Consequently this package has breaking changes too.
-  * If you don't use the 2.5.0-dev-2.0 or later, see dependency constraint recommendations below.
-
 ## Issues
   * Found issues? Report them at the [Github issue tracker](https://github.com/terrier989/dart-universal_io/issues).
   * Have a fix? [Create a pull request](https://github.com/terrier989/dart-universal_io/pull/new/master)!
@@ -24,18 +19,10 @@ which was obtained under the BSD-style license of Dart SDK.
 
 # Getting started
 ## 1.Add a dependency
-### Dart SDK 2.5.0-dev-2.0 and above
 In `pubspec.yaml`:
 ```yaml
 dependencies:
-  universal_io: ^0.8.4
-```
-
-### Dart SDK 2.4.x
-In `pubspec.yaml`:
-```yaml
-dependencies:
-  universal_io: '>=0.7.3 <0.8.0'
+  universal_io: ^0.8.5
 ```
 
 ## 2. Choose a driver (optional)
