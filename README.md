@@ -77,8 +77,12 @@ possible issues like missing cross-origin headers. The error messages look like:
     Origin:        http://source.com
     
     Cross-origin request!
-    CORS 'credentials' mode is disabled (the browser will not send authentication like cookies).
-    You can enable 'credentials' mode with: request.headers.set('Authorization', "someValue")
+    CORS 'credentials mode' is disabled (the browser will not send cookies).
+    You can enable 'credentials mode' with:
+
+        if (httpRequest is BrowserLikeHttpRequest) {
+          httpRequest.useCorsCredentials = true;
+        }
     
     Did the server send the following mandatory headers?
       * Access-Control-Allow-Origin: http://source.com

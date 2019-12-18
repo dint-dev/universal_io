@@ -1,5 +1,8 @@
 # 0.8.5
   * Raised minimum SDK to 2.6 and upgraded dependencies.
+  * Changed how CORS credentials mode is enabled. It was previously enabled with a header, but now
+    we introduced subclasses for HttpClient and HttpClientRequest. This is a breaking change, but we
+    decided not to bump the major version number.
   * Improved analysis and test settings.
 
 # 0.8.4

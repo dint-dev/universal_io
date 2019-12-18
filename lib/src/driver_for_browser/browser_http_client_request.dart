@@ -19,13 +19,15 @@ import 'dart:typed_data';
 import 'package:universal_io/driver_base.dart';
 import 'package:universal_io/driver_base.dart' show Uint8ListBuffer;
 import 'package:universal_io/prefer_universal/io.dart';
+import 'package:universal_io/src/io/io.dart';
 
 import 'browser_http_client.dart';
 import 'browser_http_client_exception.dart';
 import 'browser_http_client_response.dart';
 
 /// Used by [BrowserHttpClient].
-class BrowserHttpClientRequest extends BaseHttpClientRequest {
+class BrowserHttpClientRequest extends BaseHttpClientRequest
+    implements BrowserLikeHttpClientRequest {
   final Completer<HttpClientResponse> _completer =
       Completer<HttpClientResponse>();
 
@@ -81,14 +83,6 @@ class BrowserHttpClientRequest extends BaseHttpClientRequest {
       // Do we have credentials mode enabled?
       final origin = html.window.origin;
       var corsCredentialsMode = this.useCorsCredentials;
-
-      // If we don't have credentials mode and the request is cross-origin...
-      if (!corsCredentialsMode &&
-          BrowserHttpClient.isCrossOriginUrl(uriString, origin: origin)) {
-        // Enable credentials mode if we are sending cookies or authorization
-        corsCredentialsMode =
-            headers.value(HttpHeaders.authorizationHeader) != null;
-      }
 
       if (corsCredentialsMode) {
         xhr.withCredentials = true;

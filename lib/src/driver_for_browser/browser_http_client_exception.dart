@@ -98,8 +98,12 @@ reason for the error).\n""");
       } else {
         sb.write("disabled.\n");
         sb.write("""
-CORS 'credentials' mode is disabled (the browser will not send authentication like cookies).
-You can enable 'credentials' mode with: request.headers.set('Authorization', "someValue")
+CORS 'credentials mode' is disabled (the browser will not send cookies).
+You can enable 'credentials mode' with:
+
+    if (httpRequest is BrowserLikeHttpClientRequest) {
+      httpRequest.useCorsCredentials = true;
+    }
 """);
       }
       sb.write("\nDid the server send the following mandatory headers?\n");

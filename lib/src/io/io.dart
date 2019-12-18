@@ -34,3 +34,4 @@ export 'io/security_context.dart';
 export 'io/socket.dart';
 export 'io/stdio.dart';
 export 'io/string_transformer.dart';
+export 'cors_browser.dart';

@@ -30,3 +30,5 @@
 // This file solves the problem.
 //
 export 'dart:io';
+
+export 'io/cors_vm.dart';

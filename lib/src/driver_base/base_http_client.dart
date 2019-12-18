@@ -22,7 +22,10 @@ import 'package:universal_io/prefer_universal/io.dart';
 import 'base_io_sink.dart';
 import 'http_headers_impl.dart';
 
-abstract class BaseHttpClient implements HttpClient {
+abstract class BaseHttpClient implements HttpClient, BrowserLikeHttpClient {
+  @override
+  bool useCorsCredentials = false;
+
   @override
   Duration idleTimeout = Duration(seconds: 15);
 
