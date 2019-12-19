@@ -89,7 +89,7 @@ class _CryptoUtils {
     -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2
   ];
 
-  static Random _rng = Random.secure();
+  static final Random _rng = Random.secure();
 
   static List<int> base64StringToBytes(String input,
       [bool ignoreInvalidCharacters = true]) {
@@ -244,7 +244,7 @@ abstract class _HashBase {
   }
 
   // Finish the hash computation and return the digest string.
-  add(List<int> data) {
+  void add(List<int> data) {
     if (_digestCalled) {
       throw StateError('Hash update method called after digest was retrieved');
     }
@@ -266,13 +266,13 @@ abstract class _HashBase {
   }
 
   // Create a fresh instance of this Hash.
-  newInstance();
+  Object newInstance();
 
   // One round of the hash computation.
-  _add32(x, y) => (x + y) & _MASK_32;
+  int _add32(int x, int y) => (x + y) & _MASK_32;
 
   // Helper methods.
-  _bytesToChunk(List<int> data, int dataIndex) {
+  void _bytesToChunk(List<int> data, int dataIndex) {
     assert((data.length - dataIndex) >= (_chunkSizeInWords * _BYTES_PER_WORD));
 
     for (var wordIndex = 0; wordIndex < _chunkSizeInWords; wordIndex++) {
@@ -289,7 +289,7 @@ abstract class _HashBase {
     }
   }
 
-  _finalizeData() {
+  void _finalizeData() {
     _pendingData.add(0x80);
     var contentsLength = _lengthInBytes + 9;
     var chunkSizeInBytes = _chunkSizeInWords * _BYTES_PER_WORD;
@@ -310,7 +310,7 @@ abstract class _HashBase {
   }
 
   // Rotate left limiting to unsigned 32-bit values.
-  _iterate() {
+  void _iterate() {
     var len = _pendingData.length;
     var chunkSizeInBytes = _chunkSizeInWords * _BYTES_PER_WORD;
     if (len >= chunkSizeInBytes) {
@@ -340,11 +340,11 @@ abstract class _HashBase {
   }
 
   // Convert a 32-bit word to four bytes.
-  _roundUp(val, n) => (val + n - 1) & -n;
+  int _roundUp(int val, int n) => (val + n - 1) & -n;
 
   // Iterate through data updating the hash computation for each
   // chunk.
-  _updateHash(List<int> m);
+  void _updateHash(List<int> m);
 
   // Finalize the data. Add a 1 bit to the end of the message. Expand with
   // 0 bits and add the length of the message.
@@ -439,7 +439,7 @@ class _MD5 extends _HashBase {
 // The SHA1 hasher is used to compute an SHA1 message digest.
 class _SHA1 extends _HashBase {
   // Construct a SHA1 hasher object.
-  List<int> _w;
+  final List<int> _w;
 
   // Returns a new instance of this Hash.
   _SHA1()

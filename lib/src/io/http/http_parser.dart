@@ -149,7 +149,7 @@ class _MessageType {
 /// _HttpDetachedStreamSubscription is resumed, it'll deliver the data before
 /// resuming the underlaying subscription.
 class _HttpDetachedStreamSubscription implements StreamSubscription<Uint8List> {
-  StreamSubscription<Uint8List> _subscription;
+  final StreamSubscription<Uint8List> _subscription;
   Uint8List _injectData;
   bool _isCanceled = false;
   int _pauseCount = 1;
@@ -972,7 +972,7 @@ class _HttpParser extends Stream<_HttpIncoming> {
   }
 
   static List<String> _tokenizeFieldValue(String headerValue) {
-    List<String> tokens = List<String>();
+    List<String> tokens = <String>[];
     int start = 0;
     int index = 0;
     while (index < headerValue.length) {

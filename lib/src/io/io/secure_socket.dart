@@ -185,7 +185,7 @@ abstract class RawSecureSocket implements RawSocket {
     return driver.secure(
       socket,
       subscription: subscription,
-      host: (host != null ? host : socket.address.host),
+      host: host ?? socket.address.host,
       context: context,
       onBadCertificate: onBadCertificate,
       supportedProtocols: supportedProtocols,

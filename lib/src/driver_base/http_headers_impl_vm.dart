@@ -73,7 +73,6 @@ class HttpHeadersImpl implements HttpHeaders {
   final Map<String, List<String>> _headers;
 
   final String protocolVersion;
-  bool _mutable = true;
   List<String> _noFoldingHeaders;
   int _contentLength = -1;
   bool _persistentConnection = true;
@@ -523,11 +522,9 @@ class HttpHeadersImpl implements HttpHeaders {
     }
   }
 
-  _checkMutable() {
-    if (!_mutable) throw HttpException("HTTP headers are not mutable");
-  }
+  void _checkMutable() {}
 
-  _foldHeader(String name) {
+  bool _foldHeader(String name) {
     if (name == HttpHeaders.setCookieHeader ||
         (_noFoldingHeaders != null && _noFoldingHeaders.contains(name))) {
       return false;

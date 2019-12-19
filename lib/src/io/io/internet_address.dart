@@ -177,7 +177,7 @@ class InternetAddress {
   }
 
   @override
-  operator ==(other) {
+  bool operator ==(other) {
     if (other is InternetAddress) {
       final leftBytes = rawAddress;
       final rightBytes = other.rawAddress;

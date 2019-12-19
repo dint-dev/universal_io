@@ -172,9 +172,8 @@ class CompressionOptions {
       if (part.length >= 2 && part.startsWith('0')) {
         throw ArgumentError("Illegal 0 padding on value.");
       } else {
-        mwb = serverMaxWindowBits == null
-            ? (int.tryParse(part) ?? _WebSocketImpl.DEFAULT_WINDOW_BITS)
-            : serverMaxWindowBits;
+        mwb = serverMaxWindowBits ??
+            (int.tryParse(part) ?? _WebSocketImpl.DEFAULT_WINDOW_BITS);
         info.headerValue = "; server_max_window_bits=${mwb}";
         info.maxWindowBits = mwb;
       }

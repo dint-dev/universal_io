@@ -47,6 +47,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:meta/meta.dart';
 import 'package:universal_io/src/driver/drivers_in_js.dart';
 import 'package:universal_io/src/io/io/socket_impl.dart';
 
@@ -68,7 +69,8 @@ class ConnectionTask<S> {
   final Future<S> socket;
   final void Function() _onCancel;
 
-  ConnectionTask._({Future<S> socket, void Function() onCancel()})
+  ConnectionTask._(
+      {@required Future<S> socket, @required void Function() onCancel()})
       : assert(socket != null),
         assert(onCancel != null),
         this.socket = socket,
@@ -546,9 +548,7 @@ class RawSocketOption {
 
   /// Convenience constructor for creating an int based RawSocketOption.
   factory RawSocketOption.fromInt(int level, int option, int value) {
-    if (value == null) {
-      value = 0;
-    }
+    value ??= 0;
     final Uint8List list = Uint8List(4);
     final buffer = ByteData.view(list.buffer);
     buffer.setInt32(0, value);
@@ -742,6 +742,7 @@ abstract class Socket implements Stream<Uint8List>, IOSink {
             socketFuture.then((socket) {
               socket.close();
             });
+            return null;
           });
       return task;
     }
@@ -756,9 +757,9 @@ abstract class Socket implements Stream<Uint8List>, IOSink {
 /// The [SocketDirection] is used as a parameter to [Socket.close] and
 /// [RawSocket.close] to close a socket in the specified direction(s).
 class SocketDirection {
-  static const SocketDirection receive = SocketDirection._(0);
-  static const SocketDirection send = SocketDirection._(1);
-  static const SocketDirection both = SocketDirection._(2);
+  static const SocketDirection receive = SocketDirection._('receive');
+  static const SocketDirection send = SocketDirection._('send');
+  static const SocketDirection both = SocketDirection._('both');
 
   @Deprecated("Use receive instead")
   static const SocketDirection RECEIVE = receive;
@@ -767,9 +768,12 @@ class SocketDirection {
   @Deprecated("Use both instead")
   static const SocketDirection BOTH = both;
 
-  final _value;
+  final String _value;
 
   const SocketDirection._(this._value);
+
+  @override
+  String toString() => 'SocketDirection.$_value';
 }
 
 class SocketException implements IOException {
@@ -816,9 +820,12 @@ class SocketOption {
   /// as an individual TCP packet.
   ///
   /// tcpNoDelay is disabled by default.
-  static const SocketOption tcpNoDelay = SocketOption._(0);
+  static const SocketOption tcpNoDelay = SocketOption._('tcpNoDelay');
 
-  final _value;
+  final String _value;
 
   const SocketOption._(this._value);
+
+  @override
+  String toString() => 'SocketOptions.$_value';
 }

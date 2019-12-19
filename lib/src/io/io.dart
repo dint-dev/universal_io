@@ -15,6 +15,7 @@
 // We exposed some internal classes, which we need to hide
 //   * HttpHeadersImpl (in SDK: _HttpHeaders)
 //   * HttpClientImpl  (in SDK: _HttpClient)
+export 'cors_browser.dart';
 export 'http/http.dart' hide HttpHeadersImpl, HttpClientImpl;
 export 'io/bytes_builder.dart';
 export 'io/common.dart';
@@ -34,4 +35,3 @@ export 'io/security_context.dart';
 export 'io/socket.dart';
 export 'io/stdio.dart';
 export 'io/string_transformer.dart';
-export 'cors_browser.dart';

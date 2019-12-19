@@ -49,14 +49,12 @@ part of universal_io.http;
 int _nextServiceId = 1;
 
 // TODO(ajohnsen): Use other way of getting a unique id.
-abstract class _ServiceObject {
+mixin _ServiceObject {
   int __serviceId = 0;
   int get _serviceId {
     if (__serviceId == 0) __serviceId = _nextServiceId++;
     return __serviceId;
   }
-
-  Map _toJSON(bool ref);
 
   String get _servicePath => "$_serviceTypePath/$_serviceId";
 
@@ -169,7 +167,7 @@ typedef _BytesConsumer = void Function(List<int> bytes);
 class _HttpIncoming extends Stream<Uint8List> {
   final int _transferLength;
   final Completer _dataCompleter = Completer();
-  Stream<Uint8List> _stream;
+  final Stream<Uint8List> _stream;
 
   bool fullBodyRead = false;
 
@@ -384,7 +382,7 @@ class _HttpClientResponse extends _HttpInboundMessageListInt
 
   List<Cookie> get cookies {
     if (_cookies != null) return _cookies;
-    _cookies = List<Cookie>();
+    _cookies = <Cookie>[];
     List<String> values = headers[HttpHeaders.setCookieHeader];
     if (values != null) {
       values.forEach((value) {
@@ -888,7 +886,7 @@ class _HttpResponse extends _HttpOutboundMessage<HttpResponse>
   bool get _isConnectionClosed => _httpRequest._httpConnection._isClosing;
 
   List<Cookie> get cookies {
-    if (_cookies == null) _cookies = List<Cookie>();
+    _cookies ??= <Cookie>[];
     return _cookies;
   }
 
@@ -1097,7 +1095,7 @@ class _HttpClientRequest extends _HttpOutboundMessage<HttpClientResponse>
     implements HttpClientRequest {
   final String method;
   final Uri uri;
-  final List<Cookie> cookies = List<Cookie>();
+  final List<Cookie> cookies = <Cookie>[];
 
   // The HttpClient this request belongs to.
   final HttpClientImpl _httpClient;
@@ -1115,7 +1113,7 @@ class _HttpClientRequest extends _HttpOutboundMessage<HttpClientResponse>
 
   int _maxRedirects = 5;
 
-  List<RedirectInfo> _responseRedirects = [];
+  final List<RedirectInfo> _responseRedirects = [];
 
   _HttpClientRequest(_HttpOutgoing outgoing, Uri uri, this.method, this._proxy,
       this._httpClient, this._httpClientConnection)
@@ -1130,11 +1128,9 @@ class _HttpClientRequest extends _HttpOutboundMessage<HttpClientResponse>
   }
 
   Future<HttpClientResponse> get done {
-    if (_response == null) {
-      _response =
-          Future.wait([_responseCompleter.future, super.done], eagerError: true)
-              .then((list) => list[0]);
-    }
+    _response ??=
+        Future.wait([_responseCompleter.future, super.done], eagerError: true)
+            .then((list) => list[0]);
     return _response;
   }
 
@@ -1895,7 +1891,7 @@ class _HttpClientConnection {
 
   HttpConnectionInfo get connectionInfo => _HttpConnectionInfo.create(_socket);
 
-  static makeKey(bool isSecure, String host, int port) {
+  static String makeKey(bool isSecure, String host, int port) {
     return isSecure ? "ssh:$host:$port" : "$host:$port";
   }
 
@@ -1953,7 +1949,7 @@ class _ConnectionTarget {
     return connection;
   }
 
-  _checkPending() {
+  void _checkPending() {
     if (_pending.isNotEmpty) {
       _pending.removeFirst()();
     }
@@ -2378,7 +2374,7 @@ class HttpClientImpl implements HttpClient {
 
   static String _findProxyFromEnvironment(
       Uri url, Map<String, String> environment) {
-    checkNoProxy(String option) {
+    String checkNoProxy(String option) {
       if (option == null) return null;
       Iterator<String> names = option.split(",").map((s) => s.trim()).iterator;
       while (names.moveNext()) {
@@ -2393,7 +2389,7 @@ class HttpClientImpl implements HttpClient {
       return null;
     }
 
-    checkProxy(String option) {
+    String checkProxy(String option) {
       if (option == null) return null;
       option = option.trim();
       if (option.isEmpty) return null;
@@ -2416,25 +2412,25 @@ class HttpClientImpl implements HttpClient {
     }
 
     // Default to using the process current environment.
-    if (environment == null) environment = _platformEnvironmentCache;
+    environment ??= _platformEnvironmentCache;
 
     String proxyCfg;
 
     String noProxy = environment["no_proxy"];
-    if (noProxy == null) noProxy = environment["NO_PROXY"];
+    noProxy ??= environment["NO_PROXY"];
     if ((proxyCfg = checkNoProxy(noProxy)) != null) {
       return proxyCfg;
     }
 
     if (url.scheme == "http") {
       String proxy = environment["http_proxy"];
-      if (proxy == null) proxy = environment["HTTP_PROXY"];
+      proxy ??= environment["HTTP_PROXY"];
       if ((proxyCfg = checkProxy(proxy)) != null) {
         return proxyCfg;
       }
     } else if (url.scheme == "https") {
       String proxy = environment["https_proxy"];
-      if (proxy == null) proxy = environment["HTTPS_PROXY"];
+      proxy ??= environment["HTTPS_PROXY"];
       if ((proxyCfg = checkProxy(proxy)) != null) {
         return proxyCfg;
       }
@@ -2442,7 +2438,8 @@ class HttpClientImpl implements HttpClient {
     return "DIRECT";
   }
 
-  static Map<String, String> _platformEnvironmentCache = Platform.environment;
+  static final Map<String, String> _platformEnvironmentCache =
+      Platform.environment;
 }
 
 class _HttpConnection extends LinkedListEntry<_HttpConnection>
@@ -2453,7 +2450,7 @@ class _HttpConnection extends LinkedListEntry<_HttpConnection>
   static const _DETACHED = 3;
 
   // Use HashMap, as we don't need to keep order.
-  static Map<int, _HttpConnection> _connections =
+  static final Map<int, _HttpConnection> _connections =
       HashMap<int, _HttpConnection>();
 
   final /*_ServerSocket*/ _socket;
@@ -2604,7 +2601,7 @@ class _HttpServer extends Stream<HttpRequest>
     with _ServiceObject
     implements HttpServer {
   // Use default Map so we keep order.
-  static Map<int, _HttpServer> _servers = Map<int, _HttpServer>();
+  static final Map<int, _HttpServer> _servers = <int, _HttpServer>{};
 
   String serverHeader;
   final HttpHeaders defaultResponseHeaders = _initDefaultResponseHeaders();
@@ -2773,9 +2770,7 @@ class _HttpServer extends Stream<HttpRequest>
 
   _HttpSessionManager get _sessionManager {
     // Lazy init.
-    if (_sessionManagerInstance == null) {
-      _sessionManagerInstance = _HttpSessionManager();
-    }
+    _sessionManagerInstance ??= _HttpSessionManager();
     return _sessionManagerInstance;
   }
 
@@ -2850,7 +2845,7 @@ class _ProxyConfiguration {
   static const String PROXY_PREFIX = "PROXY ";
   static const String DIRECT_PREFIX = "DIRECT";
 
-  _ProxyConfiguration(String configuration) : proxies = List<_Proxy>() {
+  _ProxyConfiguration(String configuration) : proxies = <_Proxy>[] {
     if (configuration == null) {
       throw HttpException("Invalid proxy configuration $configuration");
     }
@@ -3019,10 +3014,6 @@ class _DetachedSocket extends Stream<Uint8List> implements Socket {
 
   void setRawOption(RawSocketOption option) {
     _socket.setRawOption(option);
-  }
-
-  Map _toJSON(bool ref) {
-    return (_socket as dynamic)._toJSON(ref);
   }
 }
 

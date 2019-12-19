@@ -78,7 +78,7 @@ class _WebSocketConsumer implements StreamConsumer {
   StreamSubscription _subscription;
   bool _issuedPause = false;
   bool _closed = false;
-  Completer _closeCompleter = Completer<WebSocket>();
+  final Completer _closeCompleter = Completer<WebSocket>();
   Completer _completer;
 
   _WebSocketConsumer(this.webSocket, this.socket);
@@ -141,7 +141,7 @@ class _WebSocketConsumer implements StreamConsumer {
     return true;
   }
 
-  _ensureController() {
+  void _ensureController() {
     if (_controller != null) return;
     _controller = StreamController(
         sync: true,
@@ -192,7 +192,7 @@ class _WebSocketConsumer implements StreamConsumer {
 
 class _WebSocketImpl extends Stream with _ServiceObject implements WebSocket {
   // Use default Map so we keep order.
-  static Map<int, _WebSocketImpl> _webSockets = Map<int, _WebSocketImpl>();
+  static final Map<int, _WebSocketImpl> _webSockets = <int, _WebSocketImpl>{};
   static const int DEFAULT_WINDOW_BITS = 15;
   static const String PER_MESSAGE_DEFLATE = "permessage-deflate";
 
@@ -351,17 +351,14 @@ class _WebSocketImpl extends Stream with _ServiceObject implements WebSocket {
       if (!_controller.hasListener && _subscription != null) {
         _controller.stream.drain().catchError((_) => {});
       }
-      if (_closeTimer == null) {
-        // When closing the web-socket, we no longer accept data.
-        _closeTimer = Timer(const Duration(seconds: 5), () {
-          // Reuse code and reason from the local close.
-          _closeCode = _outCloseCode;
-          _closeReason = _outCloseReason;
-          if (_subscription != null) _subscription.cancel();
-          _controller.close();
-          _webSockets.remove(_serviceId);
-        });
-      }
+      _closeTimer ??= Timer(const Duration(seconds: 5), () {
+        // Reuse code and reason from the local close.
+        _closeCode = _outCloseCode;
+        _closeReason = _outCloseReason;
+        if (_subscription != null) _subscription.cancel();
+        _controller.close();
+        _webSockets.remove(_serviceId);
+      });
     }
     return _sink.close();
   }
@@ -381,30 +378,6 @@ class _WebSocketImpl extends Stream with _ServiceObject implements WebSocket {
     _writeClosed = true;
     _consumer.closeSocket();
     _webSockets.remove(_serviceId);
-  }
-
-  Map<String, dynamic> _toJSON(bool ref) {
-    var name = '${_socket.address.host}:${_socket.port}';
-    var r = <String, dynamic>{
-      'id': _servicePath,
-      'type': _serviceType(ref),
-      'name': name,
-      'user_name': name,
-    };
-    if (ref) {
-      return r;
-    }
-    try {
-      r['socket'] = _socket._toJSON(true);
-    } catch (_) {
-      r['socket'] = {
-        'id': _servicePath,
-        'type': '@Socket',
-        'name': 'UserSocket',
-        'user_name': 'UserSocket',
-      };
-    }
-    return r;
   }
 
   static Future<WebSocket> connect(
@@ -507,9 +480,7 @@ class _WebSocketImpl extends Stream with _ServiceObject implements WebSocket {
       HttpClientResponse response, CompressionOptions compression) {
     String extensionHeader = response.headers.value('Sec-WebSocket-Extensions');
 
-    if (extensionHeader == null) {
-      extensionHeader = "";
-    }
+    extensionHeader ??= "";
 
     var hv = HeaderValue.parse(extensionHeader, valueSeparator: ',');
 
@@ -652,7 +623,7 @@ class _WebSocketOutgoingTransformer
     String reason = webSocket._outCloseReason;
     List<int> data;
     if (code != null) {
-      data = List<int>();
+      data = <int>[];
       data.add((code >> 8) & 0xFF);
       data.add(code & 0xFF);
       if (reason != null) {
@@ -838,19 +809,15 @@ class _WebSocketPerMessageDeflate {
   }
 
   void _ensureDecoder() {
-    if (decoder == null) {
-      decoder = RawZLibFilter.inflateFilter(
-          windowBits: serverSide ? clientMaxWindowBits : serverMaxWindowBits,
-          raw: true);
-    }
+    decoder ??= RawZLibFilter.inflateFilter(
+        windowBits: serverSide ? clientMaxWindowBits : serverMaxWindowBits,
+        raw: true);
   }
 
   void _ensureEncoder() {
-    if (encoder == null) {
-      encoder = RawZLibFilter.deflateFilter(
-          windowBits: serverSide ? serverMaxWindowBits : clientMaxWindowBits,
-          raw: true);
-    }
+    encoder ??= RawZLibFilter.deflateFilter(
+        windowBits: serverSide ? serverMaxWindowBits : clientMaxWindowBits,
+        raw: true);
   }
 }
 
@@ -908,7 +875,7 @@ class _WebSocketProtocolTransformer extends StreamTransformerBase<List<int>,
   final List _maskingBytes = List(4);
   final BytesBuilder _payload = BytesBuilder(copy: false);
 
-  _WebSocketPerMessageDeflate _deflate;
+  final _WebSocketPerMessageDeflate _deflate;
   _WebSocketProtocolTransformer([this._serverSide = false, this._deflate]);
 
   /// Process data received from the underlying communication channel.
@@ -1280,7 +1247,7 @@ class _WebSocketTransformerImpl
   }
 
   static List<String> _tokenizeFieldValue(String headerValue) {
-    List<String> tokens = List<String>();
+    List<String> tokens = <String>[];
     int start = 0;
     int index = 0;
     while (index < headerValue.length) {

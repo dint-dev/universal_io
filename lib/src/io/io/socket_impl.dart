@@ -47,6 +47,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:meta/meta.dart';
 import 'package:universal_io/driver_base.dart' show BaseIOSink;
 
 import '../io.dart';
@@ -166,6 +167,7 @@ class SocketImpl<T extends RawSocket> extends Stream<Uint8List>
         socket: future,
         onCancel: () {
           rawSocketConnectTask.cancel();
+          return null;
         });
   }
 }
@@ -174,7 +176,8 @@ class _ConnectionTask<S> implements ConnectionTask<S> {
   final Future<S> socket;
   final void Function() _onCancel;
 
-  _ConnectionTask._({Future<S> socket, void Function() onCancel()})
+  _ConnectionTask._(
+      {@required Future<S> socket, @required void Function() onCancel()})
       : assert(socket != null),
         assert(onCancel != null),
         this.socket = socket,

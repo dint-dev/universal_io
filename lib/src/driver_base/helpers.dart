@@ -14,6 +14,7 @@
 
 import 'dart:async';
 
+import 'package:meta/meta.dart';
 import 'package:universal_io/prefer_universal/io.dart';
 
 /// Driver implementation can use this method to evaluate parameters of type
@@ -40,7 +41,8 @@ class BaseConnectionTask<S> implements ConnectionTask<S> {
   final Future<S> socket;
   final void Function() _onCancel;
 
-  BaseConnectionTask({Future<S> socket, void Function() onCancel})
+  BaseConnectionTask(
+      {@required Future<S> socket, @required void Function() onCancel})
       : assert(socket != null),
         assert(onCancel != null),
         this.socket = socket,

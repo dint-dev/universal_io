@@ -56,7 +56,7 @@ class _HttpSession implements HttpSession {
   bool _isNew = true;
   DateTime _lastSeen;
   Function _timeoutCallback;
-  _HttpSessionManager _sessionManager;
+  final _HttpSessionManager _sessionManager;
   // Pointers in timeout queue.
   _HttpSession _prev;
   _HttpSession _next;
@@ -87,12 +87,14 @@ class _HttpSession implements HttpSession {
 
   Iterable get values => _data.values;
 
-  operator [](key) => _data[key];
+  Object operator [](key) => _data[key];
+
   void operator []=(key, value) {
     _data[key] = value;
   }
 
-  addAll(Map other) => _data.addAll(other);
+  void addAll(Map other) => _data.addAll(other);
+
   void addEntries(Iterable<MapEntry> entries) {
     _data.addEntries(entries);
   }
@@ -120,15 +122,15 @@ class _HttpSession implements HttpSession {
   Map<K, V> map<K, V>(MapEntry<K, V> transform(key, value)) =>
       _data.map(transform);
 
-  putIfAbsent(key, ifAbsent) => _data.putIfAbsent(key, ifAbsent);
+  Object putIfAbsent(key, ifAbsent) => _data.putIfAbsent(key, ifAbsent);
 
-  remove(key) => _data.remove(key);
+  Object remove(key) => _data.remove(key);
   void removeWhere(bool test(key, value)) {
     _data.removeWhere(test);
   }
 
   String toString() => 'HttpSession id:$id $_data';
-  update(key, update(value), {ifAbsent()}) =>
+  void update(key, update(value), {ifAbsent()}) =>
       _data.update(key, update, ifAbsent: ifAbsent);
   void updateAll(update(key, value)) {
     _data.updateAll(update);
@@ -146,7 +148,7 @@ class _HttpSession implements HttpSession {
 //  * In a map, mapping from ID to HttpSession.
 //  * In a linked list, used as a timeout queue.
 class _HttpSessionManager {
-  Map<String, _HttpSession> _sessions;
+  final Map<String, _HttpSession> _sessions;
   int _sessionTimeout = 20 * 60; // 20 mins.
   _HttpSession _head;
   _HttpSession _tail;

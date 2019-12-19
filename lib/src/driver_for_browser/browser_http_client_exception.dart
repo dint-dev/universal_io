@@ -21,11 +21,11 @@ class BrowserHttpClientException implements SocketException {
   /// Can be used to disable verbose messages.
   static bool verbose = true;
 
-  static final Set<String> _corsSimpleMethods = Set<String>.from(const [
+  static final Set<String> _corsSimpleMethods = const {
     "GET",
     "HEAD",
     "POST",
-  ]);
+  };
 
   final String method;
   final String url;

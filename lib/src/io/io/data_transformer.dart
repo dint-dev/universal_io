@@ -562,7 +562,7 @@ class _FilterSink extends ByteConversionSink {
   final RawZLibFilter _filter;
   final ByteConversionSink _sink;
   bool _closed = false;
-  bool _empty = true;
+  final bool _empty = true;
 
   _FilterSink(this._sink, this._filter);
 

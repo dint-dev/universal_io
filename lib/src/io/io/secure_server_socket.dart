@@ -146,10 +146,6 @@ class SecureServerSocket extends Stream<SecureSocket> {
   /// Closes the socket. The returned future completes when the socket
   /// is fully closed and is no longer bound.
   Future<SecureServerSocket> close() => _socket.close().then((_) => this);
-
-  set _owner(owner) {
-    _socket._owner = owner;
-  }
 }
 
 /// The RawSecureServerSocket is a server socket, providing a stream of low-level
@@ -305,9 +301,5 @@ class RawSecureServerSocket extends Stream<RawSecureSocket> {
     } else {
       close();
     }
-  }
-
-  set _owner(owner) {
-    (_socket as dynamic)._owner = owner;
   }
 }

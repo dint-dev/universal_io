@@ -357,36 +357,36 @@ class _IOOverridesScope extends IOOverrides {
   final IOOverrides _previous = IOOverrides.current;
 
   // Directory
-  Directory Function(String) _createDirectory;
-  Directory Function() _getCurrentDirectory;
-  void Function(String) _setCurrentDirectory;
-  Directory Function() _getSystemTempDirectory;
+  final Directory Function(String) _createDirectory;
+  final Directory Function() _getCurrentDirectory;
+  final void Function(String) _setCurrentDirectory;
+  final Directory Function() _getSystemTempDirectory;
 
   // File
-  File Function(String) _createFile;
+  final File Function(String) _createFile;
 
   // FileStat
-  Future<FileStat> Function(String) _stat;
-  FileStat Function(String) _statSync;
+  final Future<FileStat> Function(String) _stat;
+  final FileStat Function(String) _statSync;
 
   // FileSystemEntity
-  Future<bool> Function(String, String) _fseIdentical;
-  bool Function(String, String) _fseIdenticalSync;
-  Future<FileSystemEntityType> Function(String, bool) _fseGetType;
-  FileSystemEntityType Function(String, bool) _fseGetTypeSync;
+  final Future<bool> Function(String, String) _fseIdentical;
+  final bool Function(String, String) _fseIdenticalSync;
+  final Future<FileSystemEntityType> Function(String, bool) _fseGetType;
+  final FileSystemEntityType Function(String, bool) _fseGetTypeSync;
 
   // _FileSystemWatcher
-  Stream<FileSystemEvent> Function(String, int, bool) _fsWatch;
-  bool Function() _fsWatchIsSupported;
+  final Stream<FileSystemEvent> Function(String, int, bool) _fsWatch;
+  final bool Function() _fsWatchIsSupported;
 
   // Link
-  Link Function(String) _createLink;
+  final Link Function(String) _createLink;
 
   // Socket
-  Future<Socket> Function(dynamic, int,
+  final Future<Socket> Function(dynamic, int,
       {dynamic sourceAddress, Duration timeout}) _socketConnect;
-  Future<ConnectionTask<Socket>> Function(dynamic, int, {dynamic sourceAddress})
-      _socketStartConnect;
+  final Future<ConnectionTask<Socket>> Function(dynamic, int,
+      {dynamic sourceAddress}) _socketStartConnect;
 
   _IOOverridesScope(
     // Directory

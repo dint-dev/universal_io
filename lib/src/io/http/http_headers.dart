@@ -143,7 +143,7 @@ class HttpHeadersImpl implements HttpHeaders {
   }
 
   void noFolding(String name) {
-    if (_noFoldingHeaders == null) _noFoldingHeaders = List<String>();
+    _noFoldingHeaders ??= <String>[];
     _noFoldingHeaders.add(name);
   }
 
@@ -463,7 +463,7 @@ class HttpHeadersImpl implements HttpHeaders {
   void _addValue(String name, Object value) {
     List<String> values = _headers[name];
     if (values == null) {
-      values = List<String>();
+      values = <String>[];
       _headers[name] = values;
     }
     if (value is DateTime) {
@@ -477,21 +477,21 @@ class HttpHeadersImpl implements HttpHeaders {
 
   void _set(String name, String value) {
     assert(name == _validateField(name));
-    List<String> values = List<String>();
+    List<String> values = <String>[];
     _headers[name] = values;
     values.add(value);
   }
 
-  _checkMutable() {
+  void _checkMutable() {
     if (!_mutable) throw HttpException("HTTP headers are not mutable");
   }
 
-  _updateHostHeader() {
+  void _updateHostHeader() {
     bool defaultPort = _port == null || _port == _defaultPortForScheme;
     _set("host", defaultPort ? host : "$host:$_port");
   }
 
-  _foldHeader(String name) {
+  bool _foldHeader(String name) {
     if (name == HttpHeaders.setCookieHeader ||
         (_noFoldingHeaders != null && _noFoldingHeaders.contains(name))) {
       return false;
@@ -553,7 +553,7 @@ class HttpHeadersImpl implements HttpHeaders {
 
   List<Cookie> _parseCookies() {
     // Parse a Cookie header value according to the rules in RFC 6265.
-    var cookies = List<Cookie>();
+    var cookies = <Cookie>[];
     void parseCookieString(String s) {
       int index = 0;
 
@@ -633,7 +633,7 @@ class HttpHeadersImpl implements HttpHeaders {
     return field.toLowerCase();
   }
 
-  static _validateValue(value) {
+  static String _validateValue(String value) {
     if (value is! String) return value;
     for (var i = 0; i < value.length; i++) {
       if (!_HttpParser._isValueChar(value.codeUnitAt(i))) {
@@ -667,16 +667,12 @@ class _HeaderValue implements HeaderValue {
   String get value => _value;
 
   void _ensureParameters() {
-    if (_parameters == null) {
-      _parameters = HashMap<String, String>();
-    }
+    _parameters ??= HashMap<String, String>();
   }
 
   Map<String, String> get parameters {
     _ensureParameters();
-    if (_unmodifiableParameters == null) {
-      _unmodifiableParameters = UnmodifiableMapView(_parameters);
-    }
+    _unmodifiableParameters ??= UnmodifiableMapView(_parameters);
     return _unmodifiableParameters;
   }
 
@@ -820,8 +816,8 @@ class _ContentType extends _HeaderValue implements ContentType {
       : _primaryType = primaryType,
         _subType = subType,
         super("") {
-    if (_primaryType == null) _primaryType = "";
-    if (_subType == null) _subType = "";
+    _primaryType ??= "";
+    _subType ??= "";
     _value = "$_primaryType/$_subType";
     if (parameters != null) {
       _ensureParameters();
