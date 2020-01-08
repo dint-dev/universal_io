@@ -1,6 +1,6 @@
-name: chrome_io
+name: chrome_os_io
 version: 0.1.0
-description: Enables use of 'dart:io' in Chrome OS Apps (TCP/UDP sockets, etc.).
+description: Enables use of 'dart:io' networking classes in Chrome OS Apps.
 homepage: https://github.com/terrier989/universal_io
 
 environment:

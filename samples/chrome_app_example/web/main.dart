@@ -1,6 +1,6 @@
 import 'dart:html';
 
-import 'package:chrome_io/chrome_io.dart';
+import 'package:chrome_os_io/chrome_os_io.dart';
 import 'package:universal_io/io.dart';
 
 void main() {

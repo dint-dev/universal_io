@@ -29,9 +29,9 @@ jobs:
         run: pub run test --platform vm
         working-directory: ./packages/test_io
 
-      - name: packages/chrome_io - Install dependencies
+      - name: packages/chrome_os_io - Install dependencies
         run: pub get
-        working-directory: ./packages/chrome_io
+        working-directory: ./packages/chrome_os_io
 
       - name: samples/chrome_app_example - Install dependencies
         run: pub get

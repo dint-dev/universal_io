@@ -19,7 +19,7 @@ script:
   - pub get
   - pub run test
   - cd ../..
-  - cd packages/chrome_io
+  - cd packages/chrome_os_io
   - pub get
   - pub run test
   - cd ../..

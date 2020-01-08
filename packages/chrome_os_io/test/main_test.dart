@@ -1,4 +1,4 @@
-import 'package:chrome_io/chrome_io.dart';
+import 'package:chrome_os_io/chrome_os_io.dart';
 import 'package:test/test.dart';
 
 void main() {

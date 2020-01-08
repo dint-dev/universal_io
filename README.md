@@ -8,7 +8,7 @@ Package `universal_io` is a cross-platform _dart:io_ that works in:
   * Dart VM
 
 The Github repository also contains:
-  * `chrome_io` - Sockets for Chrome OS Apps
+  * `chrome_os_io` - Sockets for Chrome OS Apps
   * `test_io` - Various testing helpers
 
 ## License

@@ -13,5 +13,5 @@ dev_dependencies:
   webdev: any
 
 dependency_overrides:
-  chrome_io:
-    path: '../../packages/chrome_io'
+  chrome_os_io:
+    path: '../../packages/chrome_os_io'

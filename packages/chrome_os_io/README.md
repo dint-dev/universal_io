@@ -1,4 +1,4 @@
-[![Pub Package](https://img.shields.io/pub/v/chrome_io.svg)](https://pub.dartlang.org/packages/chrome_io)
+[![Pub Package](https://img.shields.io/pub/v/chrome_os_io.svg)](https://pub.dartlang.org/packages/chrome_os_io)
 [![Github Actions CI](https://github.com/dart-io-packages/universal_io/workflows/Dart%20CI/badge.svg)](https://github.com/dart-io-packages/universal_io/actions?query=workflow%3A%22Dart+CI%22)
 
 # Introduction
@@ -34,12 +34,12 @@ the following manual workflow:
 In _pubspec.yaml_:
 ```yaml
 dependencies:
-  chrome_io: ^0.1.0
+  chrome_os_io: ^0.1.0
 ```
 
 In _main.dart_:
 ```dart
-import 'package:chrome_io/chrome_io.dart';
+import 'package:chrome_os_io/chrome_os_io.dart';
 import 'package:universal_io/io.dart';
 
 void main() async {
