@@ -1,5 +1,5 @@
 name: test_io
-version: 0.1.0
+version: 0.1.1
 description:
   Access to environmental variables in browsers ando other cross-platform helpers for testing.
 homepage: https://github.com/dart-io-packages/universal_io
