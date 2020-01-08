@@ -1,7 +1,7 @@
 name: chrome_os_io
 version: 0.1.0
 description: Enables use of 'dart:io' networking classes in Chrome OS Apps.
-homepage: https://github.com/terrier989/universal_io
+homepage: https://github.com/dart-io-packages/universal_io
 
 environment:
   sdk: '>=2.5.0 <3.0.0'

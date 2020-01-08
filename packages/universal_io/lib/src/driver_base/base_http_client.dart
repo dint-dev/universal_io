@@ -203,6 +203,11 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
     if (userAgent != null) {
       headers.set(HttpHeaders.userAgentHeader, userAgent);
     }
+
+    // Set default values
+    followRedirects = true;
+    maxRedirects = 5;
+    bufferOutput = true;
   }
 
   @override

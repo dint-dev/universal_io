@@ -1,3 +1,6 @@
+# 0.8.6
+  * Fixed documentation and small fixes related to `nodejs_io`.
+
 # 0.8.5
   * Raised minimum SDK to 2.6 and upgraded dependencies.
   * Changed how CORS credentials mode is enabled. It was previously enabled with a header, but now

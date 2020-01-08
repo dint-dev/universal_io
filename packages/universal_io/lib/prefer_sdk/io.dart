@@ -15,4 +15,4 @@
 /// {@nodoc}
 library universal_io.prefer_sdk.io;
 
-export '../src/sdk_io.dart' if (dart.library.html) '../src/io/io.dart';
+export '../src/sdk_io.dart' if (dart.library.js) '../src/io/io.dart';

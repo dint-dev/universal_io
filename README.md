@@ -2,14 +2,13 @@
 [![Github Actions CI](https://github.com/dart-io-packages/universal_io/workflows/Dart%20CI/badge.svg)](https://github.com/dart-io-packages/universal_io/actions?query=workflow%3A%22Dart+CI%22)
 
 # Introduction
-Package `universal_io` is a cross-platform _dart:io_ that works in:
+This repository contains [universal_io](packages/universal_io), which is a cross-platform _dart:io_ that works in:
   * Browsers (with limitations)
   * Flutter
   * Dart VM
 
-The Github repository also contains:
-  * `chrome_os_io` - Sockets for Chrome OS Apps
-  * `test_io` - Various testing helpers
+The Github repository also contains [chrome_os_io](packages/chrome_os_io),
+[nodejs_io](packages/nodejs_io), and [test_io].
 
 ## License
 Licensed under the [Apache License 2.0](LICENSE).
@@ -44,7 +43,11 @@ dependencies:
     below.
 
 ### Chrome OS App?
-  * [universal_io_driver_chrome_os](https://github.com/terrier989/dart-universal_io_driver_chrome_os)
+  * [chrome_os_io](https://pub.dev/packages/chrome_os_io)
+
+### Node.JS?
+  * [nodejs_io](https://pub.dev/packages/nodejs_io)
+
 
 ## 3. Use
 

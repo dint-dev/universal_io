@@ -257,8 +257,25 @@ abstract class HttpServer implements Stream<HttpRequest> {
   /// distributed among all the bound `HttpServer`s. Connections can be
   /// distributed over multiple isolates this way.
   static Future<HttpServer> bind(address, int port,
-          {int backlog = 0, bool v6Only = false, bool shared = false}) =>
-      _HttpServer.bind(address, port, backlog, v6Only, shared);
+      {int backlog = 0, bool v6Only = false, bool shared = false}) {
+    final driver = IODriver.current.httpServerDriver;
+    if (driver == null) {
+      return _HttpServer.bind(
+        address,
+        port,
+        backlog,
+        v6Only,
+        shared,
+      );
+    }
+    return driver.bind(
+      address,
+      port,
+      backlog: backlog,
+      v6Only: v6Only,
+      shared: shared,
+    );
+  }
 
   /// The [address] can either be a [String] or an
   /// [InternetAddress]. If [address] is a [String], [bind] will
@@ -299,13 +316,33 @@ abstract class HttpServer implements Stream<HttpRequest> {
   /// distributed over multiple isolates this way.
 
   static Future<HttpServer> bindSecure(
-          address, int port, SecurityContext context,
-          {int backlog = 0,
-          bool v6Only = false,
-          bool requestClientCertificate = false,
-          bool shared = false}) =>
-      _HttpServer.bindSecure(address, port, context, backlog, v6Only,
-          requestClientCertificate, shared);
+      address, int port, SecurityContext context,
+      {int backlog = 0,
+      bool v6Only = false,
+      bool requestClientCertificate = false,
+      bool shared = false}) {
+    final driver = IODriver.current.httpServerDriver;
+    if (driver == null) {
+      return _HttpServer.bindSecure(
+        address,
+        port,
+        context,
+        backlog,
+        v6Only,
+        requestClientCertificate,
+        shared,
+      );
+    }
+    return driver.bindSecure(
+      address,
+      port,
+      context,
+      backlog: backlog,
+      v6Only: v6Only,
+      requestClientCertificate: requestClientCertificate,
+      shared: shared,
+    );
+  }
 
   /// Attaches the HTTP server to an existing [ServerSocket]. When the
   /// [HttpServer] is closed, the [HttpServer] will just detach itself,
@@ -911,7 +948,7 @@ abstract class Cookie {
 /// that contains the content of and information about an HTTP request.
 ///
 /// __Note__: Check out the
-/// [http_server](https://pub.dartlang.org/packages/http_server)
+/// [http_server.dart](https://pub.dartlang.org/packages/http_server)
 /// package, which makes working with the low-level
 /// dart:io HTTP server subsystem easier.
 ///

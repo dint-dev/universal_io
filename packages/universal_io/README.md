@@ -37,7 +37,8 @@ dependencies:
     below.
 
 ### Chrome OS App?
-  * [universal_io_driver_chrome_os](https://github.com/terrier989/dart-universal_io_driver_chrome_os)
+  * [chrome_os_io](https://pub.dev/packages/chrome_os_io)
+
 
 ## 3. Use
 
