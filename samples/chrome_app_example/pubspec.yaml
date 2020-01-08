@@ -1,0 +1,17 @@
+name: chrome_app_example
+version: 0.0.1
+
+environment:
+  sdk: '>=2.0.0 <3.0.0'
+
+dependencies:
+  universal_io: any
+
+dev_dependencies:
+  build_runner: any
+  build_web_compilers: any
+  webdev: any
+
+dependency_overrides:
+  chrome_io:
+    path: '../../packages/chrome_io'

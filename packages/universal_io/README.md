@@ -2,14 +2,7 @@
 [![Github Actions CI](https://github.com/dart-io-packages/universal_io/workflows/Dart%20CI/badge.svg)](https://github.com/dart-io-packages/universal_io/actions?query=workflow%3A%22Dart+CI%22)
 
 # Introduction
-Package `universal_io` is a cross-platform _dart:io_ that works in:
-  * Browsers (with limitations)
-  * Flutter
-  * Dart VM
-
-The Github repository also contains:
-  * `chrome_io` - Sockets for Chrome OS Apps
-  * `test_io` - Various testing helpers
+A cross-platform _dart:io_ that works in browsers, Flutter, and VM.
 
 ## License
 Licensed under the [Apache License 2.0](LICENSE).
@@ -67,7 +60,7 @@ will compile fine. You can try to eliminate warnings by importing
 # Manual
 ## Default driver behavior
 ### HTTP client
-In browser, HTTP client is implemented using _dart:html_ _HttpRequest_, which uses
+In browser, HTTP client is implemented using _dart:html_ _HttpRequest_, which uses 
 [XmlHttpRequest](https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest).
 
 Unlike HTTP client in the standard _dart:io_, the browser implementation sends HTTP request only
@@ -78,11 +71,11 @@ possible issues like missing cross-origin headers. The error messages look like:
 
     BrowserHttpClient received an error from XMLHttpRequest (which doesn't tell
     reason for the error).
-
+    
     HTTP method:   PUT
     URL:           http://destination.com
     Origin:        http://source.com
-
+    
     Cross-origin request!
     CORS 'credentials mode' is disabled (the browser will not send cookies).
     You can enable 'credentials mode' with:
@@ -90,7 +83,7 @@ possible issues like missing cross-origin headers. The error messages look like:
         if (httpRequest is BrowserLikeHttpRequest) {
           httpRequest.useCorsCredentials = true;
         }
-
+    
     Did the server send the following mandatory headers?
       * Access-Control-Allow-Origin: http://source.com
         * OR '*'

@@ -9,3 +9,20 @@ branches:
 
 dart_task:
   - test: --exclude-tags "ipv6"
+
+script:
+  - cd packages/universal_io
+  - pub get
+  - pub run test
+  - cd ../..
+  - cd packages/test_io
+  - pub get
+  - pub run test
+  - cd ../..
+  - cd packages/chrome_io
+  - pub get
+  - pub run test
+  - cd ../..
+  - cd samples/chrome_app_example
+  - pub get
+  - pub build
