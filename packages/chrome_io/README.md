@@ -1,5 +1,8 @@
+[![Pub Package](https://img.shields.io/pub/v/chrome_io.svg)](https://pub.dartlang.org/packages/chrome_io)
+[![Github Actions CI](https://github.com/dart-io-packages/universal_io/workflows/Dart%20CI/badge.svg)](https://github.com/dart-io-packages/universal_io/actions?query=workflow%3A%22Dart+CI%22)
+
 # Introduction
-This package enables use of 'dart:io' in [Chrome OS Apps](https://developer.chrome.com/apps).
+This package enables use of 'dart:io' networking APIs in [Chrome OS Apps](https://developer.chrome.com/apps).
 
 Supported 'dart:io' APIs include:
   * _RawDatagramSocket_ (using [chrome.sockets.udp](https://developer.chrome.com/apps/sockets_udp))
@@ -9,10 +12,6 @@ Supported 'dart:io' APIs include:
 The package is implemented as a driver for [package:universal_io](https://pub.dev/packages/universal_io).
 Licensed under the [Apache License 2.0](LICENSE). A few files in the package were obtained from
 [package:chrome](https://pub.dev/packages/chrome) under the BSD 2-Clause License.
-
-## Issues
-  * [Report an issue](https://github.com/terrier989/chrome_io/issues)
-  * Have a fix? Please create a pull request in Github.
 
 ## Contributing
 Unfortunately writing automatic tests for Chrome OS Apps is painful. At the moment, the project uses
