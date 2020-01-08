@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:test/test.dart' as test;
-import '../test_io.dart';
 
 Future<Map<String, String>> getEnvironmentalVariables() async {
   // Send request to the VM

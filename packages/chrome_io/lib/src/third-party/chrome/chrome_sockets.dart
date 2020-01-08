@@ -132,6 +132,7 @@ class ChromeSocketsTcp extends ChromeApi {
         getApi, 'onReceiveError', _createReceiveErrorInfo);
   }
 
+  @override
   bool get available => _sockets_tcp != null;
   Stream<ReceiveInfo> get onReceive => _onReceive.stream;
 
@@ -350,6 +351,7 @@ class ChromeSocketsTcpServer extends ChromeApi {
         getApi, 'onAcceptError', _createAcceptErrorInfo);
   }
 
+  @override
   bool get available => _sockets_tcpServer != null;
   Stream<AcceptInfo> get onAccept => _onAccept.stream;
 
@@ -502,6 +504,7 @@ class ChromeSocketsUdp extends ChromeApi {
         getApi, 'onReceiveError', _createReceiveErrorInfo);
   }
 
+  @override
   bool get available => _sockets_udp != null;
   Stream<ReceiveInfo> get onReceive => _onReceive.stream;
 

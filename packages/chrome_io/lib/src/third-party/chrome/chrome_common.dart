@@ -65,7 +65,7 @@ dynamic jsify(dynamic obj) {
     return obj.value;
   } else if (obj is Map) {
     // Do a deep convert.
-    Map m = {};
+    var m = {};
     for (var key in obj.keys) {
       m[key] = jsify(obj[key]);
     }
@@ -82,9 +82,9 @@ List listify(JsObject obj, [Function transformer]) {
   if (obj == null) {
     return null;
   } else {
-    List l = List(obj['length']);
+    var l = List(obj['length']);
 
-    for (int i = 0; i < l.length; i++) {
+    for (var i = 0; i < l.length; i++) {
       if (transformer != null) {
         l[i] = transformer(obj[i]);
       } else {
@@ -110,7 +110,7 @@ class ChromeCompleter<T> {
   Function _callback;
 
   ChromeCompleter.noArgs() {
-    this._callback = ([_]) {
+    _callback = ([_]) {
       var le = lastError;
       if (le != null) {
         _completer.completeError(le);
@@ -121,7 +121,7 @@ class ChromeCompleter<T> {
   }
 
   ChromeCompleter.oneArg([Function transformer]) {
-    this._callback = ([arg1]) {
+    _callback = ([arg1]) {
       var le = lastError;
       if (le != null) {
         _completer.completeError(le);
@@ -135,7 +135,7 @@ class ChromeCompleter<T> {
   }
 
   ChromeCompleter.twoArgs(Function transformer) {
-    this._callback = ([arg1, arg2]) {
+    _callback = ([arg1, arg2]) {
       var le = lastError;
       if (le != null) {
         _completer.completeError(le);
@@ -210,7 +210,7 @@ class ChromeStreamController<T> {
       // TODO: Workaround an issue where the event objects are not properly
       // proxied in M35 and after.
       var jsEvent = _api[_eventName];
-      JsObject event =
+      var event =
           (jsEvent is JsObject ? jsEvent : JsObject.fromBrowserObject(jsEvent));
       event.callMethod('addListener', [_listener]);
       _handlerAdded = true;
@@ -222,7 +222,7 @@ class ChromeStreamController<T> {
       // TODO: Workaround an issue where the event objects are not properly
       // proxied in M35 and after.
       var jsEvent = _api[_eventName];
-      JsObject event =
+      var event =
           (jsEvent is JsObject ? jsEvent : JsObject.fromBrowserObject(jsEvent));
       event.callMethod('removeListener', [_listener]);
       _handlerAdded = false;

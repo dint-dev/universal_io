@@ -286,7 +286,7 @@ class HttpHeadersImpl implements HttpHeaders {
   }
 
   void noFolding(String name) {
-    if (_noFoldingHeaders == null) _noFoldingHeaders = List<String>();
+    _noFoldingHeaders ??= _noFoldingHeaders = <String>[];
     _noFoldingHeaders.add(name);
   }
 
@@ -314,7 +314,7 @@ class HttpHeadersImpl implements HttpHeaders {
   }
 
   // [name] must be a lower-case version of the name.
-  set(String name, Object value) {
+  void set(String name, Object value) {
     _checkMutable();
     name = _validateField(name);
     _headers.remove(name);
@@ -510,7 +510,7 @@ class HttpHeadersImpl implements HttpHeaders {
   void _addValue(String name, Object value) {
     List<String> values = _headers[name];
     if (values == null) {
-      values = List<String>();
+      values = <String>[];
       _headers[name] = values;
     }
     if (value is DateTime) {
@@ -534,12 +534,12 @@ class HttpHeadersImpl implements HttpHeaders {
 
   void _set(String name, String value) {
     assert(name == _validateField(name));
-    List<String> values = List<String>();
+    List<String> values = <String>[];
     _headers[name] = values;
     values.add(value);
   }
 
-  _updateHostHeader() {
+  void _updateHostHeader() {
     bool defaultPort = _port == null || _port == _defaultPortForScheme;
     _set("host", defaultPort ? host : "$host:$_port");
   }
@@ -564,7 +564,7 @@ class HttpHeadersImpl implements HttpHeaders {
     return field.toLowerCase();
   }
 
-  static _validateValue(value) {
+  static String _validateValue(String value) {
     if (value is! String) return value;
     for (var i = 0; i < value.length; i++) {
       if (!_isValueChar(value.codeUnitAt(i))) {

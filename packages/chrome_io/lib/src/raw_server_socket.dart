@@ -39,13 +39,13 @@ class ChromeRawServerSocket extends BaseRawServerSocket {
     @required this.port,
   }) {
     if (socketId == null) {
-      throw ArgumentError.notNull("socketId");
+      throw ArgumentError.notNull('socketId');
     }
     if (address == null) {
-      throw ArgumentError.notNull("address");
+      throw ArgumentError.notNull('address');
     }
     if (port == null) {
-      throw ArgumentError.notNull("port");
+      throw ArgumentError.notNull('port');
     }
   }
 
@@ -55,8 +55,8 @@ class ChromeRawServerSocket extends BaseRawServerSocket {
   }
 
   @override
-  StreamSubscription<RawSocket> listen(void onData(RawSocket event),
-      {Function onError, void onDone(), bool cancelOnError}) {
+  StreamSubscription<RawSocket> listen(void Function(RawSocket event) onData,
+      {Function onError, void Function() onDone, bool cancelOnError}) {
     final stream = chrome.sockets.tcpServer.onAccept.asyncMap(_accept);
     return stream.listen(
       onData,

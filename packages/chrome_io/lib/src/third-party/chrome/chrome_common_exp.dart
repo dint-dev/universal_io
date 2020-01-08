@@ -73,11 +73,11 @@ class ArrayBuffer extends ChromeObject {
     } else {
       var int8View = JsObject(context['Uint8Array'], [jsProxy]);
 
-      List<int> result = List<int>(int8View['length']);
+      final result = List<int>(int8View['length']);
 
       // TODO: this is _very_ slow
       // can we instead do: jsArray = Array.apply([], int8View);
-      for (int i = 0; i < result.length; i++) {
+      for (var i = 0; i < result.length; i++) {
         result[i] = int8View[i];
       }
 
@@ -162,6 +162,7 @@ abstract class ChromeEnum {
 
   const ChromeEnum(this.value);
 
+  @override
   String toString() => value;
 }
 
@@ -180,6 +181,7 @@ class ChromeObject {
 
   JsObject toJs() => jsProxy;
 
+  @override
   String toString() => jsProxy.toString();
 }
 

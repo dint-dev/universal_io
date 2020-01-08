@@ -61,7 +61,8 @@ class ChromeRawSocket extends BaseRawSocket {
   /// Maps socket ID to socket.
   ///
   /// Used by the static methods [_onError] and [_onData].
-  static Map<int, ChromeRawSocket> _receivingSockets = <int, ChromeRawSocket>{};
+  static final Map<int, ChromeRawSocket> _receivingSockets =
+      <int, ChromeRawSocket>{};
 
   /// Used to ensure that the static method [_registerStaticListeners] is called only once.
   static bool _hasInvokedRegisterStaticListeners = false;
@@ -89,19 +90,19 @@ class ChromeRawSocket extends BaseRawSocket {
     @required this.remoteAddress,
   }) {
     if (socketId == null) {
-      throw ArgumentError.notNull("socketId");
+      throw ArgumentError.notNull('socketId');
     }
     if (address == null) {
-      throw ArgumentError.notNull("address");
+      throw ArgumentError.notNull('address');
     }
     if (port == null) {
-      throw ArgumentError.notNull("port");
+      throw ArgumentError.notNull('port');
     }
     if (remotePort == null) {
-      throw ArgumentError.notNull("remotePort");
+      throw ArgumentError.notNull('remotePort');
     }
     if (remoteAddress == null) {
-      throw ArgumentError.notNull("remoteAddress");
+      throw ArgumentError.notNull('remoteAddress');
     }
     _receivingSockets[socketId] = this;
     _registerStaticListeners();
@@ -176,9 +177,9 @@ class ChromeRawSocket extends BaseRawSocket {
   static void _onError(chrome.ReceiveErrorInfo event) {
     final socketId = event.socketId;
     final errorCode = event.resultCode;
-    final osError = OSError("Socket error at socket $socketId", errorCode);
+    final osError = OSError('Socket error at socket $socketId', errorCode);
     final error = SocketException(
-      "Socket error at socket $socketId",
+      'Socket error at socket $socketId',
       osError: osError,
     );
     final socket = _receivingSockets[event.socketId];

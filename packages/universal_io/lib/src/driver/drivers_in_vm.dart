@@ -560,7 +560,8 @@ class _ConnectionTask<S> implements ConnectionTask<S> {
   final Future<S> socket;
   final void Function() _onCancel;
 
-  _ConnectionTask({Future<S> socket, void Function() onCancel})
+  _ConnectionTask(
+      {@required Future<S> socket, @required void Function() onCancel})
       : assert(socket != null),
         assert(onCancel != null),
         this.socket = socket,

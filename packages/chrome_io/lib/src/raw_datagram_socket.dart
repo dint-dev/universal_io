@@ -36,13 +36,13 @@ class ChromeRawDatagramSocket extends BaseRawDatagramSocket {
   ChromeRawDatagramSocket.fromChromeSocketId(this.socketId,
       {@required this.address, @required this.port}) {
     if (socketId == null) {
-      throw ArgumentError.notNull("socketId");
+      throw ArgumentError.notNull('socketId');
     }
     if (address == null) {
-      throw ArgumentError.notNull("address");
+      throw ArgumentError.notNull('address');
     }
     if (port == null) {
-      throw ArgumentError.notNull("port");
+      throw ArgumentError.notNull('port');
     }
   }
 
@@ -76,7 +76,7 @@ class ChromeRawDatagramSocket extends BaseRawDatagramSocket {
       );
       if (resultValue < 0) {
         throw StateError(
-          "Binding UDP socket to $host:$port failed with error code $resultValue",
+          'Binding UDP socket to $host:$port failed with error code $resultValue',
         );
       }
       return ChromeRawDatagramSocket.fromChromeSocketId(

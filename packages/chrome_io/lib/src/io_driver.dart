@@ -52,7 +52,7 @@ class _ChromeRawSecureSocketDriver extends RawSecureSocketDriver {
       {StreamSubscription<RawSocketEvent> subscription,
       host,
       SecurityContext context,
-      bool onBadCertificate(X509Certificate certificate),
+      bool Function(X509Certificate certificate) onBadCertificate,
       List<String> supportedProtocols}) async {
     return ChromeRawSecureSocket(
       (socket as ChromeRawSocket).socketId,

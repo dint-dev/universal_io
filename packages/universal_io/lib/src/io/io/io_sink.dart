@@ -155,7 +155,7 @@ abstract class IOSink implements StreamSink<List<int>>, StringSink {
 
 class _IOSinkImpl extends _StreamSinkImpl<List<int>> implements IOSink {
   Encoding _encoding;
-  bool _encodingMutable = true;
+  final bool _encodingMutable = true;
 
   _IOSinkImpl(StreamConsumer<List<int>> target, this._encoding) : super(target);
 
