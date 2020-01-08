@@ -1,6 +1,6 @@
 # Description
 
-This contains helpers for testing 'package:datastore' setups.
+This contains IO / platform related helpers for testing.
 
 ## Getting environmental variables
 ```dart

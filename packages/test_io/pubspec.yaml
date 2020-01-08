@@ -1,7 +1,8 @@
 name: test_io
 version: 0.1.0
-description: Access to environmental variables in browsers ando other helpers for testing.
-homepage: https://github.com/dart-io-packages/universal_io/test_io
+description:
+  Access to environmental variables in browsers ando other cross-platform helpers for testing.
+homepage: https://github.com/dart-io-packages/universal_io
 
 environment:
   sdk: '>=2.5.0 <3.0.0'
