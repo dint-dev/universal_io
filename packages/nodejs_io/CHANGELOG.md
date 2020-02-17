@@ -1,6 +1,6 @@
 ## 0.2.0
 
-* Using 'universal_io' version 0.9.x.
+* Using 'universal_io' version 1.0.0.
 
 ## 0.1.0
 

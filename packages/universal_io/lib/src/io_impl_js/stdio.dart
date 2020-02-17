@@ -312,7 +312,7 @@ class StdioType {
 
 /// The standard input stream of data read by this program.
 Stdin get stdin {
-  return PlatformOverrides.current.stdin;
+  return IODriver.current.platformOverrides.stdin;
 }
 
 /// The standard output stream of data written by this program.
@@ -321,7 +321,7 @@ Stdin get stdin {
 /// result in an unhandled asynchronous error unless there is an error handler
 /// on `done`.
 Stdout get stdout {
-  return PlatformOverrides.current.stdout;
+  return IODriver.current.platformOverrides.stdout;
 }
 
 /// The standard output stream of errors written by this program.
@@ -330,7 +330,7 @@ Stdout get stdout {
 /// result in an unhandled asynchronous error unless there is an error handler
 /// on `done`.
 Stdout get stderr {
-  return PlatformOverrides.current.stderr;
+  return IODriver.current.platformOverrides.stderr;
 }
 
 /// For a stream, returns whether it is attached to a file, pipe, terminal, or

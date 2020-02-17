@@ -143,8 +143,7 @@ class Platform {
   /// so on Windows the map is case-insensitive and will convert
   /// all keys to upper case.
   /// On other platforms, keys can be distinguished by case.
-  static Map<String, String> get environment =>
-      PlatformOverrides.current.environment;
+  static Map<String, String> get environment => _current.environment;
 
   /// The path of the executable used to run the script in this isolate.
   ///
@@ -153,33 +152,29 @@ class Platform {
   /// was found by searching the system path.
   ///
   /// Use [resolvedExecutable] to get an absolute path to the executable.
-  static String get executable => PlatformOverrides.current.executable;
+  static String get executable => _current.executable;
 
   /// The flags passed to the executable used to run the script in this isolate.
   ///
   /// These are the command-line flags to the executable that precedes
   /// the script name.
   /// Provides a new list every time the value is read.
-  static List<String> get executableArguments =>
-      PlatformOverrides.current.executableArguments;
+  static List<String> get executableArguments => _current.executableArguments;
 
   /// Get the name of the current locale.
-  static String get localeName => PlatformOverrides.current.localeName;
+  static String get localeName => _current.localeName;
 
   /// The local hostname for the system.
-  static String get localHostname => PlatformOverrides.current.localHostname;
+  static String get localHostname => _current.localHostname;
 
   /// The number of individual execution units of the machine.
-  static int get numberOfProcessors =>
-      PlatformOverrides.current.numberOfProcessors;
+  static int get numberOfProcessors => _current.numberOfProcessors;
 
   /// A string representing the operating system or platform.
-  static String get operatingSystem =>
-      PlatformOverrides.current.operatingSystem;
+  static String get operatingSystem => _current.operatingSystem;
 
   /// A string representing the version of the operating system or platform.
-  static String get operatingSystemVersion =>
-      PlatformOverrides.current.operatingSystemVersion;
+  static String get operatingSystemVersion => _current.operatingSystemVersion;
 
   /// The `--packages` flag passed to the executable used to run the script
   /// in this isolate.
@@ -187,7 +182,7 @@ class Platform {
   /// If present, it specifies a file describing how Dart packages are looked up.
   ///
   /// Is `null` if there is no `--packages` flag.
-  static String get packageConfig => PlatformOverrides.current.packageConfig;
+  static String get packageConfig => _current.packageConfig;
 
   /// The `--package-root` flag passed to the executable used to run the script
   /// in this isolate.
@@ -196,19 +191,18 @@ class Platform {
   ///
   /// Is `null` if there is no `--package-root` flag.
   @deprecated
-  static String get packageRoot => PlatformOverrides.current.packageRoot;
+  static String get packageRoot => _current.packageRoot;
 
   /// The path separator used by the operating system to separate
   /// components in file paths.
-  static String get pathSeparator => PlatformOverrides.current.pathSeparator;
+  static String get pathSeparator => _current.pathSeparator;
 
   /// The path of the executable used to run the script in this
   /// isolate after it has been resolved by the OS.
   ///
   /// This is the absolute path, with all symlinks resolved, to the
   /// executable used to run the script.
-  static String get resolvedExecutable =>
-      PlatformOverrides.current.resolvedExecutable;
+  static String get resolvedExecutable => _current.resolvedExecutable;
 
   /// The absolute URI of the script being run in this isolate.
   ///
@@ -223,7 +217,7 @@ class Platform {
   ///
   /// If the executable environment does not support [script],
   /// the URI is empty.
-  static Uri get script => PlatformOverrides.current.script;
+  static Uri get script => _current.script;
 
   /// The version of the current Dart runtime.
   ///
@@ -231,5 +225,7 @@ class Platform {
   /// string representing the version of the current Dart runtime,
   /// possibly followed by whitespace and other version and
   /// build details.
-  static String get version => PlatformOverrides.current.version;
+  static String get version => _current.version;
+
+  static PlatformOverrides get _current => IODriver.current.platformOverrides;
 }

@@ -44,11 +44,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// --------------------
-// PURPOSE OF THIS FILE
-// --------------------
-// Imported ONLY by 'http_headers_impl.dart'.
-
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';

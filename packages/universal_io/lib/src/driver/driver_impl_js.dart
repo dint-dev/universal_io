@@ -129,11 +129,6 @@ class IODriver {
 
 /// Implements static members of [NetworkInterface].
 class NetworkInterfaceOverrides {
-  /// Returns the driver used by the current zone.
-  static NetworkInterfaceOverrides get current {
-    return IODriver.current.networkInterfaceOverrides;
-  }
-
   Future<List<NetworkInterface>> list({
     bool includeLoopback = false,
     bool includeLinkLocal = false,
@@ -147,8 +142,6 @@ class NetworkInterfaceOverrides {
 
 /// Implements static members of [Platform].
 class PlatformOverrides {
-  static PlatformOverrides get current => IODriver.current.platformOverrides;
-
   final int numberOfProcessors;
   final String pathSeparator;
   final String localeName;
@@ -300,7 +293,7 @@ class RawSecureServerSocketOverrides {
 
 /// Implements static members of [RawSecureSocket].
 abstract class RawSecureSocketOverrides {
-  SecurityContext get defaultSecurityContext => _BrowserSecurityContext();
+  SecurityContext get defaultSecurityContext => _SecurityContext();
 
   /// For [RawSecureSocket.connect].
   Future<RawSecureSocket> connect(
@@ -332,7 +325,7 @@ abstract class RawSecureSocketOverrides {
   /// Default implementation returns a [SecurityContext] that will throw
   /// if used.
   SecurityContext newSecurityContext({bool withTrustedRoots = false}) {
-    return _BrowserSecurityContext();
+    return _SecurityContext();
   }
 
   /// For [RawSecureSocket.secure].
@@ -426,56 +419,6 @@ abstract class RawSocketOverrides {
   });
 }
 
-/// Implements [SecurityContext] that throws when any method is used.
-class _BrowserSecurityContext implements SecurityContext {
-  _BrowserSecurityContext();
-
-  @override
-  void setAlpnProtocols(List<String> protocols, bool isServer) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void setClientAuthorities(String file, {String password}) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void setClientAuthoritiesBytes(List<int> authCertBytes, {String password}) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void setTrustedCertificates(String file, {String password}) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void setTrustedCertificatesBytes(List<int> certBytes, {String password}) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void useCertificateChain(String file, {String password}) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void useCertificateChainBytes(List<int> chainBytes, {String password}) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void usePrivateKey(String file, {String password}) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void usePrivateKeyBytes(List<int> keyBytes, {String password}) {
-    throw UnimplementedError();
-  }
-}
-
 class _ConnectionTask<S> implements ConnectionTask<S> {
   @override
   final Future<S> socket;
@@ -549,5 +492,55 @@ class _RawSecureServerSocket extends Stream<RawSecureSocket>
       onDone: onDone,
       cancelOnError: cancelOnError,
     );
+  }
+}
+
+/// Implements [SecurityContext] that throws when any method is used.
+class _SecurityContext implements SecurityContext {
+  _SecurityContext();
+
+  @override
+  void setAlpnProtocols(List<String> protocols, bool isServer) {
+    throw UnimplementedError();
+  }
+
+  @override
+  void setClientAuthorities(String file, {String password}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  void setClientAuthoritiesBytes(List<int> authCertBytes, {String password}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  void setTrustedCertificates(String file, {String password}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  void setTrustedCertificatesBytes(List<int> certBytes, {String password}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  void useCertificateChain(String file, {String password}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  void useCertificateChainBytes(List<int> chainBytes, {String password}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  void usePrivateKey(String file, {String password}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  void usePrivateKeyBytes(List<int> keyBytes, {String password}) {
+    throw UnimplementedError();
   }
 }

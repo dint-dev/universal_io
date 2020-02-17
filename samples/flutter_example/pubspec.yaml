@@ -1,5 +1,6 @@
 name: flutter_example
 version: 1.0.0+1
+publish_to: none
 
 environment:
   sdk: ">=2.7.0 <3.0.0"

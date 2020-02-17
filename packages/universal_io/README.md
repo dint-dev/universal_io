@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/dint-dev/universal_io.svg?branch=master)](https://travis-ci.org/dint-dev/universal_io)
 
 # Overview
-A cross-platform _dart:io_ that works in all platforms, including browsers, Flutter, and Dart VM.
+A cross-platform _dart:io_ that works in all platforms (browsers, Flutter, and VM).
 
 Licensed under the [Apache License 2.0](LICENSE).
 Much of the source code is derived [from Dart SDK](https://github.com/dart-lang/sdk/tree/master/sdk/lib/io),
@@ -22,7 +22,7 @@ which was obtained under the BSD-style license of Dart SDK. See LICENSE file for
 ### pubspec.yaml
 ```yaml
 dependencies:
-  universal_io: ^0.9.0
+  universal_io: ^1.0.0
 ```
 
 The may also consider [chrome_os_io](https://pub.dev/packages/chrome_os_io) (if you use Chrome OS)

@@ -1,5 +1,5 @@
-# 0.9.0
-  * Implements recent changes in 'dart:io' (SDK 2.8).
+# 1.0.0
+  * Implements recent changes in 'dart:io' (Dart SDK 2.8).
   * HttpDriver is replaced by 'dart:io' HttpOverrides.
   * FileSystemDriver is replaced by 'dart:io' IOOverrides.
   * Various other driver APIs are renamed or removed.

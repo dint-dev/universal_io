@@ -21,13 +21,13 @@ import 'files_impl_vm.dart' if (dart.library.js) 'files_impl_browser.dart'
 /// Reads file as a string. Unlike _dart:io_ [File](https://api.dartlang.org/stable/2.7.0/dart-io/Platform/file.html),
 /// this method works in browsers too.
 Future<String> readFileAsString(String path) {
-  return scriptRelativeFileAsBytes(path).then(
+  return readFileAsBytes(path).then(
     (value) => value == null ? null : utf8.decode(value),
   );
 }
 
 /// Reads file as bytes. Unlike _dart:io_ [File](https://api.dartlang.org/stable/2.7.0/dart-io/Platform/file.html),
 /// this method works in browsers too.
-Future<Uint8List> scriptRelativeFileAsBytes(String path) {
+Future<Uint8List> readFileAsBytes(String path) {
   return impl.readFileAsBytes(path);
 }
