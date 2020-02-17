@@ -1,4 +1,4 @@
-// Copyright 'dart-universal_io' project authors.
+// Copyright 2020 terrier989@gmail.com.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,12 +17,98 @@ import 'dart:convert';
 
 import 'package:meta/meta.dart';
 import 'package:test/test.dart';
+import 'package:universal_io/prefer_sdk/io.dart' as prefer_sdk;
 import 'package:universal_io/prefer_universal/io.dart';
+import 'package:universal_io/prefer_universal/io.dart' as prefer_universal;
 
 import 'example_http_server.dart';
 
 void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
   group("HttpClient:", () {
+    group('in "package:universal_io/prefer_sdk/io.dart":', () {
+      final httpClient = prefer_sdk.HttpClient();
+      if (isBrowser) {
+        test('does implement BrowserHttpClient', () async {
+          expect(httpClient, isA<BrowserHttpClient>());
+          if (httpClient is prefer_sdk.BrowserHttpClient) {
+            expect(
+              httpClient.credentialsMode,
+              prefer_sdk.BrowserHttpClientCredentialsMode.automatic,
+            );
+            httpClient.credentialsMode =
+                prefer_sdk.BrowserHttpClientCredentialsMode.include;
+            expect(
+              httpClient.credentialsMode,
+              prefer_sdk.BrowserHttpClientCredentialsMode.include,
+            );
+          }
+        });
+        test('request does implement BrowserHttpClientRequest', () async {
+          final request =
+              await prefer_sdk.HttpClient().openUrl('GET', Uri.parse('/'));
+          expect(request, isA<prefer_sdk.BrowserHttpClientRequest>());
+          if (request is prefer_sdk.BrowserHttpClientRequest) {
+            expect(
+              request.credentialsMode,
+              prefer_sdk.BrowserHttpClientCredentialsMode.automatic,
+            );
+            request.credentialsMode =
+                prefer_sdk.BrowserHttpClientCredentialsMode.include;
+            expect(
+              request.credentialsMode,
+              prefer_sdk.BrowserHttpClientCredentialsMode.include,
+            );
+          }
+        });
+      } else {
+        test('does NOT implement BrowserHttpClient', () async {
+          expect(httpClient, isNot(isA<BrowserHttpClient>()));
+        });
+      }
+    });
+
+    group('in "package:universal_io/prefer_universal/io.dart":', () {
+      final httpClient = prefer_universal.HttpClient();
+      if (isBrowser) {
+        test('does implement BrowserHttpClient', () async {
+          expect(httpClient, isA<BrowserHttpClient>());
+          if (httpClient is prefer_universal.BrowserHttpClient) {
+            expect(
+              httpClient.credentialsMode,
+              prefer_universal.BrowserHttpClientCredentialsMode.automatic,
+            );
+            httpClient.credentialsMode =
+                prefer_universal.BrowserHttpClientCredentialsMode.include;
+            expect(
+              httpClient.credentialsMode,
+              prefer_universal.BrowserHttpClientCredentialsMode.include,
+            );
+          }
+        });
+        test('request does implement BrowserHttpClientRequest', () async {
+          final request = await prefer_universal.HttpClient()
+              .openUrl('GET', Uri.parse('/'));
+          expect(request, isA<prefer_universal.BrowserHttpClientRequest>());
+          if (request is prefer_universal.BrowserHttpClientRequest) {
+            expect(
+              request.credentialsMode,
+              prefer_universal.BrowserHttpClientCredentialsMode.automatic,
+            );
+            request.credentialsMode =
+                prefer_universal.BrowserHttpClientCredentialsMode.include;
+            expect(
+              request.credentialsMode,
+              prefer_universal.BrowserHttpClientCredentialsMode.include,
+            );
+          }
+        });
+      } else {
+        test('does NOT implement BrowserHttpClient', () {
+          expect(httpClient, isNot(isA<BrowserHttpClient>()));
+        });
+      }
+    });
+
     test("Non-existing server leads to SocketException", () async {
       final httpClient = HttpClient();
       final httpRequestFuture =
@@ -37,13 +123,41 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
       await expectLater(
           () => httpResponseFuture, throwsA(TypeMatcher<SocketException>()));
     });
+
     test("GET", () async {
       await _testClient(
         method: "GET",
         path: "/greeting",
-        responseBody: "Hello world!",
+        expectedBody: "Hello world! (GET)",
         hybrid: hybrid,
       );
+    });
+
+    test("GET (multiple chunks)", () async {
+      // Wait for the server to be listening
+      final server = await ExampleHttpServer.bind(hybrid: hybrid);
+      addTearDown(() {
+        server.close();
+      });
+
+      // Send HTTP request
+      final client = HttpClient();
+      final request = await client.openUrl(
+        'GET',
+        Uri.parse('http://localhost:${server.port}/slow'),
+      );
+      if (request is BrowserHttpClientRequest) {
+        request.responseType = BrowserHttpClientResponseType.text;
+      }
+      final response = await request.close();
+      final list = await response.toList();
+
+      // Check that the data arrived in multiple parts.
+      expect(list, hasLength(greaterThanOrEqualTo(2)));
+
+      // Check that the content is correct.
+      final bytes = list.fold(<int>[], (a, b) => a..addAll(b));
+      expect(utf8.decode(bytes), 'First part.\nSecond part.\n');
     });
 
     test("POST", () async {
@@ -51,7 +165,7 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
         method: "POST",
         path: "/greeting",
         requestBody: "Hello from client",
-        responseBody: "Hello world!",
+        expectedBody: "Hello world! (POST)",
         hybrid: hybrid,
       );
     });
@@ -60,7 +174,7 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
       await _testClient(
         method: "GET",
         path: "/404",
-        status: 404,
+        expectedStatus: 404,
         hybrid: hybrid,
       );
     });
@@ -69,7 +183,7 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
       final response = await _testClient(
         method: "GET",
         path: "/set_cookie",
-        requestHeaders: {
+        headers: {
           "Cookie": Cookie("x", "v").toString(),
         },
         hybrid: hybrid,
@@ -86,31 +200,32 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
     });
 
     test("Sends cookies (except in browser)", () async {
-      var status = HttpStatus.ok;
+      var expectedStatus = HttpStatus.ok;
       if (isBrowser) {
-        status = HttpStatus.unauthorized;
+        expectedStatus = HttpStatus.unauthorized;
       }
       await _testClient(
         method: "GET",
         path: "/expect_cookie",
-        requestHeaders: {
+        headers: {
           "Cookie": Cookie("expectedCookie", "value").toString(),
         },
-        status: status,
+        expectedStatus: expectedStatus,
         hybrid: hybrid,
       );
     });
 
     test("Sends 'Authorization' header", () async {
-      final response = await _testClient(
+      await _testClient(
         method: "POST",
         path: "/expect_authorization",
-        requestHeaders: {
+        headers: {
           HttpHeaders.authorizationHeader: "expectedAuthorization",
         },
+        expectedStatus: HttpStatus.ok,
+        expectedBody: 'expectedAuthorization',
         hybrid: hybrid,
       );
-      expect(response.statusCode, HttpStatus.ok);
     });
 
     // ------
@@ -129,7 +244,7 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
         method: "DELETE",
         path: "/greeting",
         openUrl: (client, uri) => client.deleteUrl(uri),
-        responseBody: "Hello world!",
+        expectedBody: "Hello world! (DELETE)",
         hybrid: hybrid,
       );
     });
@@ -151,7 +266,7 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
         method: "GET",
         path: "/greeting",
         openUrl: (client, uri) => client.getUrl(uri),
-        responseBody: "Hello world!",
+        expectedBody: "Hello world! (GET)",
         hybrid: hybrid,
       );
     });
@@ -173,7 +288,7 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
         method: "HEAD",
         path: "/greeting",
         openUrl: (client, uri) => client.headUrl(uri),
-        responseBody: "", // <-- HEAD response doesn't have body
+        expectedBody: "", // <-- HEAD response doesn't have body
         hybrid: hybrid,
       );
     });
@@ -195,7 +310,7 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
         method: "PATCH",
         path: "/greeting",
         openUrl: (client, uri) => client.patchUrl(uri),
-        responseBody: "Hello world!",
+        expectedBody: "Hello world! (PATCH)",
         hybrid: hybrid,
       );
     });
@@ -217,7 +332,7 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
         method: "POST",
         path: "/greeting",
         openUrl: (client, uri) => client.postUrl(uri),
-        responseBody: "Hello world!",
+        expectedBody: "Hello world! (POST)",
         hybrid: hybrid,
       );
     });
@@ -239,7 +354,7 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
         method: "PUT",
         path: "/greeting",
         openUrl: (client, uri) => client.putUrl(uri),
-        responseBody: "Hello world!",
+        expectedBody: "Hello world! (PUT)",
         hybrid: hybrid,
       );
     });
@@ -293,16 +408,16 @@ Future<HttpClientResponse> _testClient({
   @required String path,
 
   /// Request headers
-  Map<String, String> requestHeaders = const <String, String>{},
+  Map<String, String> headers = const <String, String>{},
 
   /// Request body
   String requestBody,
 
   /// Expected status
-  int status = 200,
+  int expectedStatus = 200,
 
   /// Expected response body.
-  String responseBody,
+  String expectedBody,
 
   /// Function for opening HTTP request
   Future<HttpClientRequest> openUrl(HttpClient client, Uri uri),
@@ -346,7 +461,7 @@ Future<HttpClientResponse> _testClient({
   }
 
   // Set headers
-  requestHeaders.forEach((name, value) {
+  headers.forEach((name, value) {
     request.headers.set(name, value);
   });
 
@@ -371,14 +486,14 @@ Future<HttpClientResponse> _testClient({
 
   // Check response status code
   expect(response, isNotNull);
-  expect(response.statusCode, status);
+  expect(response.statusCode, expectedStatus);
 
   // Check response headers
   expect(response.headers.value("X-Response-Header"), "value");
 
   // Check response body
-  if (responseBody != null) {
-    expect(actualResponseBody, responseBody);
+  if (expectedBody != null) {
+    expect(actualResponseBody, expectedBody);
   }
 
   // Check the request that the server received

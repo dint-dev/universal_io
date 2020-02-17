@@ -1,4 +1,4 @@
-// Copyright 'dart-universal_io' project authors.
+// Copyright 2020 terrier989@gmail.com.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,4 +15,5 @@
 /// API for _dart:io_ drivers.
 library universal_io.driver;
 
-export 'src/driver/drivers.dart';
+export 'src/driver/driver_impl_js.dart'
+    if (dart.library.io) 'src/driver/driver_impl_vm.dart';

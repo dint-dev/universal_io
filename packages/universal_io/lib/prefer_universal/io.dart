@@ -1,4 +1,4 @@
-// Copyright 'dart-universal_io' project authors.
+// Copyright 2020 terrier989@gmail.com.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,4 +15,4 @@
 /// {@nodoc}
 library universal_io.prefer_universal.io;
 
-export '../src/io/io.dart' if (dart.library.io) '../src/sdk_io.dart';
+export '../src/io_impl_js.dart' if (dart.library.io) '../src/io_impl_vm.dart';

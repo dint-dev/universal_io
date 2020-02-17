@@ -1,4 +1,4 @@
-// Copyright 'dart-universal_io' project authors.
+// Copyright 2020 terrier989@gmail.com.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 import 'dart:typed_data';
 
 import 'package:test/test.dart';
-import 'package:universal_io/driver.dart';
+import 'package:universal_io/driver_base.dart' show internetAddressFromBytes;
 import 'package:universal_io/prefer_universal/io.dart';
 
 void testInternetAddress() {
@@ -114,8 +114,11 @@ void testInternetAddress() {
       // constructs an InternetAddress only from the bytes,
       // and returns its address string.
       String toString(String s) {
+        // Parse
         final parsed = InternetAddress(s);
-        return internetAddressFrom(bytes: parsed.rawAddress).address;
+
+        // Get address
+        return internetAddressFromBytes(parsed.rawAddress).address;
       }
 
       test("'0123:4567:89ab:cdef:0123:4567:89ab:cdef'", () {

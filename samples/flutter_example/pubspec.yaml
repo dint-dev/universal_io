@@ -1,0 +1,15 @@
+name: flutter_example
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.6.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  universal_io:
+    path: '../../packages/universal_io'
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

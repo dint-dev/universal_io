@@ -1,4 +1,4 @@
-// Copyright 2019 terrier989 <terrier989@gmail.com>.
+// Copyright 2019 terrier989@gmail.com.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,25 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'dart:async';
-
-import 'package:universal_io/driver.dart';
-import 'package:universal_io/prefer_universal/io.dart';
-
-import 'raw_datagram_socket.dart';
-import 'raw_server_socket.dart';
-import 'raw_socket.dart';
+part of chrome_os_io;
 
 final chromeIODriver = IODriver(
-  rawDatagramSocketDriver: const _ChromeRawDatagramSocketDriver(),
-  rawSecureSocketDriver: const _ChromeRawSecureSocketDriver(),
-  rawServerSocketDriver: _ChromeRawServerSocketDriver(),
-  rawSocketDriver: _ChromeRawSocketDriver(),
-).withMissingFeaturesFrom(defaultIODriver);
+  parent: defaultIODriver,
+  rawDatagramSocketOverrides: _ChromeRawDatagramSocketDriver(),
+  rawSecureSocketOverrides: _ChromeRawSecureSocketDriver(),
+  rawServerSocketOverrides: _ChromeRawServerSocketDriver(),
+  rawSocketOverrides: _ChromeRawSocketDriver(),
+);
 
-class _ChromeRawDatagramSocketDriver extends RawDatagramSocketDriver {
-  const _ChromeRawDatagramSocketDriver();
-
+class _ChromeRawDatagramSocketDriver extends RawDatagramSocketOverrides {
   @override
   Future<RawDatagramSocket> bind(Object host, int port,
       {bool reuseAddress = true, bool reusePort = false, int ttl = 1}) async {
@@ -44,9 +36,7 @@ class _ChromeRawDatagramSocketDriver extends RawDatagramSocketDriver {
   }
 }
 
-class _ChromeRawSecureSocketDriver extends RawSecureSocketDriver {
-  const _ChromeRawSecureSocketDriver();
-
+class _ChromeRawSecureSocketDriver extends RawSecureSocketOverrides {
   @override
   Future<RawSecureSocket> secure(RawSocket socket,
       {StreamSubscription<RawSocketEvent> subscription,
@@ -75,9 +65,7 @@ class _ChromeRawSecureSocketDriver extends RawSecureSocketDriver {
   }
 }
 
-class _ChromeRawServerSocketDriver extends RawServerSocketDriver {
-  const _ChromeRawServerSocketDriver();
-
+class _ChromeRawServerSocketDriver extends RawServerSocketOverrides {
   @override
   Future<RawServerSocket> bind(Object host, int port,
       {int backlog = 0, bool v6Only = false, bool shared = false}) async {
@@ -91,9 +79,7 @@ class _ChromeRawServerSocketDriver extends RawServerSocketDriver {
   }
 }
 
-class _ChromeRawSocketDriver extends RawSocketDriver {
-  const _ChromeRawSocketDriver();
-
+class _ChromeRawSocketDriver extends RawSocketOverrides {
   @override
   Future<ConnectionTask<RawSocket>> startConnect(Object host, int port,
       {Object sourceAddress, Duration timeout}) async {

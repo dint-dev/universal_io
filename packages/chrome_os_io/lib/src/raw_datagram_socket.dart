@@ -1,4 +1,4 @@
-// Copyright 2019 terrier989 <terrier989@gmail.com>.
+// Copyright 2019 terrier989@gmail.com.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,15 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'dart:async';
-
-import 'package:meta/meta.dart';
-import 'package:universal_io/driver.dart';
-import 'package:universal_io/driver_base.dart';
-import 'package:universal_io/prefer_universal/io.dart';
-
-import 'third-party/chrome/chrome_common.dart' as chrome;
-import 'third-party/chrome/chrome_sockets.dart' as chrome;
+part of chrome_os_io;
 
 /// [RawDatagramSocket] that uses Chrome Apps 'chrome.sockets.udp' API.
 class ChromeRawDatagramSocket extends BaseRawDatagramSocket {

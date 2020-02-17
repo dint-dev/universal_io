@@ -1,4 +1,4 @@
-// Copyright 'dart-universal_io' project authors.
+// Copyright 2020 terrier989@gmail.com.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,4 +24,5 @@ export 'src/driver_base/base_raw_socket.dart';
 export 'src/driver_base/base_std_out.dart';
 export 'src/driver_base/buffer.dart';
 export 'src/driver_base/helpers.dart';
-export 'src/driver_base/http_headers_impl.dart';
+export 'src/driver_base/http_headers.dart';
+export 'src/driver_base/internet_address.dart';

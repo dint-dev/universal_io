@@ -1,4 +1,4 @@
-// Copyright 'dart-universal_io' project authors.
+// Copyright 2020 terrier989@gmail.com.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -177,7 +177,21 @@ void _handleHttpRequest(HttpRequest request) async {
     switch (request.uri.path) {
       case "/greeting":
         response.statusCode = HttpStatus.ok;
-        response.write("Hello world!");
+        response.write("Hello world! (${request.method})");
+        break;
+
+      case "/slow":
+        response.bufferOutput = false;
+        response.statusCode = HttpStatus.ok;
+        response.headers.set('Cache-Control', 'no-cache');
+        response.headers.chunkedTransferEncoding = true;
+        response.writeln("First part.");
+        await response.flush();
+        await Future.delayed(const Duration(milliseconds: 1000));
+
+        response.writeln("Second part.");
+        await response.flush();
+        await Future.delayed(const Duration(milliseconds: 1000));
         break;
 
       case "/set_cookie":
@@ -200,10 +214,18 @@ void _handleHttpRequest(HttpRequest request) async {
         break;
 
       case "/expect_authorization":
-        response.headers.set("Access-Control-Allow-Credentials", "true");
-        response.headers
-            .set("Access-Control-Expose-Headers", "X-Response-Header");
-        response.headers.set("Access-Control-Allow-Headers", "Authorization");
+        response.headers.set(
+          "Access-Control-Allow-Credentials",
+          "true",
+        );
+        response.headers.set(
+          "Access-Control-Expose-Headers",
+          "X-Response-Header",
+        );
+        response.headers.set(
+          "Access-Control-Allow-Headers",
+          "Authorization",
+        );
 
         // Is this a preflight?
         if (request.method == "OPTIONS") {
@@ -219,6 +241,7 @@ void _handleHttpRequest(HttpRequest request) async {
         } else {
           response.statusCode = HttpStatus.unauthorized;
         }
+        response.write(authorization);
         break;
 
       case "/404":

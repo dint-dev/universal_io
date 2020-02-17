@@ -1,4 +1,4 @@
-// Copyright 2019 terrier989 <terrier989@gmail.com>.
+// Copyright 2019 terrier989@gmail.com.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'dart:async';
-import 'dart:typed_data';
+part of nodejs_io;
 
-import 'package:node_http/node_http.dart' as node_http;
-import 'package:universal_io/driver.dart';
-import 'package:universal_io/prefer_universal/io.dart';
-
-class NodeJsHttpClientDriver extends HttpClientDriver {
-  const NodeJsHttpClientDriver();
-
+class _NodeJsHttpOverrides extends HttpOverrides {
   @override
-  HttpClient newHttpClient({SecurityContext context}) {
+  HttpClient createHttpClient(SecurityContext context) {
     return _NodeJsHttpClient();
   }
 }

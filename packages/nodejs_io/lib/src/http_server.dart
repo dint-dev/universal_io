@@ -1,4 +1,4 @@
-// Copyright 2019 terrier989 <terrier989@gmail.com>.
+// Copyright 2019 terrier989@gmail.com.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'dart:async';
-import 'dart:typed_data';
+part of nodejs_io;
 
-import 'package:node_io/node_io.dart' as node_io;
-import 'package:universal_io/driver.dart';
-import 'package:universal_io/prefer_universal/io.dart';
-
-class NodeJsHttpServerDriver extends HttpServerDriver {
-  const NodeJsHttpServerDriver();
-
+class _NodeJsHttpServerOverrides extends HttpServerOverrides {
   @override
   Future<HttpServer> bind(address, int port,
       {int backlog = 0, bool v6Only = false, bool shared = false}) async {

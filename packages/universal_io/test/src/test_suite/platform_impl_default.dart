@@ -1,2 +1,2 @@
-// Conditionally imported by 'platform.dart'.
+// Conditionally imported by 'env.dart'.
 void testPlatformInBrowser() {}

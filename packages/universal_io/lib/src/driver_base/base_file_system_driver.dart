@@ -1,4 +1,4 @@
-// Copyright 'dart-universal_io' project authors.
+// Copyright 2020 terrier989@gmail.com.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:universal_io/driver.dart';
 import 'package:universal_io/prefer_universal/io.dart';
 
 class BaseDirectory extends BaseFileSystemEntity implements Directory {
@@ -232,124 +231,6 @@ class BaseFile extends BaseFileSystemEntity implements File {
       {FileMode mode = FileMode.write,
       Encoding encoding = utf8,
       bool flush = false}) {
-    throw UnimplementedError();
-  }
-}
-
-class BaseFileSystemDriver extends FileSystemDriver {
-  @override
-  bool get isWatchSupported {
-    return false;
-  }
-
-  @override
-  Directory get currentDirectory {
-    throw UnimplementedError();
-  }
-
-  @override
-  Directory get systemTempDirectory {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<bool> identicalPaths(String path0, String path1) {
-    throw UnimplementedError();
-  }
-
-  @override
-  bool identicalPathsSync(String path0, String path1) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<bool> isDirectory(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  bool isDirectorySync(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<bool> isFile(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  bool isFileSync(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<bool> isLink(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  bool isLinkSync(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Directory newDirectory(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Directory newDirectoryFromRawPath(Uint8List path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  File newFile(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  File newFileFromRawPath(Uint8List path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Link newLink(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Link newLinkFromRawPath(Uint8List path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  set currentDirectory(Directory path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<FileStat> stat(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  FileStat statSync(String path) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<FileSystemEntityType> type(String path, {bool followLinks}) {
-    throw UnimplementedError();
-  }
-
-  @override
-  FileSystemEntityType typeSync(String path, {bool followLinks}) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Stream<FileSystemEvent> watch(String path,
-      {int events = FileSystemEvent.all, bool recursive = false}) {
     throw UnimplementedError();
   }
 }

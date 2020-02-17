@@ -1,4 +1,4 @@
-// Copyright 'dart-universal_io' project authors.
+// Copyright 2020 terrier989@gmail.com.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,12 +20,9 @@ import 'package:meta/meta.dart';
 import 'package:universal_io/prefer_universal/io.dart';
 
 import 'base_io_sink.dart';
-import 'http_headers_impl.dart';
+import 'http_headers.dart';
 
-abstract class BaseHttpClient implements HttpClient, BrowserLikeHttpClient {
-  @override
-  bool useCorsCredentials = false;
-
+abstract class BaseHttpClient implements HttpClient {
   @override
   Duration idleTimeout = Duration(seconds: 15);
 
@@ -273,21 +270,13 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
       return _completer.future;
     }
     try {
-      // Flush
       await flush();
-
-      // Close
       final result = await didClose();
-
-      // Complete future
       _completer.complete(result);
-      return _completer.future;
     } catch (error, stackTrace) {
-      // Something failed
-      // Complete with an error
       _completer.completeError(error, stackTrace);
-      return _completer.future;
     }
+    return _completer.future;
   }
 
   /// A protected method only for implementations.
