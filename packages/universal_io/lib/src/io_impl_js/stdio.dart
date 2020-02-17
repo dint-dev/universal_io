@@ -78,9 +78,9 @@ abstract class Stdin implements Stream<List<int>> {
       {Encoding encoding = systemEncoding, bool retainNewlines = false}) {
     const CR = 13;
     const LF = 10;
-    final List<int> line = <int>[];
+    final line = <int>[];
     // On Windows, if lineMode is disabled, only CR is received.
-    bool crIsNewline = Platform.isWindows &&
+    var crIsNewline = Platform.isWindows &&
         (stdioType(stdin) == StdioType.terminal) &&
         !lineMode;
     if (retainNewlines) {
@@ -98,7 +98,7 @@ abstract class Stdin implements Stream<List<int>> {
     } else if (crIsNewline) {
       // CR and LF are both line terminators, neither is retained.
       while (true) {
-        int byte = readByteSync();
+        var byte = readByteSync();
         if (byte < 0) {
           if (line.isEmpty) return null;
           break;
@@ -110,7 +110,7 @@ abstract class Stdin implements Stream<List<int>> {
       // Case having to handle CR LF as a single unretained line terminator.
       outer:
       while (true) {
-        int byte = readByteSync();
+        var byte = readByteSync();
         if (byte == LF) break;
         if (byte == CR) {
           do {
@@ -270,6 +270,7 @@ class StdoutException implements IOException {
 
   const StdoutException(this.message, [this.osError]);
 
+  @override
   String toString() {
     return "StdoutException: $message${osError == null ? "" : ", $osError"}";
   }
@@ -281,6 +282,7 @@ class StdinException implements IOException {
 
   const StdinException(this.message, [this.osError]);
 
+  @override
   String toString() {
     return "StdinException: $message${osError == null ? "" : ", $osError"}";
   }
@@ -288,23 +290,24 @@ class StdinException implements IOException {
 
 /// The type of object a standard IO stream is attached to.
 class StdioType {
-  static const StdioType terminal = StdioType._("terminal");
-  static const StdioType pipe = StdioType._("pipe");
-  static const StdioType file = StdioType._("file");
-  static const StdioType other = StdioType._("other");
+  static const StdioType terminal = StdioType._('terminal');
+  static const StdioType pipe = StdioType._('pipe');
+  static const StdioType file = StdioType._('file');
+  static const StdioType other = StdioType._('other');
 
-  @Deprecated("Use terminal instead")
+  @Deprecated('Use terminal instead')
   static const StdioType TERMINAL = terminal;
-  @Deprecated("Use pipe instead")
+  @Deprecated('Use pipe instead')
   static const StdioType PIPE = pipe;
-  @Deprecated("Use file instead")
+  @Deprecated('Use file instead')
   static const StdioType FILE = file;
-  @Deprecated("Use other instead")
+  @Deprecated('Use other instead')
   static const StdioType OTHER = other;
 
   final String name;
   const StdioType._(this.name);
-  String toString() => "StdioType: $name";
+  @override
+  String toString() => 'StdioType: $name';
 }
 
 /// The standard input stream of data read by this program.

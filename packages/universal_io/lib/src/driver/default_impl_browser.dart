@@ -42,24 +42,24 @@ final IODriver defaultIODriver = IODriver(
 
 String _operatingSystemFromUserAgent(String userAgent) {
   final userAgent = html.window.navigator.userAgent;
-  if (userAgent.contains("Mac OS X")) {
-    return "macos";
+  if (userAgent.contains('Mac OS X')) {
+    return 'macos';
   }
-  if (userAgent.contains("CrOS")) {
-    return "linux";
+  if (userAgent.contains('CrOS')) {
+    return 'linux';
   }
-  if (userAgent.contains("Android")) {
-    return "android";
+  if (userAgent.contains('Android')) {
+    return 'android';
   }
-  if (userAgent.contains("iPhone")) {
-    return "ios";
+  if (userAgent.contains('iPhone')) {
+    return 'ios';
   }
-  return "windows";
+  return 'windows';
 }
 
 PlatformOverrides _platformOverridesFromEnvironment() {
   // Locale
-  String locale = "en";
+  var locale = 'en';
   final languages = html.window.navigator.languages;
   if (languages.isNotEmpty) {
     locale = languages.first;

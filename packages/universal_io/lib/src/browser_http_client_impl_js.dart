@@ -87,7 +87,7 @@ enum BrowserHttpClientCredentialsMode {
   /// Enables CORS credentials mode.
   include,
 
-  /// Automatically enables CORS credentials when HTTP request header
-  /// 'Authorization' is present.
+  /// Automatically enables CORS credentials when HTTP request is cross-origin
+  /// and has header 'Authorization'.
   automatic,
 }

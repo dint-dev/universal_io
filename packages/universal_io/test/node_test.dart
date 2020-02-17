@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@TestOn("node")
+@TestOn('node')
 @Timeout(Duration(seconds: 5))
 import 'package:test/test.dart';
 
 import 'src/test_suite/all.dart';
 
 void main() {
-  group("Test suite in Node.JS:", () {
+  group('Test suite in Node.JS:', () {
     testPlatform();
   });
 }

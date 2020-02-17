@@ -44,12 +44,12 @@ class BaseStdout extends BaseIOSink implements Stdout {
 
   @override
   int get terminalColumns {
-    throw StdoutException("Does not have terminal");
+    throw StdoutException('Does not have terminal');
   }
 
   @override
   int get terminalLines {
-    throw StdoutException("Does not have terminal");
+    throw StdoutException('Does not have terminal');
   }
 
   @override
@@ -81,7 +81,7 @@ class BaseStdout extends BaseIOSink implements Stdout {
   }
 
   @override
-  void writeAll(Iterable objects, [String separator = ""]) {
+  void writeAll(Iterable objects, [String separator = '']) {
     for (var object in objects) {
       write(object);
     }
@@ -93,8 +93,8 @@ class BaseStdout extends BaseIOSink implements Stdout {
   }
 
   @override
-  void writeln([Object obj = ""]) {
+  void writeln([Object obj = '']) {
     write(obj);
-    write("\n");
+    write('\n');
   }
 }

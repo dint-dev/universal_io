@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@TestOn("browser")
+@TestOn('browser')
 @Timeout(Duration(seconds: 20))
 import 'package:test/test.dart';
 
 import 'src/test_suite/all.dart';
 
 void main() {
-  group("Test suite in browsers:", () {
+  group('Test suite in browsers:', () {
     testPlatform();
     testHttpClient(isBrowser: true, hybrid: true);
   });

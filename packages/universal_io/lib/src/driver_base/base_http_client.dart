@@ -71,12 +71,12 @@ abstract class BaseHttpClient implements HttpClient {
 
   @override
   Future<HttpClientRequest> delete(String host, int port, String path) {
-    return open("DELETE", host, port, path);
+    return open('DELETE', host, port, path);
   }
 
   @override
   Future<HttpClientRequest> deleteUrl(Uri url) {
-    return openUrl("DELETE", url);
+    return openUrl('DELETE', url);
   }
 
   /// A protected method only for implementations.
@@ -87,35 +87,35 @@ abstract class BaseHttpClient implements HttpClient {
 
   @override
   Future<HttpClientRequest> get(String host, int port, String path) {
-    return open("GET", host, port, path);
+    return open('GET', host, port, path);
   }
 
   @override
   Future<HttpClientRequest> getUrl(Uri url) {
-    return openUrl("GET", url);
+    return openUrl('GET', url);
   }
 
   @override
   Future<HttpClientRequest> head(String host, int port, String path) {
-    return open("HEAD", host, port, path);
+    return open('HEAD', host, port, path);
   }
 
   @override
   Future<HttpClientRequest> headUrl(Uri url) {
-    return openUrl("HEAD", url);
+    return openUrl('HEAD', url);
   }
 
   @override
   Future<HttpClientRequest> open(
       String method, String host, int port, String path) {
     String query;
-    final i = path.indexOf("?");
+    final i = path.indexOf('?');
     if (i >= 0) {
       query = path.substring(i + 1);
       path = path.substring(0, i);
     }
     final uri = Uri(
-      scheme: "http",
+      scheme: 'http',
       host: host,
       port: port,
       path: path,
@@ -125,42 +125,43 @@ abstract class BaseHttpClient implements HttpClient {
     return openUrl(method, uri);
   }
 
+  @override
   @protected
   Future<HttpClientRequest> openUrl(String method, Uri url) {
     if (_isClosed) {
-      throw StateError("HTTP client is closed");
+      throw StateError('HTTP client is closed');
     }
     return didOpenUrl(method, url);
   }
 
   @override
   Future<HttpClientRequest> patch(String host, int port, String path) {
-    return open("PATCH", host, port, path);
+    return open('PATCH', host, port, path);
   }
 
   @override
   Future<HttpClientRequest> patchUrl(Uri url) {
-    return openUrl("PATCH", url);
+    return openUrl('PATCH', url);
   }
 
   @override
   Future<HttpClientRequest> post(String host, int port, String path) {
-    return open("POST", host, port, path);
+    return open('POST', host, port, path);
   }
 
   @override
   Future<HttpClientRequest> postUrl(Uri url) {
-    return openUrl("POST", url);
+    return openUrl('POST', url);
   }
 
   @override
   Future<HttpClientRequest> put(String host, int port, String path) {
-    return open("PUT", host, port, path);
+    return open('PUT', host, port, path);
   }
 
   @override
   Future<HttpClientRequest> putUrl(Uri url) {
-    return openUrl("PUT", url);
+    return openUrl('PUT', url);
   }
 }
 
@@ -174,7 +175,7 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
   final Uri uri;
 
   @override
-  final HttpHeaders headers = HttpHeadersImpl("1.1");
+  final HttpHeaders headers = HttpHeadersImpl('1.1');
 
   final Completer<HttpClientResponse> _completer =
       Completer<HttpClientResponse>();
@@ -187,12 +188,12 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
   final bool _supportsBody;
 
   BaseHttpClientRequest(this.client, this.method, this.uri)
-      : this._supportsBody = _httpMethodSupportsBody(method) {
+      : _supportsBody = _httpMethodSupportsBody(method) {
     if (method == null) {
-      throw ArgumentError.notNull("method");
+      throw ArgumentError.notNull('method');
     }
     if (uri == null) {
-      throw ArgumentError.notNull("uri");
+      throw ArgumentError.notNull('uri');
     }
 
     // Add "User-Agent" header
@@ -220,19 +221,19 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
 
   @override
   set encoding(Encoding value) {
-    throw StateError("IOSink encoding is not mutable");
+    throw StateError('IOSink encoding is not mutable');
   }
 
   @override
   void add(List<int> event) {
     if (!_supportsBody) {
-      throw StateError("HTTP method $method does not support body");
+      throw StateError('HTTP method $method does not support body');
     }
     if (_completer.isCompleted) {
-      throw StateError("StreamSink is closed");
+      throw StateError('StreamSink is closed');
     }
     if (_addStreamFuture != null) {
-      throw StateError("StreamSink is bound to a stream");
+      throw StateError('StreamSink is bound to a stream');
     }
     didAdd(event);
   }
@@ -240,7 +241,7 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
   @override
   void addError(Object error, [StackTrace stackTrace]) {
     if (_completer.isCompleted) {
-      throw StateError("HTTP request is closed already");
+      throw StateError('HTTP request is closed already');
     }
     _completer.completeError(error, stackTrace);
   }
@@ -248,10 +249,10 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
   @override
   Future<void> addStream(Stream<List<int>> stream) async {
     if (_completer.isCompleted) {
-      throw StateError("StreamSink is closed");
+      throw StateError('StreamSink is closed');
     }
     if (_addStreamFuture != null) {
-      throw StateError("StreamSink is bound to a stream");
+      throw StateError('StreamSink is bound to a stream');
     }
     final future = stream.listen((item) {
       didAdd(item);
@@ -303,11 +304,11 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
 
   static bool _httpMethodSupportsBody(String method) {
     switch (method) {
-      case "GET":
+      case 'GET':
         return false;
-      case "HEAD":
+      case 'HEAD':
         return false;
-      case "OPTIONS":
+      case 'OPTIONS':
         return false;
       default:
         return true;
@@ -318,7 +319,7 @@ abstract class BaseHttpClientRequest extends HttpClientRequest with BaseIOSink {
 abstract class BaseHttpClientResponse extends Stream<List<int>>
     implements HttpClientResponse {
   @override
-  final HttpHeaders headers = HttpHeadersImpl("1.1");
+  final HttpHeaders headers = HttpHeadersImpl('1.1');
   BaseHttpClientRequest request;
   List<Cookie> _cookies;
 
@@ -342,14 +343,14 @@ abstract class BaseHttpClientResponse extends Stream<List<int>>
 
   @override
   List<Cookie> get cookies {
-    var cookies = this._cookies;
+    var cookies = _cookies;
     if (cookies == null) {
       cookies = <Cookie>[];
       final headerValues = headers[HttpHeaders.setCookieHeader] ?? <String>[];
       for (var headerValue in headerValues) {
         _cookies.add(Cookie.fromSetCookieValue(headerValue));
       }
-      this._cookies = cookies;
+      _cookies = cookies;
     }
     return cookies;
   }
@@ -368,6 +369,7 @@ abstract class BaseHttpClientResponse extends Stream<List<int>>
   @override
   List<RedirectInfo> get redirects => const <RedirectInfo>[];
 
+  @override
   int get statusCode;
 
   @override
@@ -376,14 +378,13 @@ abstract class BaseHttpClientResponse extends Stream<List<int>>
   }
 
   @override
-  StreamSubscription<Uint8List> listen(void onData(Uint8List event),
-      {Function onError, void onDone(), bool cancelOnError});
+  StreamSubscription<Uint8List> listen(void Function(Uint8List event) onData,
+      {Function onError, void Function() onDone, bool cancelOnError});
 
   @override
   Future<HttpClientResponse> redirect(
       [String method, Uri url, bool followLoops]) {
-    final newUrl =
-        url ?? Uri.parse(this.headers.value(HttpHeaders.locationHeader));
+    final newUrl = url ?? Uri.parse(headers.value(HttpHeaders.locationHeader));
     return client
         .openUrl(method ?? request.method, newUrl ?? request.uri)
         .then((newRequest) {

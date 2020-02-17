@@ -55,33 +55,33 @@ import 'file_system_entity.dart';
 class FileMode {
   /// The mode for opening a file only for reading.
   static const read = FileMode._internal(0);
-  @Deprecated("Use read instead")
+  @Deprecated('Use read instead')
   static const READ = read;
 
   /// Mode for opening a file for reading and writing. The file is
   /// overwritten if it already exists. The file is created if it does not
   /// already exist.
   static const write = FileMode._internal(1);
-  @Deprecated("Use write instead")
+  @Deprecated('Use write instead')
   static const WRITE = write;
 
   /// Mode for opening a file for reading and writing to the
   /// end of it. The file is created if it does not already exist.
   static const append = FileMode._internal(2);
-  @Deprecated("Use append instead")
+  @Deprecated('Use append instead')
   static const APPEND = append;
 
   /// Mode for opening a file for writing *only*. The file is
   /// overwritten if it already exists. The file is created if it does not
   /// already exist.
   static const writeOnly = FileMode._internal(3);
-  @Deprecated("Use writeOnly instead")
+  @Deprecated('Use writeOnly instead')
   static const WRITE_ONLY = writeOnly;
 
   /// Mode for opening a file for writing *only* to the
   /// end of it. The file is created if it does not already exist.
   static const writeOnlyAppend = FileMode._internal(4);
-  @Deprecated("Use writeOnlyAppend instead")
+  @Deprecated('Use writeOnlyAppend instead')
   static const WRITE_ONLY_APPEND = writeOnlyAppend;
 
   /// IMPORTANT: Only declared in 'universal_io'.
@@ -92,51 +92,51 @@ class FileMode {
 }
 
 /// The mode for opening a file only for reading.
-@Deprecated("Use FileMode.read instead")
+@Deprecated('Use FileMode.read instead')
 const READ = FileMode.read;
 
 /// The mode for opening a file for reading and writing. The file is
 /// overwritten if it already exists. The file is created if it does not
 /// already exist.
-@Deprecated("Use FileMode.write instead")
+@Deprecated('Use FileMode.write instead')
 const WRITE = FileMode.write;
 
 /// The mode for opening a file for reading and writing to the
 /// end of it. The file is created if it does not already exist.
-@Deprecated("Use FileMode.append instead")
+@Deprecated('Use FileMode.append instead')
 const APPEND = FileMode.append;
 
 /// Mode for opening a file for writing *only*. The file is
 /// overwritten if it already exists. The file is created if it does not
 /// already exist.
-@Deprecated("Use FileMode.writeOnly instead")
+@Deprecated('Use FileMode.writeOnly instead')
 const WRITE_ONLY = FileMode.writeOnly;
 
 /// Mode for opening a file for writing *only* to the
 /// end of it. The file is created if it does not already exist.
-@Deprecated("Use FileMode.writeOnlyAppend instead")
+@Deprecated('Use FileMode.writeOnlyAppend instead')
 const WRITE_ONLY_APPEND = FileMode.writeOnlyAppend;
 
 /// Type of lock when requesting a lock on a file.
 class FileLock {
   /// Shared file lock.
   static const shared = FileLock._internal(1);
-  @Deprecated("Use shared instead")
+  @Deprecated('Use shared instead')
   static const SHARED = shared;
 
   /// Exclusive file lock.
   static const exclusive = FileLock._internal(2);
-  @Deprecated("Use exclusive instead")
+  @Deprecated('Use exclusive instead')
   static const EXCLUSIVE = exclusive;
 
   /// Blocking shared file lock.
   static const blockingShared = FileLock._internal(3);
-  @Deprecated("Use blockingShared instead")
+  @Deprecated('Use blockingShared instead')
   static const BLOCKING_SHARED = blockingShared;
 
   /// Blocking exclusive file lock.
   static const blockingExclusive = FileLock._internal(4);
-  @Deprecated("Use blockingExclusive instead")
+  @Deprecated('Use blockingExclusive instead')
   static const BLOCKING_EXCLUSIVE = blockingExclusive;
 
   /// IMPORTANT: Only declared in 'universal_io'.
@@ -293,7 +293,7 @@ abstract class File implements FileSystemEntity {
   /// If [path] is an absolute path, it will be immune to changes to the
   /// current working directory.
   factory File(String path) {
-    final IOOverrides overrides = IOOverrides.current;
+    final overrides = IOOverrides.current;
     if (overrides == null) {
       throw UnimplementedError();
     }
@@ -342,6 +342,7 @@ abstract class File implements FileSystemEntity {
   /// If [newPath] identifies an existing file, that file is
   /// replaced. If [newPath] identifies an existing directory, the
   /// operation fails and the future completes with an exception.
+  @override
   Future<File> rename(String newPath);
 
   /// Synchronously renames this file. Returns a [File]
@@ -350,6 +351,7 @@ abstract class File implements FileSystemEntity {
   /// If [newPath] identifies an existing file, that file is
   /// replaced. If [newPath] identifies an existing directory the
   /// operation fails and an exception is thrown.
+  @override
   File renameSync(String newPath);
 
   /// Copy this file. Returns a `Future<File>` that completes
@@ -382,6 +384,7 @@ abstract class File implements FileSystemEntity {
   /// The absolute path is computed by prefixing
   /// a relative path with the current working directory, and returning
   /// an absolute path unchanged.
+  @override
   File get absolute;
 
   /// Get the last-accessed time of the file.
@@ -602,6 +605,7 @@ abstract class File implements FileSystemEntity {
       bool flush = false});
 
   /// Get the path of the file.
+  @override
   String get path;
 }
 
@@ -859,6 +863,7 @@ abstract class RandomAccessFile {
   void unlockSync([int start = 0, int end = -1]);
 
   /// Returns a human-readable string for this RandomAccessFile instance.
+  @override
   String toString();
 
   /// Gets the path of the file underlying this RandomAccessFile.
@@ -883,26 +888,27 @@ class FileSystemException implements IOException {
   /// Creates a new FileSystemException with an optional error message
   /// [message], optional file system path [path] and optional OS error
   /// [osError].
-  const FileSystemException([this.message = "", this.path = "", this.osError]);
+  const FileSystemException([this.message = '', this.path = '', this.osError]);
 
+  @override
   String toString() {
-    StringBuffer sb = StringBuffer();
-    sb.write("FileSystemException");
+    var sb = StringBuffer();
+    sb.write('FileSystemException');
     if (message.isNotEmpty) {
-      sb.write(": $message");
+      sb.write(': $message');
       if (path != null) {
         sb.write(", path = '$path'");
       }
       if (osError != null) {
-        sb.write(" ($osError)");
+        sb.write(' ($osError)');
       }
     } else if (osError != null) {
-      sb.write(": $osError");
+      sb.write(': $osError');
       if (path != null) {
         sb.write(", path = '$path'");
       }
     } else if (path != null) {
-      sb.write(": $path");
+      sb.write(': $path');
     }
     return sb.toString();
   }

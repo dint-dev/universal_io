@@ -424,156 +424,156 @@ class HttpConnectionsInfo {
 /// The most common mode of operation is to use `set()` for setting a value,
 /// and `value()` for retrieving a value.
 abstract class HttpHeaders {
-  static const acceptHeader = "accept";
-  static const acceptCharsetHeader = "accept-charset";
-  static const acceptEncodingHeader = "accept-encoding";
-  static const acceptLanguageHeader = "accept-language";
-  static const acceptRangesHeader = "accept-ranges";
-  static const ageHeader = "age";
-  static const allowHeader = "allow";
-  static const authorizationHeader = "authorization";
-  static const cacheControlHeader = "cache-control";
-  static const connectionHeader = "connection";
-  static const contentEncodingHeader = "content-encoding";
-  static const contentLanguageHeader = "content-language";
-  static const contentLengthHeader = "content-length";
-  static const contentLocationHeader = "content-location";
-  static const contentMD5Header = "content-md5";
-  static const contentRangeHeader = "content-range";
-  static const contentTypeHeader = "content-type";
-  static const dateHeader = "date";
-  static const etagHeader = "etag";
-  static const expectHeader = "expect";
-  static const expiresHeader = "expires";
-  static const fromHeader = "from";
-  static const hostHeader = "host";
-  static const ifMatchHeader = "if-match";
-  static const ifModifiedSinceHeader = "if-modified-since";
-  static const ifNoneMatchHeader = "if-none-match";
-  static const ifRangeHeader = "if-range";
-  static const ifUnmodifiedSinceHeader = "if-unmodified-since";
-  static const lastModifiedHeader = "last-modified";
-  static const locationHeader = "location";
-  static const maxForwardsHeader = "max-forwards";
-  static const pragmaHeader = "pragma";
-  static const proxyAuthenticateHeader = "proxy-authenticate";
-  static const proxyAuthorizationHeader = "proxy-authorization";
-  static const rangeHeader = "range";
-  static const refererHeader = "referer";
-  static const retryAfterHeader = "retry-after";
-  static const serverHeader = "server";
-  static const teHeader = "te";
-  static const trailerHeader = "trailer";
-  static const transferEncodingHeader = "transfer-encoding";
-  static const upgradeHeader = "upgrade";
-  static const userAgentHeader = "user-agent";
-  static const varyHeader = "vary";
-  static const viaHeader = "via";
-  static const warningHeader = "warning";
-  static const wwwAuthenticateHeader = "www-authenticate";
+  static const acceptHeader = 'accept';
+  static const acceptCharsetHeader = 'accept-charset';
+  static const acceptEncodingHeader = 'accept-encoding';
+  static const acceptLanguageHeader = 'accept-language';
+  static const acceptRangesHeader = 'accept-ranges';
+  static const ageHeader = 'age';
+  static const allowHeader = 'allow';
+  static const authorizationHeader = 'authorization';
+  static const cacheControlHeader = 'cache-control';
+  static const connectionHeader = 'connection';
+  static const contentEncodingHeader = 'content-encoding';
+  static const contentLanguageHeader = 'content-language';
+  static const contentLengthHeader = 'content-length';
+  static const contentLocationHeader = 'content-location';
+  static const contentMD5Header = 'content-md5';
+  static const contentRangeHeader = 'content-range';
+  static const contentTypeHeader = 'content-type';
+  static const dateHeader = 'date';
+  static const etagHeader = 'etag';
+  static const expectHeader = 'expect';
+  static const expiresHeader = 'expires';
+  static const fromHeader = 'from';
+  static const hostHeader = 'host';
+  static const ifMatchHeader = 'if-match';
+  static const ifModifiedSinceHeader = 'if-modified-since';
+  static const ifNoneMatchHeader = 'if-none-match';
+  static const ifRangeHeader = 'if-range';
+  static const ifUnmodifiedSinceHeader = 'if-unmodified-since';
+  static const lastModifiedHeader = 'last-modified';
+  static const locationHeader = 'location';
+  static const maxForwardsHeader = 'max-forwards';
+  static const pragmaHeader = 'pragma';
+  static const proxyAuthenticateHeader = 'proxy-authenticate';
+  static const proxyAuthorizationHeader = 'proxy-authorization';
+  static const rangeHeader = 'range';
+  static const refererHeader = 'referer';
+  static const retryAfterHeader = 'retry-after';
+  static const serverHeader = 'server';
+  static const teHeader = 'te';
+  static const trailerHeader = 'trailer';
+  static const transferEncodingHeader = 'transfer-encoding';
+  static const upgradeHeader = 'upgrade';
+  static const userAgentHeader = 'user-agent';
+  static const varyHeader = 'vary';
+  static const viaHeader = 'via';
+  static const warningHeader = 'warning';
+  static const wwwAuthenticateHeader = 'www-authenticate';
 
-  @Deprecated("Use acceptHeader instead")
+  @Deprecated('Use acceptHeader instead')
   static const ACCEPT = acceptHeader;
-  @Deprecated("Use acceptCharsetHeader instead")
+  @Deprecated('Use acceptCharsetHeader instead')
   static const ACCEPT_CHARSET = acceptCharsetHeader;
-  @Deprecated("Use acceptEncodingHeader instead")
+  @Deprecated('Use acceptEncodingHeader instead')
   static const ACCEPT_ENCODING = acceptEncodingHeader;
-  @Deprecated("Use acceptLanguageHeader instead")
+  @Deprecated('Use acceptLanguageHeader instead')
   static const ACCEPT_LANGUAGE = acceptLanguageHeader;
-  @Deprecated("Use acceptRangesHeader instead")
+  @Deprecated('Use acceptRangesHeader instead')
   static const ACCEPT_RANGES = acceptRangesHeader;
-  @Deprecated("Use ageHeader instead")
+  @Deprecated('Use ageHeader instead')
   static const AGE = ageHeader;
-  @Deprecated("Use allowHeader instead")
+  @Deprecated('Use allowHeader instead')
   static const ALLOW = allowHeader;
-  @Deprecated("Use authorizationHeader instead")
+  @Deprecated('Use authorizationHeader instead')
   static const AUTHORIZATION = authorizationHeader;
-  @Deprecated("Use cacheControlHeader instead")
+  @Deprecated('Use cacheControlHeader instead')
   static const CACHE_CONTROL = cacheControlHeader;
-  @Deprecated("Use connectionHeader instead")
+  @Deprecated('Use connectionHeader instead')
   static const CONNECTION = connectionHeader;
-  @Deprecated("Use contentEncodingHeader instead")
+  @Deprecated('Use contentEncodingHeader instead')
   static const CONTENT_ENCODING = contentEncodingHeader;
-  @Deprecated("Use contentLanguageHeader instead")
+  @Deprecated('Use contentLanguageHeader instead')
   static const CONTENT_LANGUAGE = contentLanguageHeader;
-  @Deprecated("Use contentLengthHeader instead")
+  @Deprecated('Use contentLengthHeader instead')
   static const CONTENT_LENGTH = contentLengthHeader;
-  @Deprecated("Use contentLocationHeader instead")
+  @Deprecated('Use contentLocationHeader instead')
   static const CONTENT_LOCATION = contentLocationHeader;
-  @Deprecated("Use contentMD5Header instead")
+  @Deprecated('Use contentMD5Header instead')
   static const CONTENT_MD5 = contentMD5Header;
-  @Deprecated("Use contentRangeHeader instead")
+  @Deprecated('Use contentRangeHeader instead')
   static const CONTENT_RANGE = contentRangeHeader;
-  @Deprecated("Use contentTypeHeader instead")
+  @Deprecated('Use contentTypeHeader instead')
   static const CONTENT_TYPE = contentTypeHeader;
-  @Deprecated("Use dateHeader instead")
+  @Deprecated('Use dateHeader instead')
   static const DATE = dateHeader;
-  @Deprecated("Use etagHeader instead")
+  @Deprecated('Use etagHeader instead')
   static const ETAG = etagHeader;
-  @Deprecated("Use expectHeader instead")
+  @Deprecated('Use expectHeader instead')
   static const EXPECT = expectHeader;
-  @Deprecated("Use expiresHeader instead")
+  @Deprecated('Use expiresHeader instead')
   static const EXPIRES = expiresHeader;
-  @Deprecated("Use fromHeader instead")
+  @Deprecated('Use fromHeader instead')
   static const FROM = fromHeader;
-  @Deprecated("Use hostHeader instead")
+  @Deprecated('Use hostHeader instead')
   static const HOST = hostHeader;
-  @Deprecated("Use ifMatchHeader instead")
+  @Deprecated('Use ifMatchHeader instead')
   static const IF_MATCH = ifMatchHeader;
-  @Deprecated("Use ifModifiedSinceHeader instead")
+  @Deprecated('Use ifModifiedSinceHeader instead')
   static const IF_MODIFIED_SINCE = ifModifiedSinceHeader;
-  @Deprecated("Use ifNoneMatchHeader instead")
+  @Deprecated('Use ifNoneMatchHeader instead')
   static const IF_NONE_MATCH = ifNoneMatchHeader;
-  @Deprecated("Use ifRangeHeader instead")
+  @Deprecated('Use ifRangeHeader instead')
   static const IF_RANGE = ifRangeHeader;
-  @Deprecated("Use ifUnmodifiedSinceHeader instead")
+  @Deprecated('Use ifUnmodifiedSinceHeader instead')
   static const IF_UNMODIFIED_SINCE = ifUnmodifiedSinceHeader;
-  @Deprecated("Use lastModifiedHeader instead")
+  @Deprecated('Use lastModifiedHeader instead')
   static const LAST_MODIFIED = lastModifiedHeader;
-  @Deprecated("Use locationHeader instead")
+  @Deprecated('Use locationHeader instead')
   static const LOCATION = locationHeader;
-  @Deprecated("Use maxForwardsHeader instead")
+  @Deprecated('Use maxForwardsHeader instead')
   static const MAX_FORWARDS = maxForwardsHeader;
-  @Deprecated("Use pragmaHeader instead")
+  @Deprecated('Use pragmaHeader instead')
   static const PRAGMA = pragmaHeader;
-  @Deprecated("Use proxyAuthenticateHeader instead")
+  @Deprecated('Use proxyAuthenticateHeader instead')
   static const PROXY_AUTHENTICATE = proxyAuthenticateHeader;
-  @Deprecated("Use proxyAuthorizationHeader instead")
+  @Deprecated('Use proxyAuthorizationHeader instead')
   static const PROXY_AUTHORIZATION = proxyAuthorizationHeader;
-  @Deprecated("Use rangeHeader instead")
+  @Deprecated('Use rangeHeader instead')
   static const RANGE = rangeHeader;
-  @Deprecated("Use refererHeader instead")
+  @Deprecated('Use refererHeader instead')
   static const REFERER = refererHeader;
-  @Deprecated("Use retryAfterHeader instead")
+  @Deprecated('Use retryAfterHeader instead')
   static const RETRY_AFTER = retryAfterHeader;
-  @Deprecated("Use serverHeader instead")
+  @Deprecated('Use serverHeader instead')
   static const SERVER = serverHeader;
-  @Deprecated("Use teHeader instead")
+  @Deprecated('Use teHeader instead')
   static const TE = teHeader;
-  @Deprecated("Use trailerHeader instead")
+  @Deprecated('Use trailerHeader instead')
   static const TRAILER = trailerHeader;
-  @Deprecated("Use transferEncodingHeader instead")
+  @Deprecated('Use transferEncodingHeader instead')
   static const TRANSFER_ENCODING = transferEncodingHeader;
-  @Deprecated("Use upgradeHeader instead")
+  @Deprecated('Use upgradeHeader instead')
   static const UPGRADE = upgradeHeader;
-  @Deprecated("Use userAgentHeader instead")
+  @Deprecated('Use userAgentHeader instead')
   static const USER_AGENT = userAgentHeader;
-  @Deprecated("Use varyHeader instead")
+  @Deprecated('Use varyHeader instead')
   static const VARY = varyHeader;
-  @Deprecated("Use viaHeader instead")
+  @Deprecated('Use viaHeader instead')
   static const VIA = viaHeader;
-  @Deprecated("Use warningHeader instead")
+  @Deprecated('Use warningHeader instead')
   static const WARNING = warningHeader;
-  @Deprecated("Use wwwAuthenticateHeader instead")
+  @Deprecated('Use wwwAuthenticateHeader instead')
   static const WWW_AUTHENTICATE = wwwAuthenticateHeader;
 
   // Cookie headers from RFC 6265.
-  static const cookieHeader = "cookie";
-  static const setCookieHeader = "set-cookie";
+  static const cookieHeader = 'cookie';
+  static const setCookieHeader = 'set-cookie';
 
-  @Deprecated("Use cookieHeader instead")
+  @Deprecated('Use cookieHeader instead')
   static const COOKIE = cookieHeader;
-  @Deprecated("Use setCookieHeader instead")
+  @Deprecated('Use setCookieHeader instead')
   static const SET_COOKIE = setCookieHeader;
 
   static const generalHeaders = [
@@ -588,7 +588,7 @@ abstract class HttpHeaders {
     warningHeader
   ];
 
-  @Deprecated("Use generalHeaders instead")
+  @Deprecated('Use generalHeaders instead')
   static const GENERAL_HEADERS = generalHeaders;
 
   static const entityHeaders = [
@@ -604,7 +604,7 @@ abstract class HttpHeaders {
     lastModifiedHeader
   ];
 
-  @Deprecated("Use entityHeaders instead")
+  @Deprecated('Use entityHeaders instead')
   static const ENTITY_HEADERS = entityHeaders;
 
   static const responseHeaders = [
@@ -619,7 +619,7 @@ abstract class HttpHeaders {
     wwwAuthenticateHeader
   ];
 
-  @Deprecated("Use responseHeaders instead")
+  @Deprecated('Use responseHeaders instead')
   static const RESPONSE_HEADERS = responseHeaders;
 
   static const requestHeaders = [
@@ -644,7 +644,7 @@ abstract class HttpHeaders {
     userAgentHeader
   ];
 
-  @Deprecated("Use requestHeaders instead")
+  @Deprecated('Use requestHeaders instead')
   static const REQUEST_HEADERS = requestHeaders;
 
   /// Gets and sets the date. The value of this property will
@@ -719,7 +719,7 @@ abstract class HttpHeaders {
   /// Enumerates the headers, applying the function [f] to each
   /// header. The header name passed in [:name:] will be all lower
   /// case.
-  void forEach(void f(String name, List<String> values));
+  void forEach(void Function(String name, List<String> values) f);
 
   /// Disables folding for the header named [name] when sending the HTTP
   /// header. By default, multiple header values are folded into a
@@ -763,14 +763,14 @@ abstract class HttpHeaders {
 /// An instance of [HeaderValue] is immutable.
 abstract class HeaderValue {
   /// Creates a new header value object setting the value and parameters.
-  factory HeaderValue([String value = "", Map<String, String> parameters]) {
+  factory HeaderValue([String value = '', Map<String, String> parameters]) {
     return _HeaderValue(value, parameters);
   }
 
   /// Creates a new header value object from parsing a header value
   /// string with both value and optional parameters.
   static HeaderValue parse(String value,
-      {String parameterSeparator = ";",
+      {String parameterSeparator = ';',
       String valueSeparator,
       bool preserveBackslash = false}) {
     return _HeaderValue.parse(value,
@@ -791,6 +791,7 @@ abstract class HeaderValue {
   /// Returns the formatted string representation in the form:
   ///
   ///     value; parameter1=value1; parameter2=value2
+  @override
   String toString();
 }
 
@@ -803,7 +804,7 @@ abstract class HttpSession implements Map {
   void destroy();
 
   /// Sets a callback that will be called when the session is timed out.
-  set onTimeout(void callback());
+  set onTimeout(void Function() callback);
 
   /// Is true if the session has not been sent to the client yet.
   bool get isNew;
@@ -815,29 +816,29 @@ abstract class ContentType implements HeaderValue {
   /// Content type for plain text using UTF-8 encoding.
   ///
   ///     text/plain; charset=utf-8
-  static final text = ContentType("text", "plain", charset: "utf-8");
-  @Deprecated("Use text instead")
+  static final text = ContentType('text', 'plain', charset: 'utf-8');
+  @Deprecated('Use text instead')
   static final TEXT = text;
 
   ///  Content type for HTML using UTF-8 encoding.
   ///
   ///     text/html; charset=utf-8
-  static final html = ContentType("text", "html", charset: "utf-8");
-  @Deprecated("Use html instead")
+  static final html = ContentType('text', 'html', charset: 'utf-8');
+  @Deprecated('Use html instead')
   static final HTML = html;
 
   ///  Content type for JSON using UTF-8 encoding.
   ///
   ///     application/json; charset=utf-8
-  static final json = ContentType("application", "json", charset: "utf-8");
-  @Deprecated("Use json instead")
+  static final json = ContentType('application', 'json', charset: 'utf-8');
+  @Deprecated('Use json instead')
   static final JSON = json;
 
   ///  Content type for binary data.
   ///
   ///     application/octet-stream
-  static final binary = ContentType("application", "octet-stream");
-  @Deprecated("Use binary instead")
+  static final binary = ContentType('application', 'octet-stream');
+  @Deprecated('Use binary instead')
   static final BINARY = binary;
 
   /// Creates a new content type object setting the primary type and
@@ -941,6 +942,7 @@ abstract class Cookie {
   /// Returns the formatted string representation of the cookie. The
   /// string representation can be used for for setting the Cookie or
   /// 'set-cookie' headers
+  @override
   String toString();
 }
 
@@ -1286,11 +1288,11 @@ abstract class HttpResponse implements IOSink {
 ///     client.findProxy = null;
 abstract class HttpClient {
   static const int defaultHttpPort = 80;
-  @Deprecated("Use defaultHttpPort instead")
+  @Deprecated('Use defaultHttpPort instead')
   static const int DEFAULT_HTTP_PORT = defaultHttpPort;
 
   static const int defaultHttpsPort = 443;
-  @Deprecated("Use defaultHttpsPort instead")
+  @Deprecated('Use defaultHttpsPort instead')
   static const int DEFAULT_HTTPS_PORT = defaultHttpsPort;
 
   /// Gets and sets the idle timeout of non-active persistent (keep-alive)
@@ -1355,7 +1357,7 @@ abstract class HttpClient {
   String userAgent;
 
   factory HttpClient({SecurityContext context}) {
-    HttpOverrides overrides = HttpOverrides.current;
+    var overrides = HttpOverrides.current;
     if (overrides == null) {
       throw UnimplementedError();
     }
@@ -1508,7 +1510,8 @@ abstract class HttpClient {
   /// set the `'authorization'` header on the request to avoid the overhead
   /// of a failed request, or issues due to missing request payload on retried
   /// request.
-  set authenticate(Future<bool> f(Uri url, String scheme, String realm));
+  set authenticate(
+      Future<bool> Function(Uri url, String scheme, String realm) f);
 
   /// Add credentials to be used for authorizing HTTP requests.
   void addCredentials(Uri url, String realm, HttpClientCredentials credentials);
@@ -1536,7 +1539,7 @@ abstract class HttpClient {
   /// The static function [findProxyFromEnvironment] on this class can
   /// be used to implement proxy server resolving based on environment
   /// variables.
-  set findProxy(String f(Uri url));
+  set findProxy(String Function(Uri url) f);
 
   /// Function for resolving the proxy server to be used for a HTTP
   /// connection from the proxy configuration specified through
@@ -1589,7 +1592,7 @@ abstract class HttpClient {
   /// to set credentials for proxies which require authentication.
   static String findProxyFromEnvironment(Uri url,
       {Map<String, String> environment}) {
-    HttpOverrides overrides = HttpOverrides.current;
+    var overrides = HttpOverrides.current;
     if (overrides == null) {
       return HttpClientImpl._findProxyFromEnvironment(url, environment);
     }
@@ -1612,7 +1615,8 @@ abstract class HttpClient {
   /// using the updated credentials. Otherwise response processing will
   /// continue normally.
   set authenticateProxy(
-      Future<bool> f(String host, int port, String scheme, String realm));
+      Future<bool> Function(String host, int port, String scheme, String realm)
+          f);
 
   /// Add credentials to be used for authorizing HTTP proxies.
   void addProxyCredentials(
@@ -1639,7 +1643,7 @@ abstract class HttpClient {
   /// the request is made, even if the value of badCertificateCallback
   /// has changed since then.
   set badCertificateCallback(
-      bool callback(X509Certificate cert, String host, int port));
+      bool Function(X509Certificate cert, String host, int port) callback);
 
   /// Shuts down the HTTP client.
   ///
@@ -1746,9 +1750,11 @@ abstract class HttpClientRequest implements IOSink {
   ///
   /// If an error occurs before the response is available, this future will
   /// complete with an error.
+  @override
   Future<HttpClientResponse> get done;
 
   /// Close the request for input. Returns the value of [done].
+  @override
   Future<HttpClientResponse> close();
 
   /// Gets information about the client connection.
@@ -1956,6 +1962,7 @@ class HttpException implements IOException {
 
   const HttpException(this.message, {this.uri});
 
+  @override
   String toString() {
     var b = StringBuffer()..write('HttpException: ')..write(message);
     if (uri != null) {
@@ -1966,12 +1973,15 @@ class HttpException implements IOException {
 }
 
 class RedirectException implements HttpException {
+  @override
   final String message;
   final List<RedirectInfo> redirects;
 
   const RedirectException(this.message, this.redirects);
 
-  String toString() => "RedirectException: $message";
+  @override
+  String toString() => 'RedirectException: $message';
 
+  @override
   Uri get uri => redirects.last.location;
 }

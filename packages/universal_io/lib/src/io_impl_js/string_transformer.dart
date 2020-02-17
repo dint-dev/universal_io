@@ -63,17 +63,22 @@ class SystemEncoding extends Encoding {
   /// Users should use the top-level constant, [systemEncoding].
   const SystemEncoding();
 
+  @override
   Converter<List<int>, String> get decoder {
     return const Utf8Decoder();
   }
 
+  @override
   Converter<String, List<int>> get encoder {
     return const Utf8Encoder();
   }
 
+  @override
   String get name => 'system';
 
+  @override
   String decode(List<int> encoded) => decoder.convert(encoded);
 
+  @override
   List<int> encode(String input) => encoder.convert(input);
 }

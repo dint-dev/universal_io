@@ -108,8 +108,11 @@ abstract class BaseRawSocket extends Stream<RawSocketEvent>
   }
 
   @override
-  StreamSubscription<RawSocketEvent> listen(void onData(RawSocketEvent event),
-      {Function onError, void onDone(), bool cancelOnError}) {
+  StreamSubscription<RawSocketEvent> listen(
+      void Function(RawSocketEvent event) onData,
+      {Function onError,
+      void Function() onDone,
+      bool cancelOnError}) {
     return _streamController.stream.listen(
       onData,
       onError: onError,
@@ -161,7 +164,7 @@ abstract class BaseRawSocket extends Stream<RawSocketEvent>
 
   /// Used by [close] and [shutdown].
   Future _shutdown(SocketDirection direction) async {
-    bool isStatedChanged = false;
+    var isStatedChanged = false;
     if (direction == SocketDirection.both ||
         direction == SocketDirection.send) {
       if (!_closedWrite) {

@@ -6,8 +6,8 @@ import 'package:test/test.dart';
 import 'package:universal_io/driver_base.dart' show Uint8ListBuffer;
 
 void main() {
-  group("Uint8ListBuffer", () {
-    test("add(chunk)", () {
+  group('Uint8ListBuffer', () {
+    test('add(chunk)', () {
       final buffer = Uint8ListBuffer();
       expect(buffer.length, 0);
       expect(buffer.read(), _equalsUint8List([]));
@@ -33,7 +33,7 @@ void main() {
       expect(buffer.read(), _equalsUint8List([1, 2, 3, 4]));
     });
 
-    test("add(chunk), n-1 bytes (n=2^k)", () {
+    test('add(chunk), n-1 bytes (n=2^k)', () {
       for (var n in [8, 16, 32, 64, 128, 256, 512]) {
         final buffer = Uint8ListBuffer();
 
@@ -55,7 +55,7 @@ void main() {
       }
     });
 
-    test("add(chunk), n+1 bytes (n=2^k)", () {
+    test('add(chunk), n+1 bytes (n=2^k)', () {
       for (var n in [16, 32, 64, 128, 256, 512]) {
         final buffer = Uint8ListBuffer();
         buffer.add(<int>[1, 2]);
@@ -65,7 +65,7 @@ void main() {
       }
     });
 
-    test("addStream(stream)", () async {
+    test('addStream(stream)', () async {
       final stream = Stream<List<int>>.fromIterable(<List<int>>[
         <int>[1],
         <int>[2, 3],
@@ -83,7 +83,7 @@ void main() {
       expect(buffer.read(), _equalsUint8List([1, 2, 3]));
     });
 
-    test("read()", () {
+    test('read()', () {
       // Empty buffer
       final buffer = Uint8ListBuffer();
 
@@ -101,7 +101,7 @@ void main() {
     });
 
     test(
-        "read() after a single add(copyNotNeeded:true) returns the same reference",
+        'read() after a single add(copyNotNeeded:true) returns the same reference',
         () {
       final buffer = Uint8ListBuffer();
 
@@ -115,7 +115,7 @@ void main() {
       expect(buffer.read(), same(input));
     });
 
-    test("read(preview:true)", () {
+    test('read(preview:true)', () {
       final buffer = Uint8ListBuffer();
       buffer.add(<int>[1, 2, 3, 4, 5]);
       expect(buffer.read(preview: true), _equalsUint8List([1, 2, 3, 4, 5]));
@@ -123,7 +123,7 @@ void main() {
     });
 
     test(
-        "read(maxLength:N) after a single add(copyNotNeeded:true) returns the same reference",
+        'read(maxLength:N) after a single add(copyNotNeeded:true) returns the same reference',
         () {
       final buffer = Uint8ListBuffer();
       final written = Uint8List(5);
@@ -134,7 +134,7 @@ void main() {
       expect(buffer.read(maxLength: 5), same(written));
     });
 
-    test("read(maxLength:N)", () {
+    test('read(maxLength:N)', () {
       // Empty buffer
       final buffer = Uint8ListBuffer();
 
@@ -152,7 +152,7 @@ void main() {
       expect(buffer.read(maxLength: 3), _equalsUint8List([4, 5]));
     });
 
-    test("read(maxLength:N), whole buffer", () {
+    test('read(maxLength:N), whole buffer', () {
       final buffer = Uint8ListBuffer();
       buffer.add(<int>[1, 2, 3, 4, 5]);
       expect(buffer.length, 5);
@@ -160,7 +160,7 @@ void main() {
       expect(buffer.length, 0);
     });
 
-    test("read(maxLength:N, preview:true), with preview", () {
+    test('read(maxLength:N, preview:true), with preview', () {
       final buffer = Uint8ListBuffer();
       buffer.add(<int>[1, 2, 3, 4, 5]);
       expect(buffer.length, 5);
@@ -191,29 +191,29 @@ void main() {
       expect(buffer.length, 5);
     });
 
-    test("readUff8", () {
+    test('readUff8', () {
       final buffer = Uint8ListBuffer();
-      buffer.add(utf8.encode("abc"));
+      buffer.add(utf8.encode('abc'));
       expect(buffer.length, 3);
-      expect(buffer.readUtf8(preview: true), "abc");
+      expect(buffer.readUtf8(preview: true), 'abc');
       expect(buffer.length, 3);
-      expect(buffer.readUtf8(), "abc");
+      expect(buffer.readUtf8(), 'abc');
       expect(buffer.length, 0);
     });
 
-    test("readUff8Incomplete, 1 byte", () {
+    test('readUff8Incomplete, 1 byte', () {
       final buffer = Uint8ListBuffer();
-      buffer.add(utf8.encode("abc"));
+      buffer.add(utf8.encode('abc'));
       expect(buffer.length, 3);
-      expect(buffer.readUtf8Incomplete(preview: true), "abc");
+      expect(buffer.readUtf8Incomplete(preview: true), 'abc');
       expect(buffer.length, 3);
-      expect(buffer.readUtf8Incomplete(), "abc");
+      expect(buffer.readUtf8Incomplete(), 'abc');
       expect(buffer.length, 0);
     });
 
-    test("readUff8Incomplete, 2 byte rune", () {
+    test('readUff8Incomplete, 2 byte rune', () {
       // Define the rune
-      final writtenString = "¢";
+      final writtenString = '¢';
       final writtenData = utf8.encode(writtenString);
       expect(writtenData, hasLength(2));
 
@@ -221,12 +221,12 @@ void main() {
       final buffer = Uint8ListBuffer();
 
       // Write a single-byte character
-      buffer.add(utf8.encode("a"));
+      buffer.add(utf8.encode('a'));
 
       // Write byte 0, try to read
       buffer.add(writtenData.sublist(0, 1));
-      expect(buffer.readUtf8Incomplete(), "a");
-      expect(buffer.readUtf8Incomplete(), "");
+      expect(buffer.readUtf8Incomplete(), 'a');
+      expect(buffer.readUtf8Incomplete(), '');
 
       // Write byte 1
       buffer.add(writtenData.sublist(1, 2));
@@ -236,9 +236,9 @@ void main() {
       expect(buffer.length, 0);
     });
 
-    test("readUff8Incomplete, 4 byte rune", () {
+    test('readUff8Incomplete, 4 byte rune', () {
       // Define the rune
-      final writtenString = "𐍈";
+      final writtenString = '𐍈';
       final writtenData = utf8.encode(writtenString);
       expect(writtenData, hasLength(4));
 
@@ -246,20 +246,20 @@ void main() {
       final buffer = Uint8ListBuffer();
 
       // Write a single-byte character
-      buffer.add(utf8.encode("a"));
+      buffer.add(utf8.encode('a'));
 
       // Write byte 0, try to read
       buffer.add(writtenData.sublist(0, 1));
-      expect(buffer.readUtf8Incomplete(), "a");
-      expect(buffer.readUtf8Incomplete(), "");
+      expect(buffer.readUtf8Incomplete(), 'a');
+      expect(buffer.readUtf8Incomplete(), '');
 
       // Write byte 1, try to read
       buffer.add(writtenData.sublist(1, 2));
-      expect(buffer.readUtf8Incomplete(), "");
+      expect(buffer.readUtf8Incomplete(), '');
 
       // Write byte 2, try to read
       buffer.add(writtenData.sublist(2, 3));
-      expect(buffer.readUtf8Incomplete(), "");
+      expect(buffer.readUtf8Incomplete(), '');
 
       // Write byte 3
       buffer.add(writtenData.sublist(3, 4));

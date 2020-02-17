@@ -30,7 +30,7 @@ class _BrowserHttpClientRequest extends BaseHttpClientRequest
     credentialsMode = client.credentialsMode;
     final userAgent = client.userAgent;
     if (userAgent != null) {
-      headers.add("User-Agent", userAgent);
+      headers.add('User-Agent', userAgent);
     }
   }
 
@@ -46,7 +46,7 @@ class _BrowserHttpClientRequest extends BaseHttpClientRequest
   Future<HttpClientResponse> didClose() {
     if (cookies.isNotEmpty) {
       _completer.completeError(StateError(
-        "Attempted to send cookies, but XMLHttpRequest does not support them.",
+        'Attempted to send cookies, but XMLHttpRequest does not support them.',
       ));
       return _completer.future;
     }
@@ -65,7 +65,7 @@ class _BrowserHttpClientRequest extends BaseHttpClientRequest
       }
 
       // Timeout
-      final timeout = this.client.connectionTimeout;
+      final timeout = client.connectionTimeout;
       if (timeout != null) {
         xhr.timeout = timeout.inMilliseconds;
       }
@@ -94,7 +94,7 @@ class _BrowserHttpClientRequest extends BaseHttpClientRequest
         }
       });
 
-      final headersCompleter = this._completer;
+      final headersCompleter = _completer;
       final controller = StreamController<Uint8List>();
       var bodySeenLength = 0;
 

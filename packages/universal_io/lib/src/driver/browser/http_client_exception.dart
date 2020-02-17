@@ -31,8 +31,8 @@ class _BrowserHttpClientException implements SocketException {
 
     // Add '/' so 'http://example.com' and 'http://example.com.other.com'
     // will be different.
-    if (!origin.endsWith("/")) {
-      origin = "$origin/";
+    if (!origin.endsWith('/')) {
+      origin = '$origin/';
     }
 
     if (!url.endsWith('/')) {
@@ -46,9 +46,9 @@ class _BrowserHttpClientException implements SocketException {
   static bool verbose = true;
 
   static final Set<String> _corsSimpleMethods = const {
-    "GET",
-    "HEAD",
-    "POST",
+    'GET',
+    'HEAD',
+    'POST',
   };
 
   final String method;
@@ -81,24 +81,24 @@ class _BrowserHttpClientException implements SocketException {
   @override
   String toString() {
     if (!verbose) {
-      return "XMLHttpRequest error";
+      return 'XMLHttpRequest error';
     }
     final sb = StringBuffer();
     for (var i = 0; i < 80; i++) {
-      sb.write("-");
+      sb.write('-');
     }
-    sb.write("\n");
+    sb.write('\n');
     sb.write("""
 BrowserHttpClient received an error from XMLHttpRequest (which doesn't tell
 reason for the error).\n""");
     // Write a line
-    sb.write("\n");
+    sb.write('\n');
 
     // Write key details
     void addEntry(String key, String value) {
       sb.write(key.padRight(20));
       sb.write(value);
-      sb.write("\n");
+      sb.write('\n');
     }
 
     final headerNames = <String>[];
@@ -107,27 +107,27 @@ reason for the error).\n""");
     });
     headerNames.sort();
 
-    addEntry("HTTP method: ", method);
-    addEntry("URL: ", url);
-    addEntry("Origin: ", origin);
+    addEntry('HTTP method: ', method);
+    addEntry('URL: ', url);
+    addEntry('Origin: ', origin);
 
     // Warn about possible problem with missing CORS headers
     if (_isCrossOriginUrl(url, origin: origin) ||
         browserCredentialsMode == BrowserHttpClientCredentialsMode.include) {
-      sb.write("\n");
-      sb.write("Cross-origin request!\n");
+      sb.write('\n');
+      sb.write('Cross-origin request!\n');
       if (browserCredentialsMode == BrowserHttpClientCredentialsMode.include) {
         sb.write("XmlHttpRequest 'credentials mode' is enabled.\n");
-        sb.write("\n");
-        sb.write("Did the server send the following mandatory headers?\n");
-        sb.write("  * Access-Control-Allow-Credentials: true\n");
-        sb.write("  * Access-Control-Allow-Origin: $origin\n");
+        sb.write('\n');
+        sb.write('Did the server send the following mandatory headers?\n');
+        sb.write('  * Access-Control-Allow-Credentials: true\n');
+        sb.write('  * Access-Control-Allow-Origin: $origin\n');
         sb.write("    * In credentials mode, '*' would fail!\n");
-        sb.write("  * Access-Control-Allow-Methods: $method\n");
+        sb.write('  * Access-Control-Allow-Methods: $method\n');
         sb.write("    * In credentials mode, '*' would fail!\n");
         if (headerNames.isNotEmpty) {
           final joined = headerNames.join(', ');
-          sb.write("  * Access-Control-Allow-Headers: $joined\n");
+          sb.write('  * Access-Control-Allow-Headers: $joined\n');
           sb.write("    * In credentials mode, '*' would fail!\n");
         }
       } else {
@@ -140,26 +140,26 @@ You can enable 'credentials mode' with:
     }
 """);
       }
-      sb.write("\n");
-      sb.write("\nDid the server send the following mandatory headers?\n");
-      sb.write("  * Access-Control-Allow-Credentials: true\n");
-      sb.write("  * Access-Control-Allow-Origin: $origin\n");
+      sb.write('\n');
+      sb.write('\nDid the server send the following mandatory headers?\n');
+      sb.write('  * Access-Control-Allow-Credentials: true\n');
+      sb.write('  * Access-Control-Allow-Origin: $origin\n');
       sb.write("    * OR '*'\n");
       if (!_corsSimpleMethods.contains(method)) {
-        sb.write("  * Access-Control-Allow-Methods: $method\n");
+        sb.write('  * Access-Control-Allow-Methods: $method\n');
         sb.write("    * OR '*'\n");
       }
       if (headerNames.isNotEmpty) {
         final joined = headerNames.join(', ');
-        sb.write("  * Access-Control-Allow-Headers: $joined\n");
+        sb.write('  * Access-Control-Allow-Headers: $joined\n');
         sb.write("    * OR '*'\n");
       }
     }
     // Write a line
     for (var i = 0; i < 80; i++) {
-      sb.write("-");
+      sb.write('-');
     }
-    sb.write("\n");
+    sb.write('\n');
     return sb.toString();
   }
 }

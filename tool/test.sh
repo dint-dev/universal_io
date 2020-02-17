@@ -19,9 +19,9 @@ test packages/test_io
 test packages/nodejs_io
 test packages/chrome_os_io
 
-echo "----"
+echo "----------------------------------------"
 echo "Testing: samples/chrome_app_example"
-echo "----"
+echo "----------------------------------------"
 cd samples/chrome_app_example
 pub get
 pub run webdev build --no-release

@@ -127,8 +127,12 @@ class SecureServerSocket extends Stream<SecureSocket> {
         .then((serverSocket) => SecureServerSocket._(serverSocket));
   }
 
-  StreamSubscription<SecureSocket> listen(void onData(SecureSocket socket),
-      {Function onError, void onDone(), bool cancelOnError}) {
+  @override
+  StreamSubscription<SecureSocket> listen(
+      void Function(SecureSocket socket) onData,
+      {Function onError,
+      void Function() onDone,
+      bool cancelOnError}) {
     return _socket.asyncMap((rawSocket) => SecureSocketImpl(rawSocket)).listen(
           onData,
           onError: onError,
@@ -242,8 +246,12 @@ class RawSecureServerSocket extends Stream<RawSecureSocket> {
             supportedProtocols));
   }
 
-  StreamSubscription<RawSecureSocket> listen(void onData(RawSecureSocket s),
-      {Function onError, void onDone(), bool cancelOnError}) {
+  @override
+  StreamSubscription<RawSecureSocket> listen(
+      void Function(RawSecureSocket s) onData,
+      {Function onError,
+      void Function() onDone,
+      bool cancelOnError}) {
     return _controller.stream.listen(onData,
         onError: onError, onDone: onDone, cancelOnError: cancelOnError);
   }

@@ -42,7 +42,7 @@ abstract class BaseIOSink implements IOSink {
   }
 
   @override
-  void writeAll(Iterable objects, [String separator = ""]) {
+  void writeAll(Iterable objects, [String separator = '']) {
     write(objects.join(separator));
   }
 
@@ -52,10 +52,10 @@ abstract class BaseIOSink implements IOSink {
   }
 
   @override
-  void writeln([Object obj = ""]) {
-    if (obj != "") {
+  void writeln([Object obj = '']) {
+    if (obj != '') {
       write(obj);
     }
-    write("\n");
+    write('\n');
   }
 }

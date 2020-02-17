@@ -1,9 +1,1 @@
 include: package:pedantic/analysis_options.yaml
-
-linter:
-  rules:
-    annotate_overrides: false
-    omit_local_variable_types: false
-    prefer_single_quotes: false
-    unnecessary_this: false
-    use_function_type_syntax_for_parameters: false

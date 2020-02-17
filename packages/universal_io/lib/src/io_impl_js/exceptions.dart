@@ -46,7 +46,8 @@
 
 /// Base class for all IO related exceptions.
 abstract class IOException implements Exception {
-  String toString() => "IOException";
+  @override
+  String toString() => 'IOException';
 }
 
 /// An [OSError] object holds information about an error from the
@@ -66,20 +67,21 @@ class OSError {
   final int errorCode;
 
   /// Creates an OSError object from a message and an errorCode.
-  @pragma("vm:entry-point")
-  const OSError([this.message = "", this.errorCode = noErrorCode]);
+  @pragma('vm:entry-point')
+  const OSError([this.message = '', this.errorCode = noErrorCode]);
 
   /// Converts an OSError object to a string representation.
+  @override
   String toString() {
-    StringBuffer sb = StringBuffer();
-    sb.write("OS Error");
+    var sb = StringBuffer();
+    sb.write('OS Error');
     if (message.isNotEmpty) {
-      sb..write(": ")..write(message);
+      sb..write(': ')..write(message);
       if (errorCode != noErrorCode) {
-        sb..write(", errno = ")..write(errorCode.toString());
+        sb..write(', errno = ')..write(errorCode.toString());
       }
     } else if (errorCode != noErrorCode) {
-      sb..write(": errno = ")..write(errorCode.toString());
+      sb..write(': errno = ')..write(errorCode.toString());
     }
     return sb.toString();
   }

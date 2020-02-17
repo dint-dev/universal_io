@@ -75,7 +75,7 @@ int get exitCode => _exitCode;
 /// exit code.
 set exitCode(int code) {
   if (code is! int) {
-    throw ArgumentError("Integer value for exit code expected");
+    throw ArgumentError('Integer value for exit code expected');
   }
   _exitCode = code;
 }
@@ -110,7 +110,7 @@ int get pid => 0;
 /// cross-platform issues.
 void exit(int code) {
   if (code is! int) {
-    throw ArgumentError("Integer value for exit code expected");
+    throw ArgumentError('Integer value for exit code expected');
   }
   throw UnsupportedError("This embedder disallows calling dart:io's exit()");
 }
@@ -120,9 +120,9 @@ void exit(int code) {
 /// Use this with care, as no asynchronous operations can be processed
 /// in a isolate while it is blocked in a [sleep] call.
 void sleep(Duration duration) {
-  int milliseconds = duration.inMilliseconds;
+  var milliseconds = duration.inMilliseconds;
   if (milliseconds < 0) {
-    throw ArgumentError("sleep: duration cannot be negative");
+    throw ArgumentError('sleep: duration cannot be negative');
   }
 }
 
@@ -465,11 +465,12 @@ class ProcessException implements IOException {
   final int errorCode;
 
   const ProcessException(this.executable, this.arguments,
-      [this.message = "", this.errorCode = 0]);
+      [this.message = '', this.errorCode = 0]);
+  @override
   String toString() {
     var msg = (message == null) ? 'OS error code: $errorCode' : message;
     var args = arguments.join(' ');
-    return "ProcessException: $msg\n  Command: $executable $args";
+    return 'ProcessException: $msg\n  Command: $executable $args';
   }
 }
 
@@ -528,99 +529,100 @@ class ProcessResult {
 /// signal handler and implement another. See [ProcessSignal.watch] for more
 /// information.
 class ProcessSignal {
-  static const ProcessSignal sighup = ProcessSignal._(1, "SIGHUP");
-  static const ProcessSignal sigint = ProcessSignal._(2, "SIGINT");
-  static const ProcessSignal sigquit = ProcessSignal._(3, "SIGQUIT");
-  static const ProcessSignal sigill = ProcessSignal._(4, "SIGILL");
-  static const ProcessSignal sigtrap = ProcessSignal._(5, "SIGTRAP");
-  static const ProcessSignal sigabrt = ProcessSignal._(6, "SIGABRT");
-  static const ProcessSignal sigbus = ProcessSignal._(7, "SIGBUS");
-  static const ProcessSignal sigfpe = ProcessSignal._(8, "SIGFPE");
-  static const ProcessSignal sigkill = ProcessSignal._(9, "SIGKILL");
-  static const ProcessSignal sigusr1 = ProcessSignal._(10, "SIGUSR1");
-  static const ProcessSignal sigsegv = ProcessSignal._(11, "SIGSEGV");
-  static const ProcessSignal sigusr2 = ProcessSignal._(12, "SIGUSR2");
-  static const ProcessSignal sigpipe = ProcessSignal._(13, "SIGPIPE");
-  static const ProcessSignal sigalrm = ProcessSignal._(14, "SIGALRM");
-  static const ProcessSignal sigterm = ProcessSignal._(15, "SIGTERM");
-  static const ProcessSignal sigchld = ProcessSignal._(17, "SIGCHLD");
-  static const ProcessSignal sigcont = ProcessSignal._(18, "SIGCONT");
-  static const ProcessSignal sigstop = ProcessSignal._(19, "SIGSTOP");
-  static const ProcessSignal sigtstp = ProcessSignal._(20, "SIGTSTP");
-  static const ProcessSignal sigttin = ProcessSignal._(21, "SIGTTIN");
-  static const ProcessSignal sigttou = ProcessSignal._(22, "SIGTTOU");
-  static const ProcessSignal sigurg = ProcessSignal._(23, "SIGURG");
-  static const ProcessSignal sigxcpu = ProcessSignal._(24, "SIGXCPU");
-  static const ProcessSignal sigxfsz = ProcessSignal._(25, "SIGXFSZ");
-  static const ProcessSignal sigvtalrm = ProcessSignal._(26, "SIGVTALRM");
-  static const ProcessSignal sigprof = ProcessSignal._(27, "SIGPROF");
-  static const ProcessSignal sigwinch = ProcessSignal._(28, "SIGWINCH");
-  static const ProcessSignal sigpoll = ProcessSignal._(29, "SIGPOLL");
-  static const ProcessSignal sigsys = ProcessSignal._(31, "SIGSYS");
+  static const ProcessSignal sighup = ProcessSignal._(1, 'SIGHUP');
+  static const ProcessSignal sigint = ProcessSignal._(2, 'SIGINT');
+  static const ProcessSignal sigquit = ProcessSignal._(3, 'SIGQUIT');
+  static const ProcessSignal sigill = ProcessSignal._(4, 'SIGILL');
+  static const ProcessSignal sigtrap = ProcessSignal._(5, 'SIGTRAP');
+  static const ProcessSignal sigabrt = ProcessSignal._(6, 'SIGABRT');
+  static const ProcessSignal sigbus = ProcessSignal._(7, 'SIGBUS');
+  static const ProcessSignal sigfpe = ProcessSignal._(8, 'SIGFPE');
+  static const ProcessSignal sigkill = ProcessSignal._(9, 'SIGKILL');
+  static const ProcessSignal sigusr1 = ProcessSignal._(10, 'SIGUSR1');
+  static const ProcessSignal sigsegv = ProcessSignal._(11, 'SIGSEGV');
+  static const ProcessSignal sigusr2 = ProcessSignal._(12, 'SIGUSR2');
+  static const ProcessSignal sigpipe = ProcessSignal._(13, 'SIGPIPE');
+  static const ProcessSignal sigalrm = ProcessSignal._(14, 'SIGALRM');
+  static const ProcessSignal sigterm = ProcessSignal._(15, 'SIGTERM');
+  static const ProcessSignal sigchld = ProcessSignal._(17, 'SIGCHLD');
+  static const ProcessSignal sigcont = ProcessSignal._(18, 'SIGCONT');
+  static const ProcessSignal sigstop = ProcessSignal._(19, 'SIGSTOP');
+  static const ProcessSignal sigtstp = ProcessSignal._(20, 'SIGTSTP');
+  static const ProcessSignal sigttin = ProcessSignal._(21, 'SIGTTIN');
+  static const ProcessSignal sigttou = ProcessSignal._(22, 'SIGTTOU');
+  static const ProcessSignal sigurg = ProcessSignal._(23, 'SIGURG');
+  static const ProcessSignal sigxcpu = ProcessSignal._(24, 'SIGXCPU');
+  static const ProcessSignal sigxfsz = ProcessSignal._(25, 'SIGXFSZ');
+  static const ProcessSignal sigvtalrm = ProcessSignal._(26, 'SIGVTALRM');
+  static const ProcessSignal sigprof = ProcessSignal._(27, 'SIGPROF');
+  static const ProcessSignal sigwinch = ProcessSignal._(28, 'SIGWINCH');
+  static const ProcessSignal sigpoll = ProcessSignal._(29, 'SIGPOLL');
+  static const ProcessSignal sigsys = ProcessSignal._(31, 'SIGSYS');
 
-  @Deprecated("Use sighup instead")
+  @Deprecated('Use sighup instead')
   static const ProcessSignal SIGHUP = sighup;
-  @Deprecated("Use sigint instead")
+  @Deprecated('Use sigint instead')
   static const ProcessSignal SIGINT = sigint;
-  @Deprecated("Use sigquit instead")
+  @Deprecated('Use sigquit instead')
   static const ProcessSignal SIGQUIT = sigquit;
-  @Deprecated("Use sigill instead")
+  @Deprecated('Use sigill instead')
   static const ProcessSignal SIGILL = sigill;
-  @Deprecated("Use sigtrap instead")
+  @Deprecated('Use sigtrap instead')
   static const ProcessSignal SIGTRAP = sigtrap;
-  @Deprecated("Use sigabrt instead")
+  @Deprecated('Use sigabrt instead')
   static const ProcessSignal SIGABRT = sigabrt;
-  @Deprecated("Use sigbus instead")
+  @Deprecated('Use sigbus instead')
   static const ProcessSignal SIGBUS = sigbus;
-  @Deprecated("Use sigfpe instead")
+  @Deprecated('Use sigfpe instead')
   static const ProcessSignal SIGFPE = sigfpe;
-  @Deprecated("Use sigkill instead")
+  @Deprecated('Use sigkill instead')
   static const ProcessSignal SIGKILL = sigkill;
-  @Deprecated("Use sigusr1 instead")
+  @Deprecated('Use sigusr1 instead')
   static const ProcessSignal SIGUSR1 = sigusr1;
-  @Deprecated("Use sigsegv instead")
+  @Deprecated('Use sigsegv instead')
   static const ProcessSignal SIGSEGV = sigsegv;
-  @Deprecated("Use sigusr2 instead")
+  @Deprecated('Use sigusr2 instead')
   static const ProcessSignal SIGUSR2 = sigusr2;
-  @Deprecated("Use sigpipe instead")
+  @Deprecated('Use sigpipe instead')
   static const ProcessSignal SIGPIPE = sigpipe;
-  @Deprecated("Use sigalrm instead")
+  @Deprecated('Use sigalrm instead')
   static const ProcessSignal SIGALRM = sigalrm;
-  @Deprecated("Use sigterm instead")
+  @Deprecated('Use sigterm instead')
   static const ProcessSignal SIGTERM = sigterm;
-  @Deprecated("Use sigchld instead")
+  @Deprecated('Use sigchld instead')
   static const ProcessSignal SIGCHLD = sigchld;
-  @Deprecated("Use sigcont instead")
+  @Deprecated('Use sigcont instead')
   static const ProcessSignal SIGCONT = sigcont;
-  @Deprecated("Use sigstop instead")
+  @Deprecated('Use sigstop instead')
   static const ProcessSignal SIGSTOP = sigstop;
-  @Deprecated("Use sigtstp instead")
+  @Deprecated('Use sigtstp instead')
   static const ProcessSignal SIGTSTP = sigtstp;
-  @Deprecated("Use sigttin instead")
+  @Deprecated('Use sigttin instead')
   static const ProcessSignal SIGTTIN = sigttin;
-  @Deprecated("Use sigttou instead")
+  @Deprecated('Use sigttou instead')
   static const ProcessSignal SIGTTOU = sigttou;
-  @Deprecated("Use sigurg instead")
+  @Deprecated('Use sigurg instead')
   static const ProcessSignal SIGURG = sigurg;
-  @Deprecated("Use sigxcpu instead")
+  @Deprecated('Use sigxcpu instead')
   static const ProcessSignal SIGXCPU = sigxcpu;
-  @Deprecated("Use sigxfsz instead")
+  @Deprecated('Use sigxfsz instead')
   static const ProcessSignal SIGXFSZ = sigxfsz;
-  @Deprecated("Use sigvtalrm instead")
+  @Deprecated('Use sigvtalrm instead')
   static const ProcessSignal SIGVTALRM = sigvtalrm;
-  @Deprecated("Use sigprof instead")
+  @Deprecated('Use sigprof instead')
   static const ProcessSignal SIGPROF = sigprof;
-  @Deprecated("Use sigwinch instead")
+  @Deprecated('Use sigwinch instead')
   static const ProcessSignal SIGWINCH = sigwinch;
-  @Deprecated("Use sigpoll instead")
+  @Deprecated('Use sigpoll instead')
   static const ProcessSignal SIGPOLL = sigpoll;
-  @Deprecated("Use sigsys instead")
+  @Deprecated('Use sigsys instead')
   static const ProcessSignal SIGSYS = sigsys;
 
   final String _name;
 
   const ProcessSignal._(int signalNumber, this._name);
 
+  @override
   String toString() => _name;
 
   /// Watch for process signals.
@@ -645,23 +647,23 @@ class ProcessSignal {
 class ProcessStartMode {
   /// Normal child process.
   static const normal = ProcessStartMode._internal(0);
-  @Deprecated("Use normal instead")
+  @Deprecated('Use normal instead')
   static const NORMAL = normal;
 
   /// Stdio handles are inherited by the child process.
   static const inheritStdio = ProcessStartMode._internal(1);
-  @Deprecated("Use inheritStdio instead")
+  @Deprecated('Use inheritStdio instead')
   static const INHERIT_STDIO = inheritStdio;
 
   /// Detached child process with no open communication channel.
   static const detached = ProcessStartMode._internal(2);
-  @Deprecated("Use detached instead")
+  @Deprecated('Use detached instead')
   static const DETACHED = detached;
 
   /// Detached child process with stdin, stdout and stderr still open
   /// for communication with the child.
   static const detachedWithStdio = ProcessStartMode._internal(3);
-  @Deprecated("Use detachedWithStdio instead")
+  @Deprecated('Use detachedWithStdio instead')
   static const DETACHED_WITH_STDIO = detachedWithStdio;
 
   static List<ProcessStartMode> get values => const <ProcessStartMode>[
@@ -673,8 +675,9 @@ class ProcessStartMode {
   final int _mode;
 
   const ProcessStartMode._internal(this._mode);
+  @override
   String toString() =>
-      const ["normal", "inheritStdio", "detached", "detachedWithStdio"][_mode];
+      const ['normal', 'inheritStdio', 'detached', 'detachedWithStdio'][_mode];
 }
 
 class SignalException implements IOException {
@@ -683,11 +686,12 @@ class SignalException implements IOException {
 
   const SignalException(this.message, [this.osError]);
 
+  @override
   String toString() {
-    var msg = "";
+    var msg = '';
     if (osError != null) {
-      msg = ", osError: $osError";
+      msg = ', osError: $osError';
     }
-    return "SignalException: $message$msg";
+    return 'SignalException: $message$msg';
   }
 }

@@ -20,10 +20,10 @@ import 'package:test/test.dart';
 import 'package:universal_io/prefer_universal/io.dart';
 
 void testRawSocket({bool serverSocket = true}) {
-  group("RawSocket", () {
+  group('RawSocket', () {
     test("RawSocket.connect('localhost', badPort) should fail", () {
       expect(
-        () => RawSocket.connect("localhost", 23456),
+        () => RawSocket.connect('localhost', 23456),
         throwsA(TypeMatcher<SocketException>()),
       );
     });
@@ -31,10 +31,10 @@ void testRawSocket({bool serverSocket = true}) {
       _testRawSocketAndRawServerSocket();
     }
   });
-  group("Socket", () {
+  group('Socket', () {
     test("Socket.connect('localhost', badPort) should fail", () {
       expect(
-        () => Socket.connect("localhost", 23456),
+        () => Socket.connect('localhost', 23456),
         throwsA(TypeMatcher<SocketException>()),
       );
     });
@@ -42,7 +42,7 @@ void testRawSocket({bool serverSocket = true}) {
 }
 
 void _testRawSocketAndRawServerSocket() {
-  group("RawSocket + RawServerSocket", () {
+  group('RawSocket + RawServerSocket', () {
     RawServerSocket server;
     RawSocket client;
 
@@ -70,19 +70,19 @@ void _testRawSocketAndRawServerSocket() {
       });
     });
 
-    test("client.remoteAddress should throw if socket is closed", () {
+    test('client.remoteAddress should throw if socket is closed', () {
       expect(client.remoteAddress, isNotNull);
       client.close();
       expect(() => client.remoteAddress, throwsException);
     });
 
-    test("client.remotePort should throw if socket is closed", () {
+    test('client.remotePort should throw if socket is closed', () {
       expect(client.remotePort, greaterThan(0));
       client.close();
       expect(() => client.remotePort, throwsException);
     });
 
-    test("Two-way communication", () async {
+    test('Two-way communication', () async {
       // -------------------
       // Server expectations
       // -------------------
@@ -104,12 +104,12 @@ void _testRawSocketAndRawServerSocket() {
           }
 
           expect(event, RawSocketEvent.read);
-          expect(utf8.decode(socket.read()), "Client/0");
+          expect(utf8.decode(socket.read()), 'Client/0');
         }
 
         // Send a message
         {
-          final data = utf8.encode("Server/0");
+          final data = utf8.encode('Server/0');
           final result = socket.write(data);
           expect(result, data.length);
 
@@ -137,7 +137,7 @@ void _testRawSocketAndRawServerSocket() {
 
         // Send a message
         {
-          final data = utf8.encode("Client/0");
+          final data = utf8.encode('Client/0');
           final result = socket.write(data);
           expect(result, data.length);
           expect(await events.next, RawSocketEvent.write);
@@ -145,7 +145,7 @@ void _testRawSocketAndRawServerSocket() {
 
         // Receive a message
         expect(await events.next, RawSocketEvent.read);
-        expect(utf8.decode(socket.read()), "Server/0");
+        expect(utf8.decode(socket.read()), 'Server/0');
 
         // Close the socket
         await socket.close();

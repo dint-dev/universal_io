@@ -29,11 +29,12 @@ class _BrowserHttpClientResponse extends BaseHttpClientResponse
   @override
   final String reasonPhrase;
 
+  @override
   final int statusCode;
 
   @override
-  StreamSubscription<Uint8List> listen(void onData(Uint8List event),
-      {Function onError, void onDone(), bool cancelOnError}) {
+  StreamSubscription<Uint8List> listen(void Function(Uint8List event) onData,
+      {Function onError, void Function() onDone, bool cancelOnError}) {
     return _body.listen(
       onData,
       onError: onError,

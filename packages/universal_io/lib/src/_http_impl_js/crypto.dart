@@ -60,10 +60,10 @@ class _CryptoUtils {
   static const int LINE_LENGTH = 76;
 
   static const String _encodeTable =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
   static const String _encodeTableUrlSafe =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
 
   // Lookup table used for finding Base 64 alphabet index of a given byte.
   // -2 : Outside Base 64 alphabet.
@@ -93,16 +93,16 @@ class _CryptoUtils {
 
   static List<int> base64StringToBytes(String input,
       [bool ignoreInvalidCharacters = true]) {
-    int len = input.length;
+    var len = input.length;
     if (len == 0) {
       return List<int>(0);
     }
 
     // Count '\r', '\n' and illegal characters, For illegal characters,
     // if [ignoreInvalidCharacters] is false, throw an exception.
-    int extrasLen = 0;
-    for (int i = 0; i < len; i++) {
-      int c = _decodeTable[input.codeUnitAt(i)];
+    var extrasLen = 0;
+    for (var i = 0; i < len; i++) {
+      var c = _decodeTable[input.codeUnitAt(i)];
       if (c < 0) {
         extrasLen++;
         if (c == -2 && !ignoreInvalidCharacters) {
@@ -117,20 +117,20 @@ class _CryptoUtils {
     }
 
     // Count pad characters, ignore illegal characters at the end.
-    int padLength = 0;
-    for (int i = len - 1; i >= 0; i--) {
-      int currentCodeUnit = input.codeUnitAt(i);
+    var padLength = 0;
+    for (var i = len - 1; i >= 0; i--) {
+      var currentCodeUnit = input.codeUnitAt(i);
       if (_decodeTable[currentCodeUnit] > 0) break;
       if (currentCodeUnit == PAD) padLength++;
     }
-    int outputLen = (((len - extrasLen) * 6) >> 3) - padLength;
-    List<int> out = List<int>(outputLen);
+    var outputLen = (((len - extrasLen) * 6) >> 3) - padLength;
+    var out = List<int>(outputLen);
 
-    for (int i = 0, o = 0; o < outputLen;) {
+    for (var i = 0, o = 0; o < outputLen;) {
       // Accumulate 4 valid 6 bit Base 64 characters into an int.
-      int x = 0;
-      for (int j = 4; j > 0;) {
-        int c = _decodeTable[input.codeUnitAt(i++)];
+      var x = 0;
+      for (var j = 4; j > 0;) {
+        var c = _decodeTable[input.codeUnitAt(i++)];
         if (c >= 0) {
           x = ((x << 6) & 0xFFFFFF) | c;
           j--;
@@ -147,26 +147,26 @@ class _CryptoUtils {
 
   static String bytesToBase64(List<int> bytes,
       [bool urlSafe = false, bool addLineSeparator = false]) {
-    int len = bytes.length;
+    var len = bytes.length;
     if (len == 0) {
-      return "";
+      return '';
     }
-    final String lookup = urlSafe ? _encodeTableUrlSafe : _encodeTable;
+    final lookup = urlSafe ? _encodeTableUrlSafe : _encodeTable;
     // Size of 24 bit chunks.
-    final int remainderLength = len.remainder(3);
-    final int chunkLength = len - remainderLength;
+    final remainderLength = len.remainder(3);
+    final chunkLength = len - remainderLength;
     // Size of base output.
-    int outputLen = ((len ~/ 3) * 4) + ((remainderLength > 0) ? 4 : 0);
+    var outputLen = ((len ~/ 3) * 4) + ((remainderLength > 0) ? 4 : 0);
     // Add extra for line separators.
     if (addLineSeparator) {
       outputLen += ((outputLen - 1) ~/ LINE_LENGTH) << 1;
     }
-    List<int> out = List<int>(outputLen);
+    var out = List<int>(outputLen);
 
     // Encode 24 bit chunks.
-    int j = 0, i = 0, c = 0;
+    var j = 0, i = 0, c = 0;
     while (i < chunkLength) {
-      int x = ((bytes[i++] << 16) & 0xFFFFFF) |
+      var x = ((bytes[i++] << 16) & 0xFFFFFF) |
           ((bytes[i++] << 8) & 0xFFFFFF) |
           bytes[i++];
       out[j++] = lookup.codeUnitAt(x >> 18);
@@ -184,14 +184,14 @@ class _CryptoUtils {
     // If input length if not a multiple of 3, encode remaining bytes and
     // add padding.
     if (remainderLength == 1) {
-      int x = bytes[i];
+      var x = bytes[i];
       out[j++] = lookup.codeUnitAt(x >> 2);
       out[j++] = lookup.codeUnitAt((x << 4) & 0x3F);
       out[j++] = PAD;
       out[j++] = PAD;
     } else if (remainderLength == 2) {
-      int x = bytes[i];
-      int y = bytes[i + 1];
+      var x = bytes[i];
+      var y = bytes[i + 1];
       out[j++] = lookup.codeUnitAt(x >> 2);
       out[j++] = lookup.codeUnitAt(((x << 4) | (y >> 4)) & 0x3F);
       out[j++] = lookup.codeUnitAt((y << 2) & 0x3F);
@@ -210,8 +210,8 @@ class _CryptoUtils {
   }
 
   static Uint8List getRandomBytes(int count) {
-    final Uint8List result = Uint8List(count);
-    for (int i = 0; i < count; i++) {
+    final result = Uint8List(count);
+    for (var i = 0; i < count; i++) {
       result[i] = _rng.nextInt(0xff);
     }
     return result;
@@ -349,7 +349,7 @@ abstract class _HashBase {
   // Finalize the data. Add a 1 bit to the end of the message. Expand with
   // 0 bits and add the length of the message.
   List<int> _wordToBytes(int word) {
-    List<int> bytes = List(_BYTES_PER_WORD);
+    var bytes = List<int>(_BYTES_PER_WORD);
     bytes[0] = (word >> (_bigEndianWords ? 24 : 0)) & _MASK_8;
     bytes[1] = (word >> (_bigEndianWords ? 16 : 8)) & _MASK_8;
     bytes[2] = (word >> (_bigEndianWords ? 8 : 16)) & _MASK_8;
@@ -389,12 +389,14 @@ class _MD5 extends _HashBase {
     _h[3] = 0x10325476;
   }
 
+  @override
   _MD5 newInstance() {
     return _MD5();
   }
 
   // Compute one iteration of the MD5 algorithm with a chunk of
   // 16 32-bit pieces.
+  @override
   void _updateHash(List<int> m) {
     assert(m.length == 16);
 
@@ -454,10 +456,12 @@ class _SHA1 extends _HashBase {
 
   // Compute one iteration of the SHA1 algorithm with a chunk of
   // 16 32-bit pieces.
+  @override
   _SHA1 newInstance() {
     return _SHA1();
   }
 
+  @override
   void _updateHash(List<int> m) {
     assert(m.length == 16);
 

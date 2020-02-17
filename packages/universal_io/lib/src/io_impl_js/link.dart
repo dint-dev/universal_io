@@ -55,7 +55,7 @@ import 'file.dart';
 abstract class Link implements FileSystemEntity {
   /// Creates a Link object.
   factory Link(String path) {
-    final IOOverrides overrides = IOOverrides.current;
+    final overrides = IOOverrides.current;
     if (overrides == null) {
       throw UnimplementedError();
     }
@@ -124,8 +124,10 @@ abstract class Link implements FileSystemEntity {
   /// will complete its returned future with an exception.
   Future<Link> update(String target);
 
+  @override
   Future<String> resolveSymbolicLinks();
 
+  @override
   String resolveSymbolicLinksSync();
 
   /// Renames this link. Returns a `Future<Link>` that completes
@@ -134,6 +136,7 @@ abstract class Link implements FileSystemEntity {
   /// If [newPath] identifies an existing link, that link is
   /// replaced. If [newPath] identifies an existing file or directory,
   /// the operation fails and the future completes with an exception.
+  @override
   Future<Link> rename(String newPath);
 
   /// Synchronously renames this link. Returns a [Link]
@@ -142,6 +145,7 @@ abstract class Link implements FileSystemEntity {
   /// If [newPath] identifies an existing link, that link is
   /// replaced. If [newPath] identifies an existing file or directory
   /// the operation fails and an exception is thrown.
+  @override
   Link renameSync(String newPath);
 
   /// Returns a [Link] instance whose path is the absolute path to [this].
@@ -149,6 +153,7 @@ abstract class Link implements FileSystemEntity {
   /// The absolute path is computed by prefixing
   /// a relative path with the current working directory, and returning
   /// an absolute path unchanged.
+  @override
   Link get absolute;
 
   /// Gets the target of the link. Returns a future that completes with

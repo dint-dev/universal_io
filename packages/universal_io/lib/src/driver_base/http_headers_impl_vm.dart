@@ -83,27 +83,30 @@ class HttpHeadersImpl implements HttpHeaders {
       _host = initialHeaders._host;
       _port = initialHeaders._port;
     }
-    if (protocolVersion == "1.0") {
+    if (protocolVersion == '1.0') {
       _persistentConnection = false;
       _chunkedTransferEncoding = false;
     }
   }
 
+  @override
   List<String> operator [](String name) => _headers[_validateField(name)];
 
+  @override
   String value(String name) {
     name = _validateField(name);
-    List<String> values = _headers[name];
+    var values = _headers[name];
     if (values == null) return null;
     if (values.length > 1) {
-      throw HttpException("More than one value for header $name");
+      throw HttpException('More than one value for header $name');
     }
     return values[0];
   }
 
+  @override
   void add(String name, value, {bool preserveHeaderCase = false}) {
     _checkMutable();
-    String lowercaseName = _validateField(name);
+    var lowercaseName = _validateField(name);
 
     if (preserveHeaderCase && name != lowercaseName) {
       (_originalHeaderNames ??= {})[lowercaseName] = name;
@@ -123,9 +126,10 @@ class HttpHeadersImpl implements HttpHeaders {
     }
   }
 
+  @override
   void set(String name, Object value, {bool preserveHeaderCase = false}) {
     _checkMutable();
-    String lowercaseName = _validateField(name);
+    var lowercaseName = _validateField(name);
     _headers.remove(lowercaseName);
     _originalHeaderNames?.remove(lowercaseName);
     if (lowercaseName == HttpHeaders.transferEncodingHeader) {
@@ -139,13 +143,14 @@ class HttpHeadersImpl implements HttpHeaders {
     _addAll(lowercaseName, value);
   }
 
+  @override
   void remove(String name, Object value) {
     _checkMutable();
     name = _validateField(name);
     value = _validateValue(value);
-    List<String> values = _headers[name];
+    var values = _headers[name];
     if (values != null) {
-      int index = values.indexOf(value);
+      var index = values.indexOf(value);
       if (index != -1) {
         values.removeRange(index, index + 1);
       }
@@ -154,11 +159,12 @@ class HttpHeadersImpl implements HttpHeaders {
         _originalHeaderNames?.remove(name);
       }
     }
-    if (name == HttpHeaders.transferEncodingHeader && value == "chunked") {
+    if (name == HttpHeaders.transferEncodingHeader && value == 'chunked') {
       _chunkedTransferEncoding = false;
     }
   }
 
+  @override
   void removeAll(String name) {
     _checkMutable();
     name = _validateField(name);
@@ -166,54 +172,60 @@ class HttpHeadersImpl implements HttpHeaders {
     _originalHeaderNames?.remove(name);
   }
 
-  void forEach(void action(String name, List<String> values)) {
+  @override
+  void forEach(void Function(String name, List<String> values) action) {
     _headers.forEach((String name, List<String> values) {
-      String originalName = _originalHeaderName(name);
+      var originalName = _originalHeaderName(name);
       action(originalName, values);
     });
   }
 
+  @override
   void noFolding(String name) {
     name = _validateField(name);
     _noFoldingHeaders ??= <String>[];
     _noFoldingHeaders.add(name);
   }
 
+  @override
   bool get persistentConnection => _persistentConnection;
 
+  @override
   set persistentConnection(bool persistentConnection) {
     _checkMutable();
     if (persistentConnection == _persistentConnection) return;
     if (persistentConnection) {
-      if (protocolVersion == "1.1") {
-        remove(HttpHeaders.connectionHeader, "close");
+      if (protocolVersion == '1.1') {
+        remove(HttpHeaders.connectionHeader, 'close');
       } else {
         if (_contentLength == -1) {
           throw HttpException(
               "Trying to set 'Connection: Keep-Alive' on HTTP 1.0 headers with "
-              "no ContentLength");
+              'no ContentLength');
         }
-        add(HttpHeaders.connectionHeader, "keep-alive");
+        add(HttpHeaders.connectionHeader, 'keep-alive');
       }
     } else {
-      if (protocolVersion == "1.1") {
-        add(HttpHeaders.connectionHeader, "close");
+      if (protocolVersion == '1.1') {
+        add(HttpHeaders.connectionHeader, 'close');
       } else {
-        remove(HttpHeaders.connectionHeader, "keep-alive");
+        remove(HttpHeaders.connectionHeader, 'keep-alive');
       }
     }
     _persistentConnection = persistentConnection;
   }
 
+  @override
   int get contentLength => _contentLength;
 
+  @override
   set contentLength(int contentLength) {
     _checkMutable();
-    if (protocolVersion == "1.0" &&
+    if (protocolVersion == '1.0' &&
         persistentConnection &&
         contentLength == -1) {
       throw HttpException(
-          "Trying to clear ContentLength on HTTP 1.0 headers with "
+          'Trying to clear ContentLength on HTTP 1.0 headers with '
           "'Connection: Keep-Alive' set");
     }
     if (_contentLength == contentLength) return;
@@ -223,53 +235,60 @@ class HttpHeadersImpl implements HttpHeaders {
       _set(HttpHeaders.contentLengthHeader, contentLength.toString());
     } else {
       removeAll(HttpHeaders.contentLengthHeader);
-      if (protocolVersion == "1.1") {
+      if (protocolVersion == '1.1') {
         chunkedTransferEncoding = true;
       }
     }
   }
 
+  @override
   bool get chunkedTransferEncoding => _chunkedTransferEncoding;
 
+  @override
   set chunkedTransferEncoding(bool chunkedTransferEncoding) {
     _checkMutable();
-    if (chunkedTransferEncoding && protocolVersion == "1.0") {
+    if (chunkedTransferEncoding && protocolVersion == '1.0') {
       throw HttpException(
           "Trying to set 'Transfer-Encoding: Chunked' on HTTP 1.0 headers");
     }
     if (chunkedTransferEncoding == _chunkedTransferEncoding) return;
     if (chunkedTransferEncoding) {
-      List<String> values = _headers[HttpHeaders.transferEncodingHeader];
-      if ((values == null || !values.contains("chunked"))) {
+      var values = _headers[HttpHeaders.transferEncodingHeader];
+      if ((values == null || !values.contains('chunked'))) {
         // Headers does not specify chunked encoding - add it if set.
-        _addValue(HttpHeaders.transferEncodingHeader, "chunked");
+        _addValue(HttpHeaders.transferEncodingHeader, 'chunked');
       }
       contentLength = -1;
     } else {
       // Headers does specify chunked encoding - remove it if not set.
-      remove(HttpHeaders.transferEncodingHeader, "chunked");
+      remove(HttpHeaders.transferEncodingHeader, 'chunked');
     }
     _chunkedTransferEncoding = chunkedTransferEncoding;
   }
 
+  @override
   String get host => _host;
 
+  @override
   set host(String host) {
     _checkMutable();
     _host = host;
     _updateHostHeader();
   }
 
+  @override
   int get port => _port;
 
+  @override
   set port(int port) {
     _checkMutable();
     _port = port;
     _updateHostHeader();
   }
 
+  @override
   DateTime get ifModifiedSince {
-    List<String> values = _headers[HttpHeaders.ifModifiedSinceHeader];
+    var values = _headers[HttpHeaders.ifModifiedSinceHeader];
     if (values != null) {
       try {
         return HttpDate.parse(values[0]);
@@ -280,15 +299,17 @@ class HttpHeadersImpl implements HttpHeaders {
     return null;
   }
 
+  @override
   set ifModifiedSince(DateTime ifModifiedSince) {
     _checkMutable();
     // Format "ifModifiedSince" header with date in Greenwich Mean Time (GMT).
-    String formatted = HttpDate.format(ifModifiedSince.toUtc());
+    var formatted = HttpDate.format(ifModifiedSince.toUtc());
     _set(HttpHeaders.ifModifiedSinceHeader, formatted);
   }
 
+  @override
   DateTime get date {
-    List<String> values = _headers[HttpHeaders.dateHeader];
+    var values = _headers[HttpHeaders.dateHeader];
     if (values != null) {
       try {
         return HttpDate.parse(values[0]);
@@ -299,15 +320,17 @@ class HttpHeadersImpl implements HttpHeaders {
     return null;
   }
 
+  @override
   set date(DateTime date) {
     _checkMutable();
     // Format "DateTime" header with date in Greenwich Mean Time (GMT).
-    String formatted = HttpDate.format(date.toUtc());
-    _set("date", formatted);
+    var formatted = HttpDate.format(date.toUtc());
+    _set('date', formatted);
   }
 
+  @override
   DateTime get expires {
-    List<String> values = _headers[HttpHeaders.expiresHeader];
+    var values = _headers[HttpHeaders.expiresHeader];
     if (values != null) {
       try {
         return HttpDate.parse(values[0]);
@@ -318,13 +341,15 @@ class HttpHeadersImpl implements HttpHeaders {
     return null;
   }
 
+  @override
   set expires(DateTime expires) {
     _checkMutable();
     // Format "Expires" header with date in Greenwich Mean Time (GMT).
-    String formatted = HttpDate.format(expires.toUtc());
+    var formatted = HttpDate.format(expires.toUtc());
     _set(HttpHeaders.expiresHeader, formatted);
   }
 
+  @override
   ContentType get contentType {
     var values = _headers[HttpHeaders.contentTypeHeader];
     if (values != null) {
@@ -334,11 +359,13 @@ class HttpHeadersImpl implements HttpHeaders {
     }
   }
 
+  @override
   set contentType(ContentType contentType) {
     _checkMutable();
     _set(HttpHeaders.contentTypeHeader, contentType.toString());
   }
 
+  @override
   void clear() {
     _checkMutable();
     _headers.clear();
@@ -408,12 +435,12 @@ class HttpHeadersImpl implements HttpHeaders {
     } else if (value is String) {
       contentLength = int.parse(value);
     } else {
-      throw HttpException("Unexpected type for header named $name");
+      throw HttpException('Unexpected type for header named $name');
     }
   }
 
   void _addTransferEncoding(String name, value) {
-    if (value == "chunked") {
+    if (value == 'chunked') {
       chunkedTransferEncoding = true;
     } else {
       _addValue(HttpHeaders.transferEncodingHeader, value);
@@ -426,7 +453,7 @@ class HttpHeadersImpl implements HttpHeaders {
     } else if (value is String) {
       _set(HttpHeaders.dateHeader, value);
     } else {
-      throw HttpException("Unexpected type for header named $name");
+      throw HttpException('Unexpected type for header named $name');
     }
   }
 
@@ -436,7 +463,7 @@ class HttpHeadersImpl implements HttpHeaders {
     } else if (value is String) {
       _set(HttpHeaders.expiresHeader, value);
     } else {
-      throw HttpException("Unexpected type for header named $name");
+      throw HttpException('Unexpected type for header named $name');
     }
   }
 
@@ -446,13 +473,13 @@ class HttpHeadersImpl implements HttpHeaders {
     } else if (value is String) {
       _set(HttpHeaders.ifModifiedSinceHeader, value);
     } else {
-      throw HttpException("Unexpected type for header named $name");
+      throw HttpException('Unexpected type for header named $name');
     }
   }
 
   void _addHost(String name, value) {
     if (value is String) {
-      int pos = value.indexOf(":");
+      var pos = value.indexOf(':');
       if (pos == -1) {
         _host = value;
         _port = HttpClient.defaultHttpPort;
@@ -474,7 +501,7 @@ class HttpHeadersImpl implements HttpHeaders {
       }
       _set(HttpHeaders.hostHeader, value);
     } else {
-      throw HttpException("Unexpected type for header named $name");
+      throw HttpException('Unexpected type for header named $name');
     }
   }
 
@@ -493,7 +520,7 @@ class HttpHeadersImpl implements HttpHeaders {
   }
 
   void _addValue(String name, Object value) {
-    List<String> values = _headers[name];
+    var values = _headers[name];
     if (values == null) {
       values = <String>[];
       _headers[name] = values;
@@ -509,18 +536,18 @@ class HttpHeadersImpl implements HttpHeaders {
 
   void _set(String name, String value) {
     assert(name == _validateField(name));
-    List<String> values = <String>[];
+    var values = <String>[];
     _headers[name] = values;
     values.add(value);
   }
 
   void _checkMutable() {
-    if (!_mutable) throw HttpException("HTTP headers are not mutable");
+    if (!_mutable) throw HttpException('HTTP headers are not mutable');
   }
 
   void _updateHostHeader() {
-    bool defaultPort = _port == null || _port == _defaultPortForScheme;
-    _set("host", defaultPort ? host : "$host:$_port");
+    var defaultPort = _port == null || _port == _defaultPortForScheme;
+    _set('host', defaultPort ? host : '$host:$_port');
   }
 
   bool _foldHeader(String name) {
@@ -531,23 +558,24 @@ class HttpHeadersImpl implements HttpHeaders {
     return true;
   }
 
+  @override
   String toString() {
-    StringBuffer sb = StringBuffer();
+    var sb = StringBuffer();
     _headers.forEach((String name, List<String> values) {
-      String originalName = _originalHeaderName(name);
-      sb..write(originalName)..write(": ");
-      bool fold = _foldHeader(name);
-      for (int i = 0; i < values.length; i++) {
+      var originalName = _originalHeaderName(name);
+      sb..write(originalName)..write(': ');
+      var fold = _foldHeader(name);
+      for (var i = 0; i < values.length; i++) {
         if (i > 0) {
           if (fold) {
-            sb.write(", ");
+            sb.write(', ');
           } else {
-            sb..write("\n")..write(originalName)..write(": ");
+            sb..write('\n')..write(originalName)..write(': ');
           }
         }
         sb.write(values[i]);
       }
-      sb.write("\n");
+      sb.write('\n');
     });
     return sb.toString();
   }
@@ -561,7 +589,7 @@ class HttpHeadersImpl implements HttpHeaders {
     for (var i = 0; i < (value as String).length; i++) {
       if (!_isValueChar((value as String).codeUnitAt(i))) {
         throw FormatException(
-            "Invalid HTTP header field value: ${json.encode(value)}", value, i);
+            'Invalid HTTP header field value: ${json.encode(value)}', value, i);
       }
     }
     return value;

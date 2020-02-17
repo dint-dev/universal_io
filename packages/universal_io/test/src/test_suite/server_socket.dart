@@ -16,8 +16,8 @@ import 'package:test/test.dart';
 import 'package:universal_io/prefer_universal/io.dart';
 
 void testRawServerSocket() {
-  group("RawServerSocket", () {
-    test("RawServerSocket.bind(null, 12345) should fail", () async {
+  group('RawServerSocket', () {
+    test('RawServerSocket.bind(null, 12345) should fail', () async {
       await expectLater(
         () => RawServerSocket.bind(null, 12345),
         throwsArgumentError,
@@ -46,7 +46,7 @@ void testRawServerSocket() {
       expect(await server.toList(), []);
     });
 
-    test("RawServerSocket.bind(InternetAddress.loopbackIPv4, 0) should succeed",
+    test('RawServerSocket.bind(InternetAddress.loopbackIPv4, 0) should succeed',
         () async {
       final server = await RawServerSocket.bind(
         InternetAddress.loopbackIPv4,
@@ -62,7 +62,7 @@ void testRawServerSocket() {
       expect(await server.toList(), []);
     });
 
-    test("RawServerSocket.bind(InternetAddress.loopbackIPv6, 0) should succeed",
+    test('RawServerSocket.bind(InternetAddress.loopbackIPv6, 0) should succeed',
         () async {
       final server = await RawServerSocket.bind(
         InternetAddress.loopbackIPv6,
@@ -76,11 +76,11 @@ void testRawServerSocket() {
       // ignore: unawaited_futures
       server.close();
       expect(await server.toList(), []);
-    }, tags: ["ipv6"]);
+    }, tags: ['ipv6']);
   });
 
-  group("ServerSocket", () {
-    test("ServerSocket.bind(null, 12345) should fail", () async {
+  group('ServerSocket', () {
+    test('ServerSocket.bind(null, 12345) should fail', () async {
       await expectLater(
         () => ServerSocket.bind(null, 12345),
         throwsArgumentError,
@@ -106,7 +106,7 @@ void testRawServerSocket() {
       expect(await server.toList(), []);
     });
 
-    test("ServerSocket.bind(InternetAddress.loopbackIPv4, 0) should succeed",
+    test('ServerSocket.bind(InternetAddress.loopbackIPv4, 0) should succeed',
         () async {
       final server = await ServerSocket.bind(InternetAddress.loopbackIPv4, 0);
       addTearDown(() {
@@ -119,7 +119,7 @@ void testRawServerSocket() {
       expect(await server.toList(), []);
     });
 
-    test("ServerSocket.bind(InternetAddress.loopbackIPv6, 0) should succeed",
+    test('ServerSocket.bind(InternetAddress.loopbackIPv6, 0) should succeed',
         () async {
       final server = await ServerSocket.bind(InternetAddress.loopbackIPv6, 0);
       addTearDown(() {
@@ -130,6 +130,6 @@ void testRawServerSocket() {
       // ignore: unawaited_futures
       server.close();
       expect(await server.toList(), []);
-    }, tags: ["ipv6"]);
+    }, tags: ['ipv6']);
   });
 }

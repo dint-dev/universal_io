@@ -70,11 +70,12 @@ class ConnectionTask<S> {
   final void Function() _onCancel;
 
   ConnectionTask._(
-      {@required Future<S> socket, @required void Function() onCancel()})
+      {@required Future<S> socket,
+      @required void Function() Function() onCancel})
       : assert(socket != null),
         assert(onCancel != null),
-        this.socket = socket,
-        this._onCancel = onCancel;
+        socket = socket,
+        _onCancel = onCancel;
 
   /// Cancels the connection attempt.
   ///
@@ -178,8 +179,8 @@ abstract class RawDatagramSocket extends Stream<RawSocketEvent> {
   /// interface to use.
   ///
   /// By default this value is `null`
-  @Deprecated("This property is not implemented. Use getRawOption and "
-      "setRawOption instead.")
+  @Deprecated('This property is not implemented. Use getRawOption and '
+      'setRawOption instead.')
   NetworkInterface multicastInterface;
 
   /// Set or get, whether IPv4 broadcast is enabled.
@@ -456,19 +457,20 @@ class RawSocketEvent {
   static const RawSocketEvent readClosed = RawSocketEvent._(2);
   static const RawSocketEvent closed = RawSocketEvent._(3);
 
-  @Deprecated("Use read instead")
+  @Deprecated('Use read instead')
   static const RawSocketEvent READ = read;
-  @Deprecated("Use write instead")
+  @Deprecated('Use write instead')
   static const RawSocketEvent WRITE = write;
-  @Deprecated("Use readClosed instead")
+  @Deprecated('Use readClosed instead')
   static const RawSocketEvent READ_CLOSED = readClosed;
-  @Deprecated("Use closed instead")
+  @Deprecated('Use closed instead')
   static const RawSocketEvent CLOSED = closed;
 
   final int _value;
 
   const RawSocketEvent._(this._value);
 
+  @override
   String toString() {
     return const [
       'RawSocketEvent.read',
@@ -553,7 +555,7 @@ class RawSocketOption {
   /// Convenience constructor for creating an int based RawSocketOption.
   factory RawSocketOption.fromInt(int level, int option, int value) {
     value ??= 0;
-    final Uint8List list = Uint8List(4);
+    final list = Uint8List(4);
     final buffer = ByteData.view(list.buffer);
     buffer.setInt32(0, value);
     return RawSocketOption(level, option, list);
@@ -646,6 +648,7 @@ abstract class Socket implements Stream<Uint8List>, IOSink {
   /// Returns the [InternetAddress] used to connect this socket.
   InternetAddress get address;
 
+  @override
   Future get done;
 
   /// Returns the port used by this socket.
@@ -657,6 +660,7 @@ abstract class Socket implements Stream<Uint8List>, IOSink {
   /// Returns the remote port connected to by this socket.
   int get remotePort;
 
+  @override
   Future close();
 
   /// Destroy the socket in both directions. Calling [destroy] will make the
@@ -709,7 +713,7 @@ abstract class Socket implements Stream<Uint8List>, IOSink {
   /// connection attempts to [host] are cancelled.
   static Future<Socket> connect(host, int port,
       {sourceAddress, Duration timeout}) async {
-    final IOOverrides overrides = IOOverrides.current;
+    final overrides = IOOverrides.current;
     if (overrides == null) {
       return SocketImpl.connect(
         host,
@@ -731,7 +735,7 @@ abstract class Socket implements Stream<Uint8List>, IOSink {
   /// longer needed.
   static Future<ConnectionTask<Socket>> startConnect(host, int port,
       {sourceAddress}) async {
-    final IOOverrides overrides = IOOverrides.current;
+    final overrides = IOOverrides.current;
     if (overrides == null) {
       final socketFuture = connect(host, port, sourceAddress: sourceAddress);
       final task = ConnectionTask._(
@@ -759,11 +763,11 @@ class SocketDirection {
   static const SocketDirection send = SocketDirection._('send');
   static const SocketDirection both = SocketDirection._('both');
 
-  @Deprecated("Use receive instead")
+  @Deprecated('Use receive instead')
   static const SocketDirection RECEIVE = receive;
-  @Deprecated("Use send instead")
+  @Deprecated('Use send instead')
   static const SocketDirection SEND = send;
-  @Deprecated("Use both instead")
+  @Deprecated('Use both instead')
   static const SocketDirection BOTH = both;
 
   final String _value;
@@ -788,22 +792,23 @@ class SocketException implements IOException {
         address = null,
         port = null;
 
+  @override
   String toString() {
-    StringBuffer sb = StringBuffer();
-    sb.write("SocketException");
+    var sb = StringBuffer();
+    sb.write('SocketException');
     if (message.isNotEmpty) {
-      sb.write(": $message");
+      sb.write(': $message');
       if (osError != null) {
-        sb.write(" ($osError)");
+        sb.write(' ($osError)');
       }
     } else if (osError != null) {
-      sb.write(": $osError");
+      sb.write(': $osError');
     }
     if (address != null) {
-      sb.write(", address = ${address.host}");
+      sb.write(', address = ${address.host}');
     }
     if (port != null) {
-      sb.write(", port = $port");
+      sb.write(', port = $port');
     }
     return sb.toString();
   }

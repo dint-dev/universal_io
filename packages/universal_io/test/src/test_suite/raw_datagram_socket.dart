@@ -20,8 +20,8 @@ import 'package:test/test.dart';
 import 'package:universal_io/prefer_universal/io.dart';
 
 void testRawDatagramSocket() {
-  group("RawDatagramSocket", () {
-    test("RawDatagramSocket.bind(null, 12345) should fail", () async {
+  group('RawDatagramSocket', () {
+    test('RawDatagramSocket.bind(null, 12345) should fail', () async {
       await expectLater(
         () => RawDatagramSocket.bind(null, 12345),
         throwsA(const TypeMatcher<ArgumentError>()),
@@ -50,7 +50,7 @@ void testRawDatagramSocket() {
     });
 
     test(
-        "RawDatagramSocket.bind(InternetAddress.loopbackIPv4, 12345): should succeed",
+        'RawDatagramSocket.bind(InternetAddress.loopbackIPv4, 12345): should succeed',
         () async {
       final socket = await RawDatagramSocket.bind(
         InternetAddress.loopbackIPv4,
@@ -66,7 +66,7 @@ void testRawDatagramSocket() {
     });
 
     test(
-        "RawDatagramSocket.bind(InternetAddress.loopbackIPv4, 0) should succeed",
+        'RawDatagramSocket.bind(InternetAddress.loopbackIPv4, 0) should succeed',
         () async {
       final socket = await RawDatagramSocket.bind(
         InternetAddress.loopbackIPv4,
@@ -82,7 +82,7 @@ void testRawDatagramSocket() {
     });
 
     test(
-        "RawDatagramSocket.bind(InternetAddress.loopbackIPv6, 12345) should succeed",
+        'RawDatagramSocket.bind(InternetAddress.loopbackIPv6, 12345) should succeed',
         () async {
       final socket = await RawDatagramSocket.bind(
         InternetAddress.loopbackIPv6,
@@ -95,10 +95,10 @@ void testRawDatagramSocket() {
       expect(socket.port, 12345);
       socket.close();
       expect(await socket.toList(), [RawSocketEvent.closed]);
-    }, tags: ["ipv6"]);
+    }, tags: ['ipv6']);
 
     test(
-        "RawDatagramSocket.bind(InternetAddress.loopbackIPv6, 0) should succeed",
+        'RawDatagramSocket.bind(InternetAddress.loopbackIPv6, 0) should succeed',
         () async {
       final socket = await RawDatagramSocket.bind(
         InternetAddress.loopbackIPv6,
@@ -111,9 +111,9 @@ void testRawDatagramSocket() {
       expect(socket.port, greaterThan(0));
       socket.close();
       expect(await socket.toList(), [RawSocketEvent.closed]);
-    }, tags: ["ipv6"]);
+    }, tags: ['ipv6']);
 
-    test("Two sockets communicate with each other", () async {
+    test('Two sockets communicate with each other', () async {
       // ----------------
       // Bind two sockets
       // ----------------
@@ -146,14 +146,14 @@ void testRawDatagramSocket() {
         {
           expect(await events.next, RawSocketEvent.write);
           final datagram = thisSocket.receive();
-          expect(utf8.decode(datagram.data), "S1/M0");
+          expect(utf8.decode(datagram.data), 'S1/M0');
           expect(datagram.address, peerSocket.address);
           expect(datagram.port, peerSocket.port);
         }
 
         // Send a message
         {
-          final data = utf8.encode("S0/M0");
+          final data = utf8.encode('S0/M0');
           final result = thisSocket.send(
             data,
             peerSocket.address,
@@ -167,7 +167,7 @@ void testRawDatagramSocket() {
         {
           expect(await events.next, RawSocketEvent.read);
           final datagram = thisSocket.receive();
-          expect(utf8.decode(datagram.data), "S1/M1");
+          expect(utf8.decode(datagram.data), 'S1/M1');
           expect(datagram.address, peerSocket.address);
           expect(datagram.port, peerSocket.port);
         }
@@ -189,7 +189,7 @@ void testRawDatagramSocket() {
 
         // Send a message
         {
-          final data = utf8.encode("S1/M0");
+          final data = utf8.encode('S1/M0');
           final result = thisSocket.send(
             data,
             peerSocket.address,
@@ -205,14 +205,14 @@ void testRawDatagramSocket() {
         {
           expect(await events.next, RawSocketEvent.read);
           final datagram = thisSocket.receive();
-          expect(utf8.decode(datagram.data), "S0/M0");
+          expect(utf8.decode(datagram.data), 'S0/M0');
           expect(datagram.address, peerSocket.address);
           expect(datagram.port, peerSocket.port);
         }
 
         // Send a message
         {
-          final data = utf8.encode("S1/M1");
+          final data = utf8.encode('S1/M1');
           final result = thisSocket.send(
             data,
             peerSocket.address,

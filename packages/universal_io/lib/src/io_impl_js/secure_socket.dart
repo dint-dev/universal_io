@@ -60,15 +60,15 @@ import 'socket_impl.dart';
 /// a secure network connection, when looking up or verifying a
 /// certificate.
 class CertificateException extends TlsException {
-  const CertificateException([String message = "", OSError osError])
-      : super._("CertificateException", message, osError);
+  const CertificateException([String message = '', OSError osError])
+      : super._('CertificateException', message, osError);
 }
 
 /// An exception that happens in the handshake phase of establishing
 /// a secure network connection.
 class HandshakeException extends TlsException {
-  const HandshakeException([String message = "", OSError osError])
-      : super._("HandshakeException", message, osError);
+  const HandshakeException([String message = '', OSError osError])
+      : super._('HandshakeException', message, osError);
 }
 
 /// RawSecureSocket provides a secure (SSL or TLS) network connection.
@@ -127,7 +127,7 @@ abstract class RawSecureSocket implements RawSocket {
   /// can be obtained via [RawSecureSocket.selectedProtocol].
   static Future<RawSecureSocket> connect(host, int port,
       {SecurityContext context,
-      bool onBadCertificate(X509Certificate certificate),
+      bool Function(X509Certificate certificate) onBadCertificate,
       List<String> supportedProtocols,
       Duration timeout}) {
     final driver = IODriver.current.rawSecureSocketOverrides;
@@ -174,7 +174,7 @@ abstract class RawSecureSocket implements RawSocket {
       {StreamSubscription<RawSocketEvent> subscription,
       host,
       SecurityContext context,
-      bool onBadCertificate(X509Certificate certificate),
+      bool Function(X509Certificate certificate) onBadCertificate,
       List<String> supportedProtocols}) {
     socket.readEventsEnabled = false;
     socket.writeEventsEnabled = false;
@@ -242,7 +242,7 @@ abstract class RawSecureSocket implements RawSocket {
   /// longer needed.
   static Future<ConnectionTask<RawSecureSocket>> startConnect(host, int port,
       {SecurityContext context,
-      bool onBadCertificate(X509Certificate certificate),
+      bool Function(X509Certificate certificate) onBadCertificate,
       List<String> supportedProtocols}) {
     final driver = IODriver.current.rawSecureSocketOverrides;
     if (driver == null) {
@@ -320,7 +320,7 @@ abstract class SecureSocket extends Stream<Uint8List> implements Socket {
   /// connection attempts to [host] are cancelled.
   static Future<SecureSocket> connect(host, int port,
       {SecurityContext context,
-      bool onBadCertificate(X509Certificate certificate),
+      bool Function(X509Certificate certificate) onBadCertificate,
       List<String> supportedProtocols,
       Duration timeout}) {
     return RawSecureSocket.connect(host, port,
@@ -360,7 +360,7 @@ abstract class SecureSocket extends Stream<Uint8List> implements Socket {
   static Future<SecureSocket> secure(Socket socket,
       {host,
       SecurityContext context,
-      bool onBadCertificate(X509Certificate certificate)}) async {
+      bool Function(X509Certificate certificate) onBadCertificate}) async {
     final rawSocket = (socket as SocketImpl).rawSocket;
     final rawSecureSocket = await RawSecureSocket.secure(
       rawSocket,
@@ -411,7 +411,7 @@ abstract class SecureSocket extends Stream<Uint8List> implements Socket {
   /// longer needed.
   static Future<ConnectionTask<SecureSocket>> startConnect(host, int port,
       {SecurityContext context,
-      bool onBadCertificate(X509Certificate certificate),
+      bool Function(X509Certificate certificate) onBadCertificate,
       List<String> supportedProtocols}) {
     throw UnimplementedError();
   }
@@ -424,22 +424,23 @@ class TlsException implements IOException {
   final String message;
   final OSError osError;
 
-  @pragma("vm:entry-point")
-  const TlsException([String message = "", OSError osError])
-      : this._("TlsException", message, osError);
+  @pragma('vm:entry-point')
+  const TlsException([String message = '', OSError osError])
+      : this._('TlsException', message, osError);
 
   const TlsException._(this.type, this.message, this.osError);
 
+  @override
   String toString() {
-    StringBuffer sb = StringBuffer();
+    var sb = StringBuffer();
     sb.write(type);
     if (message.isNotEmpty) {
-      sb.write(": $message");
+      sb.write(': $message');
       if (osError != null) {
-        sb.write(" ($osError)");
+        sb.write(' ($osError)');
       }
     } else if (osError != null) {
-      sb.write(": $osError");
+      sb.write(': $osError');
     }
     return sb.toString();
   }

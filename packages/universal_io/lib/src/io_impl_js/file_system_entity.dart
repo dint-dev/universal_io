@@ -57,25 +57,26 @@ import 'file.dart';
 
 class FileSystemEntityType {
   static const file = FileSystemEntityType._internal(0);
-  @Deprecated("Use file instead")
+  @Deprecated('Use file instead')
   static const FILE = file;
 
   static const directory = FileSystemEntityType._internal(1);
-  @Deprecated("Use directory instead")
+  @Deprecated('Use directory instead')
   static const DIRECTORY = directory;
 
   static const link = FileSystemEntityType._internal(2);
-  @Deprecated("Use link instead")
+  @Deprecated('Use link instead')
   static const LINK = link;
 
   static const notFound = FileSystemEntityType._internal(3);
-  @Deprecated("Use notFound instead")
+  @Deprecated('Use notFound instead')
   static const NOT_FOUND = notFound;
 
   final int _type;
 
   const FileSystemEntityType._internal(this._type);
 
+  @override
   String toString() => const ['file', 'directory', 'link', 'notFound'][_type];
 }
 
@@ -126,7 +127,7 @@ class FileStat {
   /// If the call fails, returns a [FileStat] object with [FileStat.type] set to
   /// [FileSystemEntityType.notFound] and the other fields invalid.
   static FileStat statSync(String path) {
-    final IOOverrides overrides = IOOverrides.current;
+    final overrides = IOOverrides.current;
     if (overrides == null) {
       throw UnimplementedError();
     }
@@ -138,20 +139,21 @@ class FileStat {
   ///
   /// Returns a [Future] which completes with the same results as [statSync].
   static Future<FileStat> stat(String path) {
-    final IOOverrides overrides = IOOverrides.current;
+    final overrides = IOOverrides.current;
     if (overrides == null) {
       throw UnimplementedError();
     }
     return overrides.stat(path);
   }
 
-  String toString() => """
+  @override
+  String toString() => '''
 FileStat: type $type
           changed $changed
           modified $modified
           accessed $accessed
           mode ${modeString()}
-          size $size""";
+          size $size''';
 
   /// Returns the mode value as a human-readable string.
   ///
@@ -164,9 +166,9 @@ FileStat: type $type
     var permissions = mode & 0xFFF;
     var codes = const ['---', '--x', '-w-', '-wx', 'r--', 'r-x', 'rw-', 'rwx'];
     var result = [];
-    if ((permissions & 0x800) != 0) result.add("(suid) ");
-    if ((permissions & 0x400) != 0) result.add("(guid) ");
-    if ((permissions & 0x200) != 0) result.add("(sticky) ");
+    if ((permissions & 0x800) != 0) result.add('(suid) ');
+    if ((permissions & 0x400) != 0) result.add('(guid) ');
+    if ((permissions & 0x200) != 0) result.add('(sticky) ');
     result
       ..add(codes[(permissions >> 6) & 0x7])
       ..add(codes[(permissions >> 3) & 0x7])
@@ -419,7 +421,7 @@ abstract class FileSystemEntity {
   /// A move event may be reported as seperate delete and create events.
   Stream<FileSystemEvent> watch(
       {int events = FileSystemEvent.all, bool recursive = false}) {
-    final IOOverrides overrides = IOOverrides.current;
+    final overrides = IOOverrides.current;
     if (overrides == null) {
       throw UnimplementedError();
     }
@@ -439,7 +441,7 @@ abstract class FileSystemEntity {
   /// Completes the returned Future with an error if one of the paths points
   /// to an object that does not exist.
   static Future<bool> identical(String path1, String path2) {
-    IOOverrides overrides = IOOverrides.current;
+    var overrides = IOOverrides.current;
     if (overrides == null) {
       throw UnimplementedError();
     }
@@ -482,7 +484,7 @@ abstract class FileSystemEntity {
   /// Throws an error if one of the paths points to an object that does not
   /// exist.
   static bool identicalSync(String path1, String path2) {
-    IOOverrides overrides = IOOverrides.current;
+    var overrides = IOOverrides.current;
     if (overrides == null) {
       throw UnimplementedError();
     }
@@ -493,7 +495,7 @@ abstract class FileSystemEntity {
   ///
   /// OS X 10.6 and below is not supported.
   static bool get isWatchSupported {
-    final IOOverrides overrides = IOOverrides.current;
+    final overrides = IOOverrides.current;
     if (overrides == null) {
       throw UnimplementedError();
     }
@@ -506,7 +508,7 @@ abstract class FileSystemEntity {
   /// results as [typeSync].
   static Future<FileSystemEntityType> type(String path,
       {bool followLinks = true}) {
-    final IOOverrides overrides = IOOverrides.current;
+    final overrides = IOOverrides.current;
     if (overrides == null) {
       throw UnimplementedError();
     }
@@ -523,7 +525,7 @@ abstract class FileSystemEntity {
   /// Returns [FileSystemEntityType.notFound] if [path] does not point to a file
   /// system object or if any other error occurs in looking up the path.
   static FileSystemEntityType typeSync(String path, {bool followLinks = true}) {
-    final IOOverrides overrides = IOOverrides.current;
+    final overrides = IOOverrides.current;
     if (overrides == null) {
       throw UnimplementedError();
     }
@@ -568,7 +570,7 @@ abstract class FileSystemEntity {
   /// "\\\\server_name\\". Ignores trailing path separators, and leaves no
   /// trailing path separators.
   static String parentOf(String path) {
-    int rootEnd = -1;
+    var rootEnd = -1;
     if (Platform.isWindows) {
       if (path.startsWith(_absoluteWindowsPathPattern)) {
         // Root ends at first / or \ after the first two characters.
@@ -582,7 +584,7 @@ abstract class FileSystemEntity {
     }
     // Ignore trailing slashes.
     // All non-trivial cases have separators between two non-separators.
-    int pos = path.lastIndexOf(_parentRegExp);
+    var pos = path.lastIndexOf(_parentRegExp);
     if (pos > rootEnd) {
       return path.substring(0, pos + 1);
     } else if (rootEnd > -1) {
@@ -600,28 +602,28 @@ abstract class FileSystemEntity {
 class FileSystemEvent {
   /// Bitfield for [FileSystemEntity.watch], to enable [FileSystemCreateEvent]s.
   static const int create = 1 << 0;
-  @Deprecated("Use create instead")
+  @Deprecated('Use create instead')
   static const int CREATE = 1 << 0;
 
   /// Bitfield for [FileSystemEntity.watch], to enable [FileSystemModifyEvent]s.
   static const int modify = 1 << 1;
-  @Deprecated("Use modify instead")
+  @Deprecated('Use modify instead')
   static const int MODIFY = 1 << 1;
 
   /// Bitfield for [FileSystemEntity.watch], to enable [FileSystemDeleteEvent]s.
   static const int delete = 1 << 2;
-  @Deprecated("Use delete instead")
+  @Deprecated('Use delete instead')
   static const int DELETE = 1 << 2;
 
   /// Bitfield for [FileSystemEntity.watch], to enable [FileSystemMoveEvent]s.
   static const int move = 1 << 3;
-  @Deprecated("Use move instead")
+  @Deprecated('Use move instead')
   static const int MOVE = 1 << 3;
 
   /// Bitfield for [FileSystemEntity.watch], for enabling all of [create],
   /// [modify], [delete] and [move].
   static const int all = create | modify | delete | move;
-  @Deprecated("Use all instead")
+  @Deprecated('Use all instead')
   static const int ALL = create | modify | delete | move;
 
   /// The type of event. See [FileSystemEvent] for a list of events.
@@ -648,6 +650,7 @@ class FileSystemCreateEvent extends FileSystemEvent {
   FileSystemCreateEvent._(path, isDirectory)
       : super._(FileSystemEvent.create, path, isDirectory);
 
+  @override
   String toString() => "FileSystemCreateEvent('$path')";
 }
 
@@ -660,6 +663,7 @@ class FileSystemModifyEvent extends FileSystemEvent {
   FileSystemModifyEvent._(path, isDirectory, this.contentChanged)
       : super._(FileSystemEvent.modify, path, isDirectory);
 
+  @override
   String toString() =>
       "FileSystemModifyEvent('$path', contentChanged=$contentChanged)";
 }
@@ -669,6 +673,7 @@ class FileSystemDeleteEvent extends FileSystemEvent {
   FileSystemDeleteEvent._(path, isDirectory)
       : super._(FileSystemEvent.delete, path, isDirectory);
 
+  @override
   String toString() => "FileSystemDeleteEvent('$path')";
 }
 
@@ -681,6 +686,7 @@ class FileSystemMoveEvent extends FileSystemEvent {
   FileSystemMoveEvent._(path, isDirectory, this.destination)
       : super._(FileSystemEvent.move, path, isDirectory);
 
+  @override
   String toString() {
     var buffer = StringBuffer();
     buffer.write("FileSystemMoveEvent('$path'");

@@ -71,8 +71,8 @@ class ServerSocketImpl extends ServerSocket {
   }
 
   @override
-  StreamSubscription<Socket> listen(void onData(Socket event),
-      {Function onError, void onDone(), bool cancelOnError}) {
+  StreamSubscription<Socket> listen(void Function(Socket event) onData,
+      {Function onError, void Function() onDone, bool cancelOnError}) {
     return _rawServerSocket.map((rawSocket) {
       return SocketImpl(rawSocket);
     }).listen(
@@ -166,8 +166,8 @@ class SocketImpl<T extends RawSocket> extends Stream<Uint8List>
       rawSocket.getRawOption(option);
 
   @override
-  StreamSubscription<Uint8List> listen(void onData(Uint8List data),
-      {Function onError, void onDone(), bool cancelOnError}) {
+  StreamSubscription<Uint8List> listen(void Function(Uint8List data) onData,
+      {Function onError, void Function() onDone, bool cancelOnError}) {
     return _streamController.stream.listen(
       onData,
       onError: onError,
@@ -216,15 +216,17 @@ class SocketImpl<T extends RawSocket> extends Stream<Uint8List>
 }
 
 class _ConnectionTask<S> implements ConnectionTask<S> {
+  @override
   final Future<S> socket;
   final void Function() _onCancel;
 
   _ConnectionTask._(
-      {@required Future<S> socket, @required void Function() onCancel()})
+      {@required Future<S> socket,
+      @required void Function() Function() onCancel})
       : assert(socket != null),
         assert(onCancel != null),
-        this.socket = socket,
-        this._onCancel = onCancel;
+        socket = socket,
+        _onCancel = onCancel;
 
   @override
   void cancel() {

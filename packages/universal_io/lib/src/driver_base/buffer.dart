@@ -35,7 +35,7 @@ class Uint8ListBuffer implements Sink<List<int>>, StreamConsumer<List<int>> {
   @override
   void add(List<int> input, {bool copyNotNeeded = false}) {
     if (_isClosed) {
-      throw StateError("close() has been invoked");
+      throw StateError('close() has been invoked');
     }
     final inputLength = input.length;
     if (inputLength == 0) {
@@ -43,21 +43,21 @@ class Uint8ListBuffer implements Sink<List<int>>, StreamConsumer<List<int>> {
     }
 
     // Is this the first write?
-    var buffer = this._buffer;
+    var buffer = _buffer;
     if (buffer == null) {
       if (copyNotNeeded && input is Uint8List) {
-        this._buffer = input;
+        _buffer = input;
       } else {
-        this._buffer = Uint8List.fromList(input);
+        _buffer = Uint8List.fromList(input);
       }
-      this._start = 0;
-      this._length = input.length;
+      _start = 0;
+      _length = input.length;
       return;
     }
 
     // Do we need to expand the buffer?
-    var start = this._start;
-    final oldLength = this._length;
+    var start = _start;
+    final oldLength = _length;
     final newLength = oldLength + inputLength;
     if (buffer.lengthInBytes < start + newLength) {
       // Choose a big enough capacity
@@ -76,10 +76,10 @@ class Uint8ListBuffer implements Sink<List<int>>, StreamConsumer<List<int>> {
       // Update variables/fields
       buffer = newBuffer;
       start = 0;
-      this._buffer = buffer;
-      this._start = start;
+      _buffer = buffer;
+      _start = start;
     }
-    this._length = newLength;
+    _length = newLength;
 
     final oldEnd = start + oldLength;
     for (var i = 0; i < inputLength; i++) {
@@ -103,12 +103,12 @@ class Uint8ListBuffer implements Sink<List<int>>, StreamConsumer<List<int>> {
   /// Returns the first position of the byte, starting at [start] (inclusive).
   /// Returns -1 if the byte is not found.
   int indexOfByte(int input, [start = 0]) {
-    final buffer = this._buffer;
-    final start = this._start;
+    final buffer = _buffer;
+    final start = _start;
     final end = start + _length;
     if (start >= end) {
       throw ArgumentError.value(
-          start, "start", "Buffer has only $_length bytes");
+          start, 'start', 'Buffer has only $_length bytes');
     }
     for (var i = start; i < end; i++) {
       if (buffer[i] == input) {
@@ -121,13 +121,13 @@ class Uint8ListBuffer implements Sink<List<int>>, StreamConsumer<List<int>> {
   /// Returns the last position of the byte, starting at [start] (inclusive, null
   /// means length-1). Returns -1 if the byte is not found.
   int lastIndexOfByte(int input, [int start]) {
-    final buffer = this._buffer;
-    final bufferStart = this._start;
+    final buffer = _buffer;
+    final bufferStart = _start;
     if (start == null) {
       start = _length - 1;
     } else if (start >= _length) {
       throw ArgumentError.value(
-          start, "start", "Buffer has only $_length bytes");
+          start, 'start', 'Buffer has only $_length bytes');
     }
     for (var i = bufferStart + start; i >= bufferStart; i--) {
       if (buffer[i] == input) {
@@ -141,8 +141,8 @@ class Uint8ListBuffer implements Sink<List<int>>, StreamConsumer<List<int>> {
     if (start + input.length > _length) {
       return false;
     }
-    final buffer = this._buffer;
-    final bufferStart = this._start + 1;
+    final buffer = _buffer;
+    final bufferStart = _start + 1;
     for (var i = 0; i < input.length; i++) {
       if (buffer[bufferStart + i] != input[i]) {
         return false;
@@ -161,7 +161,7 @@ class Uint8ListBuffer implements Sink<List<int>>, StreamConsumer<List<int>> {
   ///
   /// If [preview] is true, the method will keep the bytes in the buffer.
   Uint8List read({int maxLength, preview = false}) {
-    final availableLength = this._length;
+    final availableLength = _length;
     if (availableLength == 0 || maxLength == 0) {
       return _empty;
     }
@@ -169,15 +169,15 @@ class Uint8ListBuffer implements Sink<List<int>>, StreamConsumer<List<int>> {
     if (maxLength != null && maxLength < length) {
       length = maxLength;
     }
-    final start = this._start;
+    final start = _start;
     if (!preview) {
-      this._start = start + length;
-      this._length = availableLength - length;
+      _start = start + length;
+      _length = availableLength - length;
     }
-    final data = this._buffer;
+    final data = _buffer;
     if (length == data.length) {
       if (!preview) {
-        this._buffer = null;
+        _buffer = null;
       }
       return data;
     }
@@ -193,12 +193,12 @@ class Uint8ListBuffer implements Sink<List<int>>, StreamConsumer<List<int>> {
   ///
   /// The method will throw [FormatException] if the content is not valid UTF-8.
   String readUtf8({bool preview = false}) {
-    final start = this._start;
-    final length = this._length;
+    final start = _start;
+    final length = _length;
     final result = const Utf8Decoder().convert(_buffer, start, start + length);
     if (!preview) {
-      this._start = start + length;
-      this._length = 0;
+      _start = start + length;
+      _length = 0;
     }
     return result;
   }
@@ -208,34 +208,34 @@ class Uint8ListBuffer implements Sink<List<int>>, StreamConsumer<List<int>> {
   ///
   /// The method will throw [FormatException] if the content is not valid UTF-8.
   String readUtf8Incomplete({int maxLengthInBytes, bool preview = false}) {
-    var availableLength = this._length;
+    var availableLength = _length;
     if (availableLength == 0) {
-      return "";
+      return '';
     }
     if (maxLengthInBytes != null && maxLengthInBytes < availableLength) {
       availableLength = maxLengthInBytes;
     }
-    final start = this._start;
+    final start = _start;
     final incompleteRuneLength = _lengthOfIncompleteUtf8Rune(
       _buffer,
       start,
       start + availableLength,
     );
     if (incompleteRuneLength == availableLength) {
-      return "";
+      return '';
     }
     final end = start + availableLength - incompleteRuneLength;
     final result = const Utf8Decoder().convert(_buffer, start, end);
     if (!preview) {
-      this.discard(end - start);
+      discard(end - start);
     }
     return result;
   }
 
   /// Discards N first bytes.
   void discard(int n) {
-    this._start += n;
-    this._length -= n;
+    _start += n;
+    _length -= n;
   }
 
   /// Returns length for UTF-8 decoder. If bytes end with the an incomplete

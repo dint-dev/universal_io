@@ -67,19 +67,19 @@ InternetAddress internetAddressFromBytes(List<int> bytes,
 class InternetAddress {
   /// IP version 4 loopback address. Use this address when listening on
   /// or connecting to the loopback adapter using IP version 4 (IPv4).
-  static final InternetAddress loopbackIPv4 = InternetAddress("127.0.0.1");
+  static final InternetAddress loopbackIPv4 = InternetAddress('127.0.0.1');
 
   /// IP version 6 loopback address. Use this address when listening on
   /// or connecting to the loopback adapter using IP version 6 (IPv6).
-  static final InternetAddress loopbackIPv6 = InternetAddress("::1");
+  static final InternetAddress loopbackIPv6 = InternetAddress('::1');
 
   /// IP version 4 any address. Use this address when listening on
   /// all adapters IP addresses using IP version 4 (IPv4).
-  static final InternetAddress anyIPv4 = InternetAddress("0.0.0.0");
+  static final InternetAddress anyIPv4 = InternetAddress('0.0.0.0');
 
   /// IP version 6 any address. Use this address when listening on
   /// all adapters IP addresses using IP version 6 (IPv6).
-  static final InternetAddress anyIPv6 = InternetAddress("::");
+  static final InternetAddress anyIPv6 = InternetAddress('::');
 
   final String _host;
 
@@ -98,8 +98,8 @@ class InternetAddress {
 
   /// Private constructor.
   InternetAddress._(this.rawAddress, {String address, String host})
-      : this._address = address,
-        this._host = host;
+      : _address = address,
+        _host = host;
 
   /// Address as given in the constructor. Can be null.
   String _address;
@@ -167,7 +167,7 @@ class InternetAddress {
   @override
   int get hashCode {
     var h = 0;
-    final bytes = this.rawAddress;
+    final bytes = rawAddress;
     for (var i = 0; i < bytes.length; i++) {
       h ^= bytes[i] << 8 * (i % 3);
     }
@@ -208,15 +208,16 @@ class InternetAddressType {
   String get name {
     switch (_value) {
       case -1:
-        return "ANY";
+        return 'ANY';
       case 0:
-        return "IPv4";
+        return 'IPv4';
       case 1:
-        return "IPv6";
+        return 'IPv6';
       default:
-        throw ArgumentError("Invalid InternetAddress");
+        throw ArgumentError('Invalid InternetAddress');
     }
   }
 
-  String toString() => "InternetAddressType: $name";
+  @override
+  String toString() => 'InternetAddressType: $name';
 }

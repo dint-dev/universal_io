@@ -19,22 +19,22 @@ class _BrowserHttpClient extends BaseHttpClient with BrowserHttpClient {
   @override
   Future<HttpClientRequest> didOpenUrl(String method, Uri url) {
     if (url.host == null) {
-      throw ArgumentError.value(url, "url", "Host can't be null");
+      throw ArgumentError.value(url, 'url', "Host can't be null");
     }
     var scheme = url.scheme;
     var needsNewUrl = false;
     if (scheme == null) {
-      scheme = "https";
+      scheme = 'https';
       needsNewUrl = true;
     } else {
       switch (scheme) {
-        case "":
-          scheme = "https";
+        case '':
+          scheme = 'https';
           needsNewUrl = true;
           break;
-        case "http":
+        case 'http':
           break;
-        case "https":
+        case 'https':
           break;
         default:
           throw ArgumentError.value("Unsupported scheme '$scheme'");

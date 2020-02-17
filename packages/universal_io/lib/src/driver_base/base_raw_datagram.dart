@@ -43,10 +43,10 @@ abstract class BaseRawDatagramSocket extends Stream<RawSocketEvent>
   NetworkInterface multicastInterface;
 
   BaseRawDatagramSocket() {
-    this.readEventsEnabled = true;
-    this.writeEventsEnabled = true;
-    this.broadcastEnabled = false;
-    this.multicastHops = 1;
+    readEventsEnabled = true;
+    writeEventsEnabled = true;
+    broadcastEnabled = false;
+    multicastHops = 1;
   }
 
   @mustCallSuper
@@ -98,7 +98,7 @@ abstract class BaseRawDatagramSocket extends Stream<RawSocketEvent>
   @override
   Uint8List getRawOption(RawSocketOption option) {
     throw OSError(
-      "getRawSocketOption(...) is unsupported by $this",
+      'getRawSocketOption(...) is unsupported by $this',
     );
   }
 
@@ -113,8 +113,11 @@ abstract class BaseRawDatagramSocket extends Stream<RawSocketEvent>
   }
 
   @override
-  StreamSubscription<RawSocketEvent> listen(void onData(RawSocketEvent event),
-      {Function onError, void onDone(), bool cancelOnError}) {
+  StreamSubscription<RawSocketEvent> listen(
+      void Function(RawSocketEvent event) onData,
+      {Function onError,
+      void Function() onDone,
+      bool cancelOnError}) {
     return _streamController.stream.listen(
       onData,
       onError: onError,
@@ -138,7 +141,7 @@ abstract class BaseRawDatagramSocket extends Stream<RawSocketEvent>
   @override
   void setRawOption(RawSocketOption option) {
     throw OSError(
-      "setRawSocketOption(...) is unsupported by $this",
+      'setRawSocketOption(...) is unsupported by $this',
     );
   }
 }

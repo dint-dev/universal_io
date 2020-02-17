@@ -24,7 +24,7 @@ import 'package:universal_io/prefer_universal/io.dart' as prefer_universal;
 import 'example_http_server.dart';
 
 void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
-  group("HttpClient:", () {
+  group('HttpClient:', () {
     group('in "package:universal_io/prefer_sdk/io.dart":', () {
       final httpClient = prefer_sdk.HttpClient();
       if (isBrowser) {
@@ -109,10 +109,10 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
       }
     });
 
-    test("Non-existing server leads to SocketException", () async {
+    test('Non-existing server leads to SocketException', () async {
       final httpClient = HttpClient();
       final httpRequestFuture =
-          httpClient.getUrl(Uri.parse("http://localhost:23456"));
+          httpClient.getUrl(Uri.parse('http://localhost:23456'));
       if (!isBrowser) {
         await expectLater(
             () => httpRequestFuture, throwsA(TypeMatcher<SocketException>()));
@@ -124,16 +124,16 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
           () => httpResponseFuture, throwsA(TypeMatcher<SocketException>()));
     });
 
-    test("GET", () async {
+    test('GET', () async {
       await _testClient(
-        method: "GET",
-        path: "/greeting",
-        expectedBody: "Hello world! (GET)",
+        method: 'GET',
+        path: '/greeting',
+        expectedBody: 'Hello world! (GET)',
         hybrid: hybrid,
       );
     });
 
-    test("GET (multiple chunks)", () async {
+    test('GET (multiple chunks)', () async {
       // Wait for the server to be listening
       final server = await ExampleHttpServer.bind(hybrid: hybrid);
       addTearDown(() {
@@ -160,31 +160,31 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
       expect(utf8.decode(bytes), 'First part.\nSecond part.\n');
     });
 
-    test("POST", () async {
+    test('POST', () async {
       await _testClient(
-        method: "POST",
-        path: "/greeting",
-        requestBody: "Hello from client",
-        expectedBody: "Hello world! (POST)",
+        method: 'POST',
+        path: '/greeting',
+        requestBody: 'Hello from client',
+        expectedBody: 'Hello world! (POST)',
         hybrid: hybrid,
       );
     });
 
-    test("Status 404", () async {
+    test('Status 404', () async {
       await _testClient(
-        method: "GET",
-        path: "/404",
+        method: 'GET',
+        path: '/404',
         expectedStatus: 404,
         hybrid: hybrid,
       );
     });
 
-    test("Receives cookies (except in browser)", () async {
+    test('Receives cookies (except in browser)', () async {
       final response = await _testClient(
-        method: "GET",
-        path: "/set_cookie",
+        method: 'GET',
+        path: '/set_cookie',
         headers: {
-          "Cookie": Cookie("x", "v").toString(),
+          'Cookie': Cookie('x', 'v').toString(),
         },
         hybrid: hybrid,
       );
@@ -194,21 +194,21 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
         expect(response.cookies, []);
       } else {
         expect(response.cookies, hasLength(1));
-        expect(response.cookies.single.name, "x");
-        expect(response.cookies.single.value, "y");
+        expect(response.cookies.single.name, 'x');
+        expect(response.cookies.single.value, 'y');
       }
     });
 
-    test("Sends cookies (except in browser)", () async {
+    test('Sends cookies (except in browser)', () async {
       var expectedStatus = HttpStatus.ok;
       if (isBrowser) {
         expectedStatus = HttpStatus.unauthorized;
       }
       await _testClient(
-        method: "GET",
-        path: "/expect_cookie",
+        method: 'GET',
+        path: '/expect_cookie',
         headers: {
-          "Cookie": Cookie("expectedCookie", "value").toString(),
+          'Cookie': Cookie('expectedCookie', 'value').toString(),
         },
         expectedStatus: expectedStatus,
         hybrid: hybrid,
@@ -217,10 +217,10 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
 
     test("Sends 'Authorization' header", () async {
       await _testClient(
-        method: "POST",
-        path: "/expect_authorization",
+        method: 'POST',
+        path: '/expect_authorization',
         headers: {
-          HttpHeaders.authorizationHeader: "expectedAuthorization",
+          HttpHeaders.authorizationHeader: 'expectedAuthorization',
         },
         expectedStatus: HttpStatus.ok,
         expectedBody: 'expectedAuthorization',
@@ -231,20 +231,20 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
     // ------
     // DELETE
     // ------
-    test("client.delete(...)", () async {
+    test('client.delete(...)', () async {
       await _testClientMethodWithoutUri(
-        method: "DELETE",
+        method: 'DELETE',
         openUrl: (client, host, port, path) => client.delete(host, port, path),
         hybrid: hybrid,
       );
     });
 
-    test("client.deleteUrl(...)", () async {
+    test('client.deleteUrl(...)', () async {
       await _testClient(
-        method: "DELETE",
-        path: "/greeting",
+        method: 'DELETE',
+        path: '/greeting',
         openUrl: (client, uri) => client.deleteUrl(uri),
-        expectedBody: "Hello world! (DELETE)",
+        expectedBody: 'Hello world! (DELETE)',
         hybrid: hybrid,
       );
     });
@@ -253,20 +253,20 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
     // GET
     // ---
 
-    test("client.get(...)", () async {
+    test('client.get(...)', () async {
       await _testClientMethodWithoutUri(
-        method: "GET",
+        method: 'GET',
         openUrl: (client, host, port, path) => client.get(host, port, path),
         hybrid: hybrid,
       );
     });
 
-    test("client.getUrl(...)", () async {
+    test('client.getUrl(...)', () async {
       await _testClient(
-        method: "GET",
-        path: "/greeting",
+        method: 'GET',
+        path: '/greeting',
         openUrl: (client, uri) => client.getUrl(uri),
-        expectedBody: "Hello world! (GET)",
+        expectedBody: 'Hello world! (GET)',
         hybrid: hybrid,
       );
     });
@@ -275,20 +275,20 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
     // HEAD
     // ----
 
-    test("client.head(...)", () async {
+    test('client.head(...)', () async {
       await _testClientMethodWithoutUri(
-        method: "HEAD",
+        method: 'HEAD',
         openUrl: (client, host, port, path) => client.head(host, port, path),
         hybrid: hybrid,
       );
     });
 
-    test("client.headUrl(...)", () async {
+    test('client.headUrl(...)', () async {
       await _testClient(
-        method: "HEAD",
-        path: "/greeting",
+        method: 'HEAD',
+        path: '/greeting',
         openUrl: (client, uri) => client.headUrl(uri),
-        expectedBody: "", // <-- HEAD response doesn't have body
+        expectedBody: '', // <-- HEAD response doesn't have body
         hybrid: hybrid,
       );
     });
@@ -297,20 +297,20 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
     // PATCH
     // -----
 
-    test("client.patch(...)", () async {
+    test('client.patch(...)', () async {
       await _testClientMethodWithoutUri(
-        method: "PATCH",
+        method: 'PATCH',
         openUrl: (client, host, port, path) => client.patch(host, port, path),
         hybrid: hybrid,
       );
     });
 
-    test("client.patchUrl(...)", () async {
+    test('client.patchUrl(...)', () async {
       await _testClient(
-        method: "PATCH",
-        path: "/greeting",
+        method: 'PATCH',
+        path: '/greeting',
         openUrl: (client, uri) => client.patchUrl(uri),
-        expectedBody: "Hello world! (PATCH)",
+        expectedBody: 'Hello world! (PATCH)',
         hybrid: hybrid,
       );
     });
@@ -319,20 +319,20 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
     // POST
     // ----
 
-    test("client.post(...)", () async {
+    test('client.post(...)', () async {
       await _testClientMethodWithoutUri(
-        method: "POST",
+        method: 'POST',
         openUrl: (client, host, port, path) => client.post(host, port, path),
         hybrid: hybrid,
       );
     });
 
-    test("client.postUrl(...)", () async {
+    test('client.postUrl(...)', () async {
       await _testClient(
-        method: "POST",
-        path: "/greeting",
+        method: 'POST',
+        path: '/greeting',
         openUrl: (client, uri) => client.postUrl(uri),
-        expectedBody: "Hello world! (POST)",
+        expectedBody: 'Hello world! (POST)',
         hybrid: hybrid,
       );
     });
@@ -341,32 +341,32 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
     // PUT
     // ---
 
-    test("client.put(...)", () async {
+    test('client.put(...)', () async {
       await _testClientMethodWithoutUri(
-        method: "PUT",
+        method: 'PUT',
         openUrl: (client, host, port, path) => client.put(host, port, path),
         hybrid: hybrid,
       );
     });
 
-    test("client.putUrl(...)", () async {
+    test('client.putUrl(...)', () async {
       await _testClient(
-        method: "PUT",
-        path: "/greeting",
+        method: 'PUT',
+        path: '/greeting',
         openUrl: (client, uri) => client.putUrl(uri),
-        expectedBody: "Hello world! (PUT)",
+        expectedBody: 'Hello world! (PUT)',
         hybrid: hybrid,
       );
     });
 
-    test("TLS connection to a self-signed server fails", () async {
+    test('TLS connection to a self-signed server fails', () async {
       final server = await ExampleHttpServer.bind(hybrid: hybrid);
       addTearDown(() {
         server.close();
       });
       final client = HttpClient();
       final port = server.port;
-      final uri = Uri.parse("https://localhost:$port/greeting");
+      final uri = Uri.parse('https://localhost:$port/greeting');
       if (isBrowser) {
         // In browser, request is sent only after it's closed.
         final request = await client.getUrl(uri);
@@ -379,7 +379,7 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
 
     if (!isBrowser) {
       test(
-          "TLS connection to a self-signed server succeeds with"
+          'TLS connection to a self-signed server succeeds with'
           " the help of 'badCertificateCallback'", () async {
         final server =
             await ExampleHttpServer.bind(secure: true, hybrid: hybrid);
@@ -391,7 +391,7 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
           return true;
         };
         final port = server.port;
-        final uri = Uri.parse("https://localhost:$port/greeting");
+        final uri = Uri.parse('https://localhost:$port/greeting');
         final request = await client.getUrl(uri);
         final response = await request.close();
         expect(response.statusCode, 200);
@@ -420,7 +420,7 @@ Future<HttpClientResponse> _testClient({
   String expectedBody,
 
   /// Function for opening HTTP request
-  Future<HttpClientRequest> openUrl(HttpClient client, Uri uri),
+  Future<HttpClientRequest> Function(HttpClient client, Uri uri) openUrl,
 
   /// Use hybrid server?
   @required bool hybrid,
@@ -429,10 +429,10 @@ Future<HttpClientResponse> _testClient({
   bool xmlHttpRequestError = false,
 }) async {
   if (method == null) {
-    throw ArgumentError.notNull("method");
+    throw ArgumentError.notNull('method');
   }
   if (path == null) {
-    throw ArgumentError.notNull("path");
+    throw ArgumentError.notNull('path');
   }
 
   // Wait for the server to be listening
@@ -444,9 +444,9 @@ Future<HttpClientResponse> _testClient({
   // Send HTTP request
   final client = HttpClient();
   HttpClientRequest request;
-  final host = "localhost";
+  final host = 'localhost';
   final port = server.port;
-  final uri = Uri.parse("http://$host:$port$path");
+  final uri = Uri.parse('http://$host:$port$path');
   if (openUrl != null) {
     // Use a custom method
     // (we test their correctness)
@@ -489,7 +489,7 @@ Future<HttpClientResponse> _testClient({
   expect(response.statusCode, expectedStatus);
 
   // Check response headers
-  expect(response.headers.value("X-Response-Header"), "value");
+  expect(response.headers.value('X-Response-Header'), 'value');
 
   // Check response body
   if (expectedBody != null) {
@@ -503,8 +503,8 @@ Future<HttpClientResponse> _testClient({
       isTrue);
   final requestInfo = await server.requestsQueue.next;
   expect(requestInfo.method, method);
-  expect(requestInfo.uri, "$path");
-  expect(requestInfo.body, requestBody ?? "");
+  expect(requestInfo.uri, '$path');
+  expect(requestInfo.body, requestBody ?? '');
 
   return response;
 }
@@ -525,7 +525,7 @@ Future _testClientMethodWithoutUri({
   @required bool hybrid,
 }) async {
   if (method == null) {
-    throw ArgumentError.notNull("method");
+    throw ArgumentError.notNull('method');
   }
 
   // Wait for the server to be listening
@@ -538,14 +538,14 @@ Future _testClientMethodWithoutUri({
   final client = HttpClient();
 
   // Create a HTTP request
-  final host = "localhost";
+  final host = 'localhost';
   final port = server.port;
-  final path = "/greeting";
+  final path = '/greeting';
   final request = await openUrl(client, host, port, path);
 
   // Test that the request seems correct
-  expect(request.uri.scheme, "http");
-  expect(request.uri.host, "localhost");
+  expect(request.uri.scheme, 'http');
+  expect(request.uri.host, 'localhost');
   expect(request.uri.port, port);
   expect(request.uri.path, path);
 

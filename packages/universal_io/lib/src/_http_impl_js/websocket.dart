@@ -58,13 +58,13 @@ class CompressionOptions {
   /// * `clientMaxWindowBits`: 15
   /// * `serverMaxWindowBits`: 15
   static const CompressionOptions compressionDefault = CompressionOptions();
-  @Deprecated("Use compressionDefault instead")
+  @Deprecated('Use compressionDefault instead')
   static const CompressionOptions DEFAULT = compressionDefault;
 
   /// Disables WebSocket Compression.
   static const CompressionOptions compressionOff =
       CompressionOptions(enabled: false);
-  @Deprecated("Use compressionOff instead")
+  @Deprecated('Use compressionOff instead')
   static const CompressionOptions OFF = compressionOff;
 
   /// Controls whether the client will reuse its compression instances.
@@ -91,20 +91,20 @@ class CompressionOptions {
 
   /// Returns default values for client compression request headers.
   String _createClientRequestHeader(HeaderValue requested, int size) {
-    var info = "";
+    var info = '';
 
     // If responding to a valid request, specify size
     if (requested != null) {
-      info = "; client_max_window_bits=$size";
+      info = '; client_max_window_bits=$size';
     } else {
       // Client request. Specify default
       if (clientMaxWindowBits == null) {
-        info = "; client_max_window_bits";
+        info = '; client_max_window_bits';
       } else {
-        info = "; client_max_window_bits=$clientMaxWindowBits";
+        info = '; client_max_window_bits=$clientMaxWindowBits';
       }
       if (serverMaxWindowBits != null) {
-        info += "; server_max_window_bits=$serverMaxWindowBits";
+        info += '; server_max_window_bits=$serverMaxWindowBits';
       }
     }
 
@@ -122,7 +122,7 @@ class CompressionOptions {
   /// [_CompressionMaxWindowBits] object with the response headers and
   /// negotiated `maxWindowBits` value.
   _CompressionMaxWindowBits _createHeader([HeaderValue requested]) {
-    var info = _CompressionMaxWindowBits("", 0);
+    var info = _CompressionMaxWindowBits('', 0);
     if (!enabled) {
       return info;
     }
@@ -133,14 +133,14 @@ class CompressionOptions {
         (requested == null ||
             (requested != null &&
                 requested.parameters.containsKey(_clientNoContextTakeover)))) {
-      info.headerValue += "; client_no_context_takeover";
+      info.headerValue += '; client_no_context_takeover';
     }
 
     if (serverNoContextTakeover &&
         (requested == null ||
             (requested != null &&
                 requested.parameters.containsKey(_serverNoContextTakeover)))) {
-      info.headerValue += "; server_no_context_takeover";
+      info.headerValue += '; server_no_context_takeover';
     }
 
     var headerList = _createServerResponseHeader(requested);
@@ -170,15 +170,15 @@ class CompressionOptions {
     }
     if (part != null) {
       if (part.length >= 2 && part.startsWith('0')) {
-        throw ArgumentError("Illegal 0 padding on value.");
+        throw ArgumentError('Illegal 0 padding on value.');
       } else {
         mwb = serverMaxWindowBits ??
             (int.tryParse(part) ?? _WebSocketImpl.DEFAULT_WINDOW_BITS);
-        info.headerValue = "; server_max_window_bits=${mwb}";
+        info.headerValue = '; server_max_window_bits=${mwb}';
         info.maxWindowBits = mwb;
       }
     } else {
-      info.headerValue = "";
+      info.headerValue = '';
       info.maxWindowBits = _WebSocketImpl.DEFAULT_WINDOW_BITS;
     }
     return info;
@@ -199,13 +199,13 @@ abstract class WebSocket
   static const int closing = 2;
   static const int closed = 3;
 
-  @Deprecated("Use connecting instead")
+  @Deprecated('Use connecting instead')
   static const int CONNECTING = connecting;
-  @Deprecated("Use open instead")
+  @Deprecated('Use open instead')
   static const int OPEN = open;
-  @Deprecated("Use closing instead")
+  @Deprecated('Use closing instead')
   static const int CLOSING = closing;
-  @Deprecated("Use closed instead")
+  @Deprecated('Use closed instead')
   static const int CLOSED = closed;
 
   /// Gets the user agent used for WebSocket connections.
@@ -256,8 +256,8 @@ abstract class WebSocket
       bool serverSide,
       CompressionOptions compression = CompressionOptions.compressionDefault}) {
     if (serverSide == null) {
-      throw ArgumentError("The serverSide argument must be passed "
-          "explicitly to WebSocket.fromUpgradedSocket.");
+      throw ArgumentError('The serverSide argument must be passed '
+          'explicitly to WebSocket.fromUpgradedSocket.');
     }
     return _WebSocketImpl._fromSocket(
         socket, protocol, compression, serverSide);
@@ -287,11 +287,13 @@ abstract class WebSocket
 
   /// Sends data on the WebSocket connection. The data in [data] must
   /// be either a `String`, or a `List<int>` holding bytes.
+  @override
   void add(/*String|List<int>*/ data);
 
   /// Sends data from a stream on WebSocket connection. Each data event from
   /// [stream] will be send as a single WebSocket frame. The data from [stream]
   /// must be either `String`s, or `List<int>`s holding bytes.
+  @override
   Future addStream(Stream stream);
 
   /// Sends a text message with the text represented by [bytes].
@@ -304,6 +306,7 @@ abstract class WebSocket
   /// arguments to send close information to the remote peer. If they are
   /// omitted, the peer will see [WebSocketStatus.noStatusReceived] code
   /// with no reason.
+  @override
   Future close([int code, String reason]);
 
   /// Create a new WebSocket connection. The URL supplied in [url]
@@ -342,9 +345,10 @@ abstract class WebSocket
 class WebSocketException implements IOException {
   final String message;
 
-  const WebSocketException([this.message = ""]);
+  const WebSocketException([this.message = '']);
 
-  String toString() => "WebSocketException: $message";
+  @override
+  String toString() => 'WebSocketException: $message';
 }
 
 /// WebSocket status codes used when closing a WebSocket connection.
@@ -363,31 +367,31 @@ abstract class WebSocketStatus {
   static const int internalServerError = 1011;
   static const int reserved1015 = 1015;
 
-  @Deprecated("Use normalClosure instead")
+  @Deprecated('Use normalClosure instead')
   static const int NORMAL_CLOSURE = normalClosure;
-  @Deprecated("Use goingAway instead")
+  @Deprecated('Use goingAway instead')
   static const int GOING_AWAY = goingAway;
-  @Deprecated("Use protocolError instead")
+  @Deprecated('Use protocolError instead')
   static const int PROTOCOL_ERROR = protocolError;
-  @Deprecated("Use unsupportedData instead")
+  @Deprecated('Use unsupportedData instead')
   static const int UNSUPPORTED_DATA = unsupportedData;
-  @Deprecated("Use reserved1004 instead")
+  @Deprecated('Use reserved1004 instead')
   static const int RESERVED_1004 = reserved1004;
-  @Deprecated("Use noStatusReceived instead")
+  @Deprecated('Use noStatusReceived instead')
   static const int NO_STATUS_RECEIVED = noStatusReceived;
-  @Deprecated("Use abnormalClosure instead")
+  @Deprecated('Use abnormalClosure instead')
   static const int ABNORMAL_CLOSURE = abnormalClosure;
-  @Deprecated("Use invalidFramePayloadData instead")
+  @Deprecated('Use invalidFramePayloadData instead')
   static const int INVALID_FRAME_PAYLOAD_DATA = invalidFramePayloadData;
-  @Deprecated("Use policyViolation instead")
+  @Deprecated('Use policyViolation instead')
   static const int POLICY_VIOLATION = policyViolation;
-  @Deprecated("Use messageTooBig instead")
+  @Deprecated('Use messageTooBig instead')
   static const int MESSAGE_TOO_BIG = messageTooBig;
-  @Deprecated("Use missingMandatoryExtension instead")
+  @Deprecated('Use missingMandatoryExtension instead')
   static const int MISSING_MANDATORY_EXTENSION = missingMandatoryExtension;
-  @Deprecated("Use internalServerError instead")
+  @Deprecated('Use internalServerError instead')
   static const int INTERNAL_SERVER_ERROR = internalServerError;
-  @Deprecated("Use reserved1015 instead")
+  @Deprecated('Use reserved1015 instead')
   static const int RESERVED_1015 = reserved1015;
 }
 
@@ -431,7 +435,8 @@ abstract class WebSocketTransformer
   /// to negotiate with the specified [CompressionOptions]. If none is specified
   /// then the [WebSocket] will be created with the default [CompressionOptions].
   factory WebSocketTransformer(
-      {/*String|Future<String>*/ protocolSelector(List<String> protocols),
+      {/*String|Future<String>*/ Function(List<String> protocols)
+          protocolSelector,
       CompressionOptions compression = CompressionOptions.compressionDefault}) {
     return _WebSocketTransformerImpl(protocolSelector, compression);
   }
@@ -457,7 +462,7 @@ abstract class WebSocketTransformer
   /// to negotiate with the specified [CompressionOptions]. If none is specified
   /// then the [WebSocket] will be created with the default [CompressionOptions].
   static Future<WebSocket> upgrade(HttpRequest request,
-      {protocolSelector(List<String> protocols),
+      {Function(List<String> protocols) protocolSelector,
       CompressionOptions compression = CompressionOptions.compressionDefault}) {
     return _WebSocketTransformerImpl._upgrade(
         request, protocolSelector, compression);

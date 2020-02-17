@@ -46,7 +46,7 @@
 
 part of universal_io.http;
 
-const String _DART_SESSION_ID = "DARTSESSID";
+const String _DART_SESSION_ID = 'DARTSESSID';
 
 // A _HttpSession is a node in a double-linked list, with _next and _prev being
 // the previous and next pointers.
@@ -61,79 +61,106 @@ class _HttpSession implements HttpSession {
   // Pointers in timeout queue.
   _HttpSession _prev;
   _HttpSession _next;
+  @override
   final String id;
 
   final Map _data = HashMap();
 
   _HttpSession(this._sessionManager, this.id) : _lastSeen = DateTime.now();
 
+  @override
   Iterable<MapEntry> get entries => _data.entries;
 
   // Mark the session as seen. This will reset the timeout and move the node to
   // the end of the timeout queue.
+  @override
   bool get isEmpty => _data.isEmpty;
 
+  @override
   bool get isNew => _isNew;
 
+  @override
   bool get isNotEmpty => _data.isNotEmpty;
 
+  @override
   Iterable get keys => _data.keys;
 
   // Map implementation:
   DateTime get lastSeen => _lastSeen;
+  @override
   int get length => _data.length;
-  set onTimeout(void callback()) {
+  @override
+  set onTimeout(void Function() callback) {
     _timeoutCallback = callback;
   }
 
+  @override
   Iterable get values => _data.values;
 
+  @override
   Object operator [](key) => _data[key];
 
+  @override
   void operator []=(key, value) {
     _data[key] = value;
   }
 
+  @override
   void addAll(Map other) => _data.addAll(other);
 
+  @override
   void addEntries(Iterable<MapEntry> entries) {
     _data.addEntries(entries);
   }
 
+  @override
   Map<K, V> cast<K, V>() => _data.cast<K, V>();
 
+  @override
   void clear() {
     _data.clear();
   }
 
+  @override
   bool containsKey(key) => _data.containsKey(key);
 
+  @override
   bool containsValue(value) => _data.containsValue(value);
 
+  @override
   void destroy() {
     _destroyed = true;
     _sessionManager._removeFromTimeoutQueue(this);
     _sessionManager._sessions.remove(id);
   }
 
-  void forEach(void f(key, value)) {
+  @override
+  void forEach(void Function(String key, String value) f) {
     _data.forEach(f);
   }
 
-  Map<K, V> map<K, V>(MapEntry<K, V> transform(key, value)) =>
+  @override
+  Map<K, V> map<K, V>(
+          MapEntry<K, V> Function(String key, String value) transform) =>
       _data.map(transform);
 
+  @override
   Object putIfAbsent(key, ifAbsent) => _data.putIfAbsent(key, ifAbsent);
 
+  @override
   Object remove(key) => _data.remove(key);
-  void removeWhere(bool test(key, value)) {
+  @override
+  void removeWhere(bool Function(String key, String value) test) {
     _data.removeWhere(test);
   }
 
+  @override
   String toString() => 'HttpSession id:$id $_data';
-  void update(key, update(value), {ifAbsent()}) =>
+  @override
+  void update(key, void Function(String value) update, {Function() ifAbsent}) =>
       _data.update(key, update, ifAbsent: ifAbsent);
-  void updateAll(update(key, value)) {
+  @override
+  void updateAll(void Function(String key, String value) update) {
     _data.updateAll(update);
   }
 
@@ -180,7 +207,7 @@ class _HttpSessionManager {
   }
 
   String createSessionId() {
-    const int _KEY_LENGTH = 16; // 128 bits.
+    const _KEY_LENGTH = 16; // 128 bits.
     var data = _CryptoUtils.getRandomBytes(_KEY_LENGTH);
     return _CryptoUtils.bytesToHex(data);
   }
@@ -229,7 +256,7 @@ class _HttpSessionManager {
   void _startTimer() {
     assert(_timer == null);
     if (_head != null) {
-      int seconds = DateTime.now().difference(_head.lastSeen).inSeconds;
+      var seconds = DateTime.now().difference(_head.lastSeen).inSeconds;
       _timer =
           Timer(Duration(seconds: _sessionTimeout - seconds), _timerTimeout);
     }

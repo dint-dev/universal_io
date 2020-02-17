@@ -10,14 +10,14 @@ Uint8List parseIp(String source) {
   for (var i = 0; i < source.length; i++) {
     final c = source.substring(i, i + 1);
     switch (c) {
-      case ":":
+      case ':':
         return Uri.parseIPv6Address(source) as Uint8List;
-      case ".":
+      case '.':
         return Uri.parseIPv4Address(source) as Uint8List;
     }
   }
   // Not an IP address
-  return throw ArgumentError.value(source, "source");
+  return throw ArgumentError.value(source, 'source');
 }
 
 String stringFromIp(Uint8List bytes) {
@@ -26,7 +26,7 @@ String stringFromIp(Uint8List bytes) {
   }
   switch (bytes.length) {
     case 4:
-      return bytes.map((item) => item.toString()).join(".");
+      return bytes.map((item) => item.toString()).join('.');
     case 16:
       return _stringFromIp6(bytes);
     default:
@@ -41,11 +41,11 @@ String _stringFromIp6(Uint8List bytes) {
 
   // Longest seen span
   int longestStart;
-  int longestLength = 0;
+  var longestLength = 0;
 
   // Current span
   int start;
-  int length = 0;
+  var length = 0;
 
   // Iterate
   for (var i = 0; i < 16; i++) {
@@ -91,7 +91,7 @@ String _stringFromIp6(Uint8List bytes) {
   var colon = false;
   for (var i = 0; i < 16; i++) {
     if (i == longestStart) {
-      sb.write("::");
+      sb.write('::');
       i += longestLength - 1;
       colon = false;
       continue;
@@ -102,7 +102,7 @@ String _stringFromIp6(Uint8List bytes) {
       // First byte of a group
       //
       if (colon) {
-        sb.write(":");
+        sb.write(':');
       } else {
         colon = true;
       }
@@ -116,7 +116,7 @@ String _stringFromIp6(Uint8List bytes) {
       // If this is a single-digit number and the previous byte was non-zero,
       // we must add zero
       if (byte < 16 && bytes[i - 1] != 0) {
-        sb.write("0");
+        sb.write('0');
       }
       sb.write(byte.toRadixString(16));
     }

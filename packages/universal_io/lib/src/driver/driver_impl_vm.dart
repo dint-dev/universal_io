@@ -163,19 +163,19 @@ class PlatformOverrides {
 
   PlatformOverrides({
     this.numberOfProcessors = 1,
-    this.pathSeparator = "/",
-    this.localeName = "en",
-    this.operatingSystem = "",
-    this.operatingSystemVersion = "",
-    this.localHostname = "",
+    this.pathSeparator = '/',
+    this.localeName = 'en',
+    this.operatingSystem = '',
+    this.operatingSystemVersion = '',
+    this.localHostname = '',
     this.environment = const <String, String>{},
-    this.executable = "",
-    this.resolvedExecutable = "",
+    this.executable = '',
+    this.resolvedExecutable = '',
     this.script,
     this.executableArguments = const <String>[],
-    this.packageRoot = "",
-    this.packageConfig = "",
-    this.version = "2.0.0",
+    this.packageRoot = '',
+    this.packageConfig = '',
+    this.version = '2.0.0',
     this.stdin,
     this.stdout,
     this.stderr,
@@ -301,7 +301,7 @@ abstract class RawSecureSocketOverrides {
     host,
     int port, {
     SecurityContext context,
-    bool onBadCertificate(X509Certificate certificate),
+    bool Function(X509Certificate certificate) onBadCertificate,
     List<String> supportedProtocols,
     Duration timeout,
   }) async {
@@ -317,7 +317,7 @@ abstract class RawSecureSocketOverrides {
     }
     return connectionTask.socket.timeout(timeout, onTimeout: () {
       connectionTask.cancel();
-      throw TimeoutException("RawSecureSocket.connect(...) timeout");
+      throw TimeoutException('RawSecureSocket.connect(...) timeout');
     });
   }
 
@@ -335,7 +335,7 @@ abstract class RawSecureSocketOverrides {
     StreamSubscription<RawSocketEvent> subscription,
     host,
     SecurityContext context,
-    bool onBadCertificate(X509Certificate certificate),
+    bool Function(X509Certificate certificate) onBadCertificate,
     List<String> supportedProtocols,
   });
 
@@ -355,7 +355,7 @@ abstract class RawSecureSocketOverrides {
     host,
     int port, {
     SecurityContext context,
-    bool onBadCertificate(X509Certificate certificate),
+    bool Function(X509Certificate certificate) onBadCertificate,
     List<String> supportedProtocols,
   }) async {
     final socketConnectionTask = await RawSocket.startConnect(host, port);
@@ -408,7 +408,7 @@ abstract class RawSocketOverrides {
     }
     return connectionTask.socket.timeout(timeout, onTimeout: () {
       connectionTask.cancel();
-      throw TimeoutException("RawSocket.connect(...) timeout");
+      throw TimeoutException('RawSocket.connect(...) timeout');
     });
   }
 
@@ -479,8 +479,8 @@ class _ConnectionTask<S> implements ConnectionTask<S> {
       {@required Future<S> socket, @required void Function() onCancel})
       : assert(socket != null),
         assert(onCancel != null),
-        this.socket = socket,
-        this._onCancel = onCancel;
+        socket = socket,
+        _onCancel = onCancel;
 
   @override
   void cancel() {
@@ -525,9 +525,9 @@ class _RawSecureServerSocket extends Stream<RawSecureSocket>
 
   @override
   StreamSubscription<RawSecureSocket> listen(
-      void onData(RawSecureSocket socket),
+      void Function(RawSecureSocket socket) onData,
       {Function onError,
-      void onDone(),
+      void Function() onDone,
       bool cancelOnError}) {
     return _socket.asyncMap((rawSocket) {
       return RawSecureSocket.secureServer(

@@ -87,7 +87,7 @@ abstract class HttpOverrides {
   }
 
   /// Runs [body] in a fresh [Zone] using the provided overrides.
-  static R runZoned<R>(R body(),
+  static R runZoned<R>(R Function() body,
       {HttpClient Function(SecurityContext) createHttpClient,
       String Function(Uri uri, Map<String, String> environment)
           findProxyFromEnvironment,
@@ -107,7 +107,7 @@ abstract class HttpOverrides {
   ///
   /// Note that [overrides] should be an instance of a class that extends
   /// [HttpOverrides].
-  static R runWithHttpOverrides<R>(R body(), HttpOverrides overrides,
+  static R runWithHttpOverrides<R>(R Function() body, HttpOverrides overrides,
       {ZoneSpecification zoneSpecification, Function onError}) {
     return _asyncRunZoned<R>(body,
         zoneValues: {

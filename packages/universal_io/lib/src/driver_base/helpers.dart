@@ -45,8 +45,8 @@ class BaseConnectionTask<S> implements ConnectionTask<S> {
       {@required Future<S> socket, @required void Function() onCancel})
       : assert(socket != null),
         assert(onCancel != null),
-        this.socket = socket,
-        this._onCancel = onCancel;
+        socket = socket,
+        _onCancel = onCancel;
 
   @override
   void cancel() {

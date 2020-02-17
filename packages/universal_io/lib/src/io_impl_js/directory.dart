@@ -154,9 +154,10 @@ import '../io_impl_js.dart';
 /// * [Write Command-Line Apps](https://www.dartlang.org/docs/tutorials/cmdline/),
 ///   a tutorial about writing command-line apps, includes information about
 ///   files and directories.
-@pragma("vm:entry-point")
+@pragma('vm:entry-point')
 abstract class Directory implements FileSystemEntity {
   /// Gets the path of this directory.
+  @override
   String get path;
 
   /// Creates a [Directory] object.
@@ -166,16 +167,16 @@ abstract class Directory implements FileSystemEntity {
   ///
   /// If [path] is an absolute path, it will be immune to changes to the
   /// current working directory.
-  @pragma("vm:entry-point")
+  @pragma('vm:entry-point')
   factory Directory(String path) {
-    final IOOverrides overrides = IOOverrides.current;
+    final overrides = IOOverrides.current;
     if (overrides == null) {
       throw UnimplementedError();
     }
     return overrides.createDirectory(path);
   }
 
-  @pragma("vm:entry-point")
+  @pragma('vm:entry-point')
   factory Directory.fromRawPath(Uint8List path) {
     throw UnimplementedError();
   }
@@ -188,7 +189,7 @@ abstract class Directory implements FileSystemEntity {
   /// Creates a directory object pointing to the current working
   /// directory.
   static Directory get current {
-    final IOOverrides overrides = IOOverrides.current;
+    final overrides = IOOverrides.current;
     if (overrides == null) {
       throw UnimplementedError();
     }
@@ -200,6 +201,7 @@ abstract class Directory implements FileSystemEntity {
   /// The returned URI's scheme is always "file" if the entity's [path] is
   /// absolute, otherwise the scheme will be empty.
   /// The returned URI's path always ends in a slash ('/').
+  @override
   Uri get uri;
 
   /// Sets the current working directory of the Dart process including
@@ -219,7 +221,7 @@ abstract class Directory implements FileSystemEntity {
   /// while asynchronous operations are pending or when other isolates
   /// are working with the file system, can lead to unexpected results.
   static set current(path) {
-    final IOOverrides overrides = IOOverrides.current;
+    final overrides = IOOverrides.current;
     if (overrides == null) {
       throw UnimplementedError();
     }
@@ -253,7 +255,7 @@ abstract class Directory implements FileSystemEntity {
   /// The location of the system temp directory is platform-dependent,
   /// and may be set by an environment variable.
   static Directory get systemTemp {
-    final IOOverrides overrides = IOOverrides.current;
+    final overrides = IOOverrides.current;
     if (overrides == null) {
       throw UnimplementedError();
     }
@@ -277,8 +279,10 @@ abstract class Directory implements FileSystemEntity {
   /// Returns the newly created temporary directory.
   Directory createTempSync([String prefix]);
 
+  @override
   Future<String> resolveSymbolicLinks();
 
+  @override
   String resolveSymbolicLinksSync();
 
   /// Renames this directory. Returns a [:Future<Directory>:] that completes
@@ -287,6 +291,7 @@ abstract class Directory implements FileSystemEntity {
   /// If newPath identifies an existing directory, that directory is
   /// replaced. If newPath identifies an existing file, the operation
   /// fails and the future completes with an exception.
+  @override
   Future<Directory> rename(String newPath);
 
   /// Synchronously renames this directory. Returns a [Directory]
@@ -295,6 +300,7 @@ abstract class Directory implements FileSystemEntity {
   /// If newPath identifies an existing directory, that directory is
   /// replaced. If newPath identifies an existing file the operation
   /// fails and an exception is thrown.
+  @override
   Directory renameSync(String newPath);
 
   /// Returns a [Directory] instance whose path is the absolute path to [this].
@@ -302,6 +308,7 @@ abstract class Directory implements FileSystemEntity {
   /// The absolute path is computed by prefixing
   /// a relative path with the current working directory, and returning
   /// an absolute path unchanged.
+  @override
   Directory get absolute;
 
   /// Lists the sub-directories and files of this [Directory].
@@ -347,5 +354,6 @@ abstract class Directory implements FileSystemEntity {
       {bool recursive = false, bool followLinks = true});
 
   /// Returns a human readable string for this Directory instance.
+  @override
   String toString();
 }

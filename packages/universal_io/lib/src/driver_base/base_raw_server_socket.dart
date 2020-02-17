@@ -41,8 +41,8 @@ abstract class BaseRawServerSocket extends Stream<RawSocket>
   FutureOr didClose();
 
   @override
-  StreamSubscription<RawSocket> listen(void onData(RawSocket event),
-      {Function onError, void onDone(), bool cancelOnError}) {
+  StreamSubscription<RawSocket> listen(void Function(RawSocket event) onData,
+      {Function onError, void Function() onDone, bool cancelOnError}) {
     return streamController.stream.listen(
       onData,
       onError: onError,

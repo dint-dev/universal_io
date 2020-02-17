@@ -52,13 +52,13 @@ import '../io_impl_js.dart';
 /// An instance of the default implementation of the [GZipCodec].
 const GZipCodec gzip = GZipCodec._default();
 
-@Deprecated("Use gzip instead")
+@Deprecated('Use gzip instead')
 const GZipCodec GZIP = gzip;
 
 /// An instance of the default implementation of the [ZLibCodec].
 const ZLibCodec zlib = ZLibCodec._default();
 
-@Deprecated("Use zlib instead")
+@Deprecated('Use zlib instead')
 const ZLibCodec ZLIB = zlib;
 
 void _validateZLibeLevel(int level) {
@@ -171,10 +171,12 @@ class GZipCodec extends Codec<List<int>, List<int>> {
         dictionary = null;
 
   /// Get a [ZLibDecoder] for decoding `GZip` compressed data.
+  @override
   ZLibDecoder get decoder =>
       ZLibDecoder(windowBits: windowBits, dictionary: dictionary, raw: raw);
 
   /// Get a [ZLibEncoder] for encoding to `GZip` compressed data.
+  @override
   ZLibEncoder get encoder => ZLibEncoder(
       gzip: true,
       level: level,
@@ -312,10 +314,12 @@ class ZLibCodec extends Codec<List<int>, List<int>> {
         dictionary = null;
 
   /// Get a [ZLibDecoder] for decoding `ZLib` compressed data.
+  @override
   ZLibDecoder get decoder =>
       ZLibDecoder(windowBits: windowBits, dictionary: dictionary, raw: raw);
 
   /// Get a [ZLibEncoder] for encoding to `ZLib` compressed data.
+  @override
   ZLibEncoder get encoder => ZLibEncoder(
       gzip: false,
       level: level,
@@ -356,8 +360,9 @@ class ZLibDecoder extends Converter<List<int>, List<int>> {
 
   /// Convert a list of bytes using the options given to the [ZLibDecoder]
   /// constructor.
+  @override
   List<int> convert(List<int> bytes) {
-    _BufferSink sink = _BufferSink();
+    var sink = _BufferSink();
     startChunkedConversion(sink)
       ..add(bytes)
       ..close();
@@ -367,6 +372,7 @@ class ZLibDecoder extends Converter<List<int>, List<int>> {
   /// Start a chunked conversion. While it accepts any [Sink]
   /// taking [List<int>]'s, the optimal sink to be passed as [sink] is a
   /// [ByteConversionSink].
+  @override
   ByteConversionSink startChunkedConversion(Sink<List<int>> sink) {
     if (sink is! ByteConversionSink) {
       sink = ByteConversionSink.from(sink);
@@ -440,8 +446,9 @@ class ZLibEncoder extends Converter<List<int>, List<int>> {
 
   /// Convert a list of bytes using the options given to the ZLibEncoder
   /// constructor.
+  @override
   List<int> convert(List<int> bytes) {
-    _BufferSink sink = _BufferSink();
+    var sink = _BufferSink();
     startChunkedConversion(sink)
       ..add(bytes)
       ..close();
@@ -451,6 +458,7 @@ class ZLibEncoder extends Converter<List<int>, List<int>> {
   /// Start a chunked conversion using the options given to the [ZLibEncoder]
   /// constructor. While it accepts any [Sink] taking [List<int>]'s,
   /// the optimal sink to be passed as [sink] is a [ByteConversionSink].
+  @override
   ByteConversionSink startChunkedConversion(Sink<List<int>> sink) {
     if (sink is! ByteConversionSink) {
       sink = ByteConversionSink.from(sink);
@@ -467,94 +475,97 @@ abstract class ZLibOption {
   /// Minimal value for [ZLibCodec.windowBits], [ZLibEncoder.windowBits]
   /// and [ZLibDecoder.windowBits].
   static const int minWindowBits = 8;
-  @Deprecated("Use minWindowBits instead")
+  @Deprecated('Use minWindowBits instead')
   static const int MIN_WINDOW_BITS = 8;
 
   /// Maximal value for [ZLibCodec.windowBits], [ZLibEncoder.windowBits]
   /// and [ZLibDecoder.windowBits].
   static const int maxWindowBits = 15;
-  @Deprecated("Use maxWindowBits instead")
+  @Deprecated('Use maxWindowBits instead')
   static const int MAX_WINDOW_BITS = 15;
 
   /// Default value for [ZLibCodec.windowBits], [ZLibEncoder.windowBits]
   /// and [ZLibDecoder.windowBits].
   static const int defaultWindowBits = 15;
-  @Deprecated("Use defaultWindowBits instead")
+  @Deprecated('Use defaultWindowBits instead')
   static const int DEFAULT_WINDOW_BITS = 15;
 
   /// Minimal value for [ZLibCodec.level] and [ZLibEncoder.level].
   static const int minLevel = -1;
-  @Deprecated("Use minLevel instead")
+  @Deprecated('Use minLevel instead')
   static const int MIN_LEVEL = -1;
 
   /// Maximal value for [ZLibCodec.level] and [ZLibEncoder.level]
   static const int maxLevel = 9;
-  @Deprecated("Use maxLevel instead")
+  @Deprecated('Use maxLevel instead')
   static const int MAX_LEVEL = 9;
 
   /// Default value for [ZLibCodec.level] and [ZLibEncoder.level].
   static const int defaultLevel = 6;
-  @Deprecated("Use defaultLevel instead")
+  @Deprecated('Use defaultLevel instead')
   static const int DEFAULT_LEVEL = 6;
 
   /// Minimal value for [ZLibCodec.memLevel] and [ZLibEncoder.memLevel].
   static const int minMemLevel = 1;
-  @Deprecated("Use minMemLevel instead")
+  @Deprecated('Use minMemLevel instead')
   static const int MIN_MEM_LEVEL = 1;
 
   /// Maximal value for [ZLibCodec.memLevel] and [ZLibEncoder.memLevel].
   static const int maxMemLevel = 9;
-  @Deprecated("Use maxMemLevel instead")
+  @Deprecated('Use maxMemLevel instead')
   static const int MAX_MEM_LEVEL = 9;
 
   /// Default value for [ZLibCodec.memLevel] and [ZLibEncoder.memLevel].
   static const int defaultMemLevel = 8;
-  @Deprecated("Use defaultMemLevel instead")
+  @Deprecated('Use defaultMemLevel instead')
   static const int DEFAULT_MEM_LEVEL = 8;
 
   /// Recommended strategy for data produced by a filter (or predictor)
   static const int strategyFiltered = 1;
-  @Deprecated("Use strategyFiltered instead")
+  @Deprecated('Use strategyFiltered instead')
   static const int STRATEGY_FILTERED = 1;
 
   /// Use this strategy to force Huffman encoding only (no string match)
   static const int strategyHuffmanOnly = 2;
-  @Deprecated("Use strategyHuffmanOnly instead")
+  @Deprecated('Use strategyHuffmanOnly instead')
   static const int STRATEGY_HUFFMAN_ONLY = 2;
 
   /// Use this strategy to limit match distances to one (run-length encoding)
   static const int strategyRle = 3;
-  @Deprecated("Use strategyRle instead")
+  @Deprecated('Use strategyRle instead')
   static const int STRATEGY_RLE = 3;
 
   /// This strategy prevents the use of dynamic Huffman codes, allowing for a
   /// simpler decoder
   static const int strategyFixed = 4;
-  @Deprecated("Use strategyFixed instead")
+  @Deprecated('Use strategyFixed instead')
   static const int STRATEGY_FIXED = 4;
 
   /// Recommended strategy for normal data
   static const int strategyDefault = 0;
-  @Deprecated("Use strategyDefault instead")
+  @Deprecated('Use strategyDefault instead')
   static const int STRATEGY_DEFAULT = 0;
 }
 
 class _BufferSink extends ByteConversionSink {
   final BytesBuilder builder = BytesBuilder(copy: false);
 
+  @override
   void add(List<int> chunk) {
     builder.add(chunk);
   }
 
+  @override
   void addSlice(List<int> chunk, int start, int end, bool isLast) {
     if (chunk is Uint8List) {
-      Uint8List list = chunk;
+      var list = chunk;
       builder.add(Uint8List.view(list.buffer, start, end - start));
     } else {
       builder.add(chunk.sublist(start, end));
     }
   }
 
+  @override
   void close() {}
 }
 
@@ -566,14 +577,17 @@ class _FilterSink extends ByteConversionSink {
 
   _FilterSink(this._sink, this._filter);
 
+  @override
   void add(List<int> data) {
     addSlice(data, 0, data.length, false);
   }
 
+  @override
   void addSlice(List<int> data, int start, int end, bool isLast) {
     throw UnimplementedError();
   }
 
+  @override
   void close() {
     if (_closed) return;
     // Be sure to send process an empty chunk of data. Without this, the empty

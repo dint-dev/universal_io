@@ -20,16 +20,16 @@ import 'package:universal_io/prefer_universal/io.dart';
 import 'localhost_certificate.dart';
 
 void testSecureSocket({bool secureServerSocket = true}) {
-  test("SecurityContext()", () async {
+  test('SecurityContext()', () async {
     SecurityContext();
   });
 
-  test("SecurityContext.defaultContext()", () async {
+  test('SecurityContext.defaultContext()', () async {
     SecurityContext.defaultContext;
   });
 
-  group("SecureServerSocket", () {
-    test("bind(...)", () async {
+  group('SecureServerSocket', () {
+    test('bind(...)', () async {
       final server = await SecureServerSocket.bind(
         InternetAddress.loopbackIPv4,
         0,
@@ -43,9 +43,9 @@ void testSecureSocket({bool secureServerSocket = true}) {
     });
   });
 
-  group("SecureSocket", () {
+  group('SecureSocket', () {
     if (secureServerSocket) {
-      test("communicates with SecureServerSocket (with a bad certificate)",
+      test('communicates with SecureServerSocket (with a bad certificate)',
           () async {
         final server = await SecureServerSocket.bind(
           InternetAddress.loopbackIPv4,
@@ -58,11 +58,11 @@ void testSecureSocket({bool secureServerSocket = true}) {
         });
 
         server.listen(expectAsync1((socket) async {
-          socket.write("Hello from server");
+          socket.write('Hello from server');
 
           // We assume that everything arrives in a single read
           final received = await utf8.decodeStream(socket);
-          expect(received, "Hello from client");
+          expect(received, 'Hello from client');
           await socket.close();
         }));
 
@@ -84,11 +84,11 @@ void testSecureSocket({bool secureServerSocket = true}) {
 
         final clientReceivedFuture = utf8.decodeStream(client);
 
-        client.write("Hello from client");
+        client.write('Hello from client');
 
         await client.close();
 
-        expect(await clientReceivedFuture, "Hello from server");
+        expect(await clientReceivedFuture, 'Hello from server');
 
         await server.close();
       });

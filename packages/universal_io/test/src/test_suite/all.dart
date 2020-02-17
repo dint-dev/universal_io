@@ -72,7 +72,7 @@ void testSockets({
       f();
     } else {
       for (var i = 0; i < times; i++) {
-        group("Repeat #$i", f);
+        group('Repeat #$i', f);
       }
     }
   }

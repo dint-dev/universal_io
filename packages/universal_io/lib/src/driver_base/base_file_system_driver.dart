@@ -239,7 +239,7 @@ class BaseFileSystemEntity implements FileSystemEntity {
   @override
   final String path;
 
-  BaseFileSystemEntity(String path) : this.path = _trimRightSlash(path);
+  BaseFileSystemEntity(String path) : path = _trimRightSlash(path);
 
   @override
   FileSystemEntity get absolute {
@@ -248,12 +248,12 @@ class BaseFileSystemEntity implements FileSystemEntity {
 
   @override
   bool get isAbsolute {
-    return path.contains("..") && path.split("/").any((v) => v == "..");
+    return path.contains('..') && path.split('/').any((v) => v == '..');
   }
 
   @override
   Directory get parent {
-    final i = path.lastIndexOf("/");
+    final i = path.lastIndexOf('/');
     if (i < 0) {
       return null;
     }
@@ -323,11 +323,11 @@ class BaseFileSystemEntity implements FileSystemEntity {
 
   static FileSystemException _notFoundException(String path) {
     return FileSystemException(
-        "file not found", path, OSError("file not found"));
+        'file not found', path, OSError('file not found'));
   }
 
   static String _trimRightSlash(String s) {
-    while (s.endsWith("/") && s.length > 1) {
+    while (s.endsWith('/') && s.length > 1) {
       s = s.substring(0, s.length - 1);
     }
     return s;
@@ -335,6 +335,6 @@ class BaseFileSystemEntity implements FileSystemEntity {
 
   static FileSystemException _writingNotAllowedException(String path) {
     return FileSystemException(
-        "writing is not allowed", path, OSError("writing is not allowed"));
+        'writing is not allowed', path, OSError('writing is not allowed'));
   }
 }

@@ -63,12 +63,12 @@ void hybridMain(StreamChannel objectChannel, Object message) async {
   channel.stream.listen((message) async {
     final type = message[0] as String;
     switch (type) {
-      case "bind":
+      case 'bind':
         // Bind
         httpServerCompleter.complete(_bindHttpServer());
         break;
 
-      case "bindSecure":
+      case 'bindSecure':
         httpServerCompleter.complete(_bindSecureHttpServer());
         break;
 
@@ -89,7 +89,7 @@ void hybridMain(StreamChannel objectChannel, Object message) async {
   }
 
   // Tell the test where we are listening
-  await channel.sink.add(["info", server.port]);
+  await channel.sink.add(['info', server.port]);
 
   // Close it when the channel closes
   // ignore: unawaited_futures
@@ -104,9 +104,9 @@ void hybridMain(StreamChannel objectChannel, Object message) async {
       final requestBody = await utf8.decodeStream(request);
 
       // Tell the test about the request we received
-      if (request.method != "OPTIONS") {
+      if (request.method != 'OPTIONS') {
         channel.sink.add([
-          "request",
+          'request',
           request.method,
           request.uri.toString(),
           requestBody,
@@ -126,14 +126,14 @@ void hybridMain(StreamChannel objectChannel, Object message) async {
 
 Future<HttpServer> _bindHttpServer() {
   return HttpServer.bind(
-    "localhost",
+    'localhost',
     0,
   );
 }
 
 Future<HttpServer> _bindSecureHttpServer() {
   return HttpServer.bindSecure(
-    "localhost",
+    'localhost',
     0,
     localHostSecurityContext(),
   );
@@ -145,65 +145,65 @@ void _handleHttpRequest(HttpRequest request) async {
   try {
     // Check that the request is from loopback
     if (!request.connectionInfo.remoteAddress.isLoopback) {
-      throw StateError("Unauthorized remote address");
+      throw StateError('Unauthorized remote address');
     }
 
     // CORS:
     // We need to allow origin.
-    final origin = request.headers.value("Origin");
+    final origin = request.headers.value('Origin');
     response.headers.set(
-      "Access-Control-Allow-Origin",
-      origin ?? "*",
+      'Access-Control-Allow-Origin',
+      origin ?? '*',
     );
 
     // CORS:
     // We need allow methods that are not simple.
     // (simple methods are GET, HEAD, POST)
     response.headers.set(
-      "Access-Control-Allow-Methods",
-      "DELETE, GET, HEAD, PATCH, POST, PUT",
+      'Access-Control-Allow-Methods',
+      'DELETE, GET, HEAD, PATCH, POST, PUT',
     );
 
     // CORS:
     // We need to allow reading our example response header.
     response.headers.set(
-      "Access-Control-Expose-Headers",
-      "*",
+      'Access-Control-Expose-Headers',
+      '*',
     );
 
-    response.headers.set("X-Response-Header", "value");
+    response.headers.set('X-Response-Header', 'value');
     response.headers.contentType = ContentType.text;
 
     switch (request.uri.path) {
-      case "/greeting":
+      case '/greeting':
         response.statusCode = HttpStatus.ok;
-        response.write("Hello world! (${request.method})");
+        response.write('Hello world! (${request.method})');
         break;
 
-      case "/slow":
+      case '/slow':
         response.bufferOutput = false;
         response.statusCode = HttpStatus.ok;
         response.headers.set('Cache-Control', 'no-cache');
         response.headers.chunkedTransferEncoding = true;
-        response.writeln("First part.");
+        response.writeln('First part.');
         await response.flush();
         await Future.delayed(const Duration(milliseconds: 1000));
 
-        response.writeln("Second part.");
+        response.writeln('Second part.');
         await response.flush();
         await Future.delayed(const Duration(milliseconds: 1000));
         break;
 
-      case "/set_cookie":
+      case '/set_cookie':
         // Not tested in browser
         response.statusCode = HttpStatus.ok;
-        response.cookies.add(Cookie("x", "y"));
+        response.cookies.add(Cookie('x', 'y'));
         break;
 
-      case "/expect_cookie":
+      case '/expect_cookie':
         // Not tested in browser
         final cookie = request.cookies.firstWhere(
-          (cookie) => cookie.name == "expectedCookie",
+          (cookie) => cookie.name == 'expectedCookie',
           orElse: () => null,
         );
         if (cookie == null) {
@@ -213,22 +213,22 @@ void _handleHttpRequest(HttpRequest request) async {
         }
         break;
 
-      case "/expect_authorization":
+      case '/expect_authorization':
         response.headers.set(
-          "Access-Control-Allow-Credentials",
-          "true",
+          'Access-Control-Allow-Credentials',
+          'true',
         );
         response.headers.set(
-          "Access-Control-Expose-Headers",
-          "X-Response-Header",
+          'Access-Control-Expose-Headers',
+          'X-Response-Header',
         );
         response.headers.set(
-          "Access-Control-Allow-Headers",
-          "Authorization",
+          'Access-Control-Allow-Headers',
+          'Authorization',
         );
 
         // Is this a preflight?
-        if (request.method == "OPTIONS") {
+        if (request.method == 'OPTIONS') {
           response.statusCode = HttpStatus.ok;
           return;
         }
@@ -236,7 +236,7 @@ void _handleHttpRequest(HttpRequest request) async {
         final authorization =
             request.headers.value(HttpHeaders.authorizationHeader);
 
-        if (authorization == "expectedAuthorization") {
+        if (authorization == 'expectedAuthorization') {
           response.statusCode = HttpStatus.ok;
         } else {
           response.statusCode = HttpStatus.unauthorized;
@@ -244,7 +244,7 @@ void _handleHttpRequest(HttpRequest request) async {
         response.write(authorization);
         break;
 
-      case "/404":
+      case '/404':
         response.statusCode = HttpStatus.notFound;
         break;
 
@@ -262,7 +262,7 @@ void _handleHttpRequest(HttpRequest request) async {
 ///
 /// Used for testing the browser.
 class _HybridExampleHttpServer implements ExampleHttpServer {
-  static const _spawnUri = "src/test_suite/example_http_server.dart";
+  static const _spawnUri = 'src/test_suite/example_http_server.dart';
 
   final StreamChannel<List> _streamChannel;
 
@@ -275,6 +275,7 @@ class _HybridExampleHttpServer implements ExampleHttpServer {
   _HybridExampleHttpServer._(
       this._streamChannel, this.port, this.requestsQueue);
 
+  @override
   void close() {
     _streamChannel.sink.close();
   }
@@ -284,7 +285,7 @@ class _HybridExampleHttpServer implements ExampleHttpServer {
     final channel = spawnHybridUri(_spawnUri);
 
     // Send "bind" message
-    channel.sink.add([secure ? "bindSecure" : "bind"]);
+    channel.sink.add([secure ? 'bindSecure' : 'bind']);
 
     final requestsSink = StreamController<ExampleHttpRequest>();
     Completer completer = Completer<ExampleHttpServer>();
@@ -292,7 +293,7 @@ class _HybridExampleHttpServer implements ExampleHttpServer {
       (args) {
         final type = args[0] as String;
         switch (type) {
-          case "info":
+          case 'info':
             final port = (args[1] as num).toInt();
 
             final result = _HybridExampleHttpServer._(
@@ -304,7 +305,7 @@ class _HybridExampleHttpServer implements ExampleHttpServer {
             completer = null;
             break;
 
-          case "request":
+          case 'request':
             requestsSink.add(ExampleHttpRequest(
               args[1] as String,
               args[2] as String,
@@ -342,6 +343,7 @@ class _HybridExampleHttpServer implements ExampleHttpServer {
 /// Implementation of [ExampleHttpServer] that uses [HttpServer.bind] directly.
 class _NormalExampleHttpServer implements ExampleHttpServer {
   final HttpServer server;
+  @override
   final StreamQueue<ExampleHttpRequest> requestsQueue;
 
   _NormalExampleHttpServer._(this.server, this.requestsQueue);
@@ -355,11 +357,10 @@ class _NormalExampleHttpServer implements ExampleHttpServer {
   }
 
   static Future<ExampleHttpServer> bind({bool secure = false}) async {
-    final HttpServer server =
-        await (secure ? _bindSecureHttpServer() : _bindHttpServer());
+    final server = await (secure ? _bindSecureHttpServer() : _bindHttpServer());
     final requestsController = StreamController<ExampleHttpRequest>();
     server.listen((request) async {
-      if (request.method != "OPTIONS") {
+      if (request.method != 'OPTIONS') {
         final body = await utf8.decodeStream(request);
         requestsController.add(ExampleHttpRequest(
           request.method,

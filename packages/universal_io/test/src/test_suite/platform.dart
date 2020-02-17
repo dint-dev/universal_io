@@ -5,14 +5,14 @@ import 'platform_impl_default.dart'
     if (dart.library.html) 'platform_impl_browser.dart';
 
 void testPlatform() {
-  group("Platform: ", () {
+  group('Platform: ', () {
     test("pathSeparator == '/'", () {
-      expect(Platform.pathSeparator, "/");
-    }, testOn: "posix");
+      expect(Platform.pathSeparator, '/');
+    }, testOn: 'posix');
 
     test("pathSeparator == '\'", () {
-      expect(Platform.pathSeparator, r"\");
-    }, testOn: "windows");
+      expect(Platform.pathSeparator, r'\');
+    }, testOn: 'windows');
 
     // Run tests that only work in browser
     testPlatformInBrowser();
