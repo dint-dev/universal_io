@@ -4,7 +4,7 @@ description: Enables use of 'dart:io' networking classes in Chrome OS Apps.
 homepage: https://github.com/dart-io-packages/universal_io
 
 environment:
-  sdk: '>=2.8.0-dev.9.0 <3.0.0'
+  sdk: '>=2.7.0 <3.0.0'
 
 dependencies:
   meta: ^1.1.7
