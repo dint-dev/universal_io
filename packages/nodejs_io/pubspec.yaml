@@ -1,6 +1,7 @@
 name: nodejs_io
-version: 0.2.0
-description: Enables use of 'dart:io' APIs in Node.JS.
+version: 0.2.1
+description:
+  An adapter between 'universal_io' and Node.JS. Makes a few 'dart:io' APIs work in Node.JS.
 homepage: https://github.com/dart-io-packages/universal_io
 
 environment:

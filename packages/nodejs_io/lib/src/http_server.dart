@@ -39,7 +39,7 @@ class _NodeJsHttpServerOverrides extends HttpServerOverrides {
 }
 
 class _NodeJsHttpRequest extends Stream<Uint8List> implements HttpRequest {
-  final node_io.HttpRequest impl;
+  final node_io.HttpRequest _impl;
 
   @override
   final HttpResponse response;
@@ -50,13 +50,13 @@ class _NodeJsHttpRequest extends Stream<Uint8List> implements HttpRequest {
   @override
   final HttpHeaders headers = HttpHeadersImpl('1.1');
 
-  _NodeJsHttpRequest(this.impl, this.response) {
-    impl.headers.forEach((name, values) {
+  _NodeJsHttpRequest(this._impl, this.response) {
+    _impl.headers.forEach((name, values) {
       for (var value in values) {
         headers.add(name, value);
       }
     });
-    for (var cookie in impl.cookies) {
+    for (var cookie in _impl.cookies) {
       cookies.add(Cookie.fromSetCookieValue(cookie.toString()));
     }
   }
@@ -73,27 +73,27 @@ class _NodeJsHttpRequest extends Stream<Uint8List> implements HttpRequest {
 
   @override
   int get contentLength {
-    return impl.contentLength;
+    return _impl.contentLength;
   }
 
   @override
   String get method {
-    return impl.method;
+    return _impl.method;
   }
 
   @override
   bool get persistentConnection {
-    return impl.persistentConnection;
+    return _impl.persistentConnection;
   }
 
   @override
   String get protocolVersion {
-    return impl.protocolVersion;
+    return _impl.protocolVersion;
   }
 
   @override
   Uri get requestedUri {
-    return impl.requestedUri;
+    return _impl.requestedUri;
   }
 
   @override
@@ -103,13 +103,13 @@ class _NodeJsHttpRequest extends Stream<Uint8List> implements HttpRequest {
 
   @override
   Uri get uri {
-    return impl.uri;
+    return _impl.uri;
   }
 
   @override
   StreamSubscription<Uint8List> listen(void Function(Uint8List event) onData,
       {Function onError, void Function() onDone, bool cancelOnError}) {
-    return impl.listen(
+    return _impl.listen(
       onData,
       onError: onError,
       onDone: onDone,
@@ -119,7 +119,7 @@ class _NodeJsHttpRequest extends Stream<Uint8List> implements HttpRequest {
 }
 
 class _NodeJsHttpResponse extends BaseIOSink implements HttpResponse {
-  final node_io.HttpResponse impl;
+  final node_io.HttpResponse _impl;
 
   bool _isHeadersCommitted = false;
 
@@ -138,7 +138,7 @@ class _NodeJsHttpResponse extends BaseIOSink implements HttpResponse {
   @override
   final List<Cookie> cookies = <Cookie>[];
 
-  _NodeJsHttpResponse(this.impl);
+  _NodeJsHttpResponse(this._impl);
 
   @override
   HttpConnectionInfo get connectionInfo {
@@ -146,47 +146,47 @@ class _NodeJsHttpResponse extends BaseIOSink implements HttpResponse {
   }
 
   @override
-  Duration get deadline => impl.deadline;
+  Duration get deadline => _impl.deadline;
 
   @override
   set deadline(Duration value) {
-    impl.deadline = value;
+    _impl.deadline = value;
   }
 
   @override
-  Future get done => impl.done;
+  Future get done => _impl.done;
 
   @override
-  String get reasonPhrase => impl.reasonPhrase;
+  String get reasonPhrase => _impl.reasonPhrase;
 
   @override
   set reasonPhrase(String value) {
-    impl.reasonPhrase = value;
+    _impl.reasonPhrase = value;
   }
 
   @override
-  int get statusCode => impl.statusCode;
+  int get statusCode => _impl.statusCode;
 
   @override
   set statusCode(int value) {
-    impl.statusCode = value;
+    _impl.statusCode = value;
   }
 
   @override
   void add(List<int> data) {
     _commitHeaders();
-    impl.add(data);
+    _impl.add(data);
   }
 
   @override
   void addError(Object error, [StackTrace stackTrace]) {
-    impl.addError(error, stackTrace);
+    _impl.addError(error, stackTrace);
   }
 
   @override
   Future close() {
     _commitHeaders();
-    return impl.close();
+    return _impl.close();
   }
 
   @override
@@ -196,7 +196,7 @@ class _NodeJsHttpResponse extends BaseIOSink implements HttpResponse {
 
   @override
   Future redirect(Uri location, {int status = HttpStatus.movedTemporarily}) {
-    return impl.redirect(location, status: status);
+    return _impl.redirect(location, status: status);
   }
 
   void _commitHeaders() {
@@ -206,17 +206,17 @@ class _NodeJsHttpResponse extends BaseIOSink implements HttpResponse {
     _isHeadersCommitted = true;
     headers.forEach((name, values) {
       for (var value in values) {
-        impl.headers.add(name, value);
+        _impl.headers.add(name, value);
       }
     });
     for (var cookie in cookies) {
-      impl.cookies.add(node_io.Cookie.fromSetCookieValue(cookie.toString()));
+      _impl.cookies.add(node_io.Cookie.fromSetCookieValue(cookie.toString()));
     }
   }
 }
 
 class _NodeJsHttpServer extends Stream<HttpRequest> implements HttpServer {
-  final node_io.HttpServer impl;
+  final node_io.HttpServer _impl;
 
   @override
   String serverHeader;
@@ -227,11 +227,11 @@ class _NodeJsHttpServer extends Stream<HttpRequest> implements HttpServer {
   @override
   Duration idleTimeout;
 
-  _NodeJsHttpServer(this.impl);
+  _NodeJsHttpServer(this._impl);
 
   @override
   InternetAddress get address {
-    return InternetAddress(impl.address.address);
+    return InternetAddress(_impl.address.address);
   }
 
   @override
@@ -241,17 +241,17 @@ class _NodeJsHttpServer extends Stream<HttpRequest> implements HttpServer {
 
   @override
   int get port {
-    return impl.port;
+    return _impl.port;
   }
 
   @override
   set sessionTimeout(int timeout) {
-    impl.sessionTimeout = timeout;
+    _impl.sessionTimeout = timeout;
   }
 
   @override
   Future close({bool force = false}) {
-    return impl.close(force: force);
+    return _impl.close(force: force);
   }
 
   @override
@@ -265,7 +265,7 @@ class _NodeJsHttpServer extends Stream<HttpRequest> implements HttpServer {
       {Function onError,
       void Function() onDone,
       bool cancelOnError}) {
-    return impl.map((nodeRequest) {
+    return _impl.map((nodeRequest) {
       return _NodeJsHttpRequest(
         nodeRequest,
         _NodeJsHttpResponse(nodeRequest.response),

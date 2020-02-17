@@ -30,10 +30,10 @@ class _NodeJsHttpClient extends BaseHttpClient {
 }
 
 class _NodeJsHttpClientRequest extends BaseHttpClientRequest {
-  final node_http.StreamedRequest impl;
+  final node_http.StreamedRequest _impl;
 
   _NodeJsHttpClientRequest(
-      _NodeJsHttpClient client, String method, Uri uri, this.impl)
+      _NodeJsHttpClient client, String method, Uri uri, this._impl)
       : super(client, method, uri);
 
   Future<node_http.StreamedResponse> _response;
@@ -44,35 +44,35 @@ class _NodeJsHttpClientRequest extends BaseHttpClientRequest {
     }
     headers.forEach((key, values) {
       for (var value in values) {
-        impl.headers[key] = value;
+        _impl.headers[key] = value;
       }
     });
     final nodeClient = node_http.NodeClient();
     _response = nodeClient.send(
-      impl,
+      _impl,
     );
   }
 
   @override
   set followRedirects(bool value) {
-    impl.followRedirects = value;
+    _impl.followRedirects = value;
   }
 
   @override
   set maxRedirects(int value) {
-    impl.maxRedirects = value;
+    _impl.maxRedirects = value;
   }
 
   @override
   void didAdd(List<int> data) {
     _commitHeaders();
-    impl.sink.add(data);
+    _impl.sink.add(data);
   }
 
   @override
   Future<HttpClientResponse> didClose() async {
     _commitHeaders();
-    impl.sink.close();
+    _impl.sink.close();
     final nodeResponse = await _response;
     final response = _NodeJsHttpClientResponse(this);
     response.statusCode = nodeResponse.statusCode;

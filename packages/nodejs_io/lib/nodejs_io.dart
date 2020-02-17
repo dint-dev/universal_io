@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/// Contains an implementation of [IODriver] for Node.JS.
 library nodejs_io;
 
 import 'dart:async';
@@ -26,6 +27,18 @@ import 'package:universal_io/prefer_universal/io.dart';
 part 'src/http_client.dart';
 part 'src/http_server.dart';
 
+/// An implementation of [IODriver] for Node.JS.
+///
+/// Usage:
+/// ```
+/// import 'package:nodejs_io/nodejs_io.dart';
+///
+/// void main() {
+///   nodeJsIODriver.enable();
+///
+///   // ...
+/// }
+/// ```
 final IODriver nodeJsIODriver = IODriver(
   parent: defaultIODriver,
   httpOverrides: _NodeJsHttpOverrides(),
