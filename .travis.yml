@@ -25,4 +25,4 @@ script:
   - cd ../..
   - cd samples/chrome_app_example
   - pub get
-  - pub build
+  - pub run webdev build

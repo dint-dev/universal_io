@@ -1,62 +1,44 @@
 [![Pub Package](https://img.shields.io/pub/v/universal_io.svg)](https://pub.dartlang.org/packages/universal_io)
-[![Github Actions CI](https://github.com/dart-io-packages/universal_io/workflows/Dart%20CI/badge.svg)](https://github.com/dart-io-packages/universal_io/actions?query=workflow%3A%22Dart+CI%22)
+[![Github Actions CI](https://github.com/dint-dev/universal_io/workflows/Dart%20CI/badge.svg)](https://github.com/dint-dev/universal_io/actions?query=workflow%3A%22Dart+CI%22)
+[![Build Status](https://travis-ci.org/dint-dev/universal_io.svg?branch=master)](https://travis-ci.org/dint-dev/universal_io)
 
-# Introduction
-This repository contains [universal_io](packages/universal_io), which is a cross-platform _dart:io_ that works in:
-  * Browsers (with limitations)
-  * Flutter
-  * Dart VM
+# Overview
+A cross-platform _dart:io_ that works in all platforms, including browsers, Flutter, and Dart VM.
 
-The Github repository also contains [chrome_os_io](packages/chrome_os_io),
-[nodejs_io](packages/nodejs_io), and [test_io].
-
-## License
 Licensed under the [Apache License 2.0](LICENSE).
+Much of the source code is derived [from Dart SDK](https://github.com/dart-lang/sdk/tree/master/sdk/lib/io),
+which was obtained under the BSD-style license of Dart SDK. See LICENSE file for details.
 
-Much of the source code in this project is from Dart SDK ([github.com/dart-lang/sdk/tree/master/sdk/lib/io](https://github.com/dart-lang/sdk/tree/master/sdk/lib/io)),
-which was obtained under the BSD-style license of Dart SDK.
+Other Pub packages in this repository include:
+  * [chrome_os_io](packages/chrome_os_io) (adapter for Chrome OS sockets API)
+  * [nodejs_io](packages/nodejs_io) (adapter for Node.JS)
+  * [test_io](test_io) (helpers for unit tests)
 
-## Issues
-  * Found issues? Report them at the [Github issue tracker](https://github.com/terrier989/dart-universal_io/issues).
-  * Have a fix? [Create a pull request](https://github.com/terrier989/dart-universal_io/pull/new/master)!
+## Links
+  * [Pub package](https://pub.dev/packages/universal_io)
+  * [Issue tracker](https://github.com/dint-dev/universal_io/issues)
+  * [Create a pull request](https://github.com/dint-dev/universal_io/pull/new/master)
 
 ## Similar packages
   * [universal_html](https://pub.dev/packages/universal_html) (cross-platform _dart:html_)
 
 # Getting started
-## 1.Add a dependency
-In `pubspec.yaml`:
+### pubspec.yaml
 ```yaml
 dependencies:
-  universal_io: ^0.8.5
+  universal_io: ^0.9.0
 ```
 
-## 2. Choose a driver (optional)
-### VM/Flutter?
-  * Library "package:universal_io/io.dart" will automatically export _dart:io_ for you.
+The may also consider [chrome_os_io](https://pub.dev/packages/chrome_os_io) (if you use Chrome OS)
+and [nodejs_io](https://pub.dev/packages/nodejs_io) (if you use Node.JS).
 
-### Browser?
-  * _BrowserIODriver_ is automatically used when you use _Dart2js_ / _devc_. This is possible with
-    "conditional imports" feature of Dart.
-  * The driver implements _HttpClient_ (with restrictions) and a few other features.
-    If you need features such as sockets or unrestricted HTTP connections, choose one of the options
-    below.
-
-### Chrome OS App?
-  * [chrome_os_io](https://pub.dev/packages/chrome_os_io)
-
-### Node.JS?
-  * [nodejs_io](https://pub.dev/packages/nodejs_io)
-
-
-## 3. Use
+### main.dart
 
 ```dart
-import 'package:universal_io/prefer_universal/io.dart';
+import 'package:universal_io/io.dart';
 
-void main() async {
-  // Use 'dart:io' HttpClient API.
-  final httpClient = new HttpClient();
+Future<void> main() async {
+  final httpClient = HttpClient();
   final request = await httpClient.getUrl(Uri.parse("http://google.com"));
   final response = await request.close();
 }
@@ -64,66 +46,77 @@ void main() async {
 
 In some situations, Dart development tools (your IDE) may give warnings, but your application
 will compile fine. You can try to eliminate warnings by importing
-"package:universal_io/prefer_universal/io.dart' instead of the library above.
+`"package:universal_io/prefer_universal/io.dart"` or `"package:universal_io/prefer_sdk/io.dart"`
 
 
-# Manual
-## Default driver behavior
-### HTTP client
-In browser, HTTP client is implemented using _dart:html_ _HttpRequest_, which uses
-[XmlHttpRequest](https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest).
+# Browser driver behavior
+## HTTP client
+HTTP client is implemented using [XMLHttpRequest (XHR)](https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest)
+(in _dart:html_, the class is [HttpRequest](https://api.dart.dev/stable/2.7.1/dart-html/HttpRequest-class.html)).
 
-Unlike HTTP client in the standard _dart:io_, the browser implementation sends HTTP request only
-after _httpRequest.close()_ has been called.
+XHR causes the following differences with _dart:io_:
+  * HTTP connection is created only after `request.close()` has been called.
+  * Same-origin policy limitations. For making cross-origin requests, see documentation below.
 
-If a cross-origin request fails, error message contains a detailed description how to fix
+### CORS
+If the HTTP request is cross-origin and _Authorization_ header is present, the request will
+automatically use [CORS credentials mode](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS).
+For other requests, you can manually enable credentials mode using:
+```dart
+if (request is BrowserHttpClientRequest) {
+  request.credentialsMode = BrowserHttpClientCredentialsMode.include;
+}
+```
+
+If any cross-origin request fails, error message contains a detailed description how to fix
 possible issues like missing cross-origin headers. The error messages look like:
 
-    BrowserHttpClient received an error from XMLHttpRequest (which doesn't tell
-    reason for the error).
-
-    HTTP method:   PUT
-    URL:           http://destination.com
-    Origin:        http://source.com
-
-    Cross-origin request!
-    CORS 'credentials mode' is disabled (the browser will not send cookies).
-    You can enable 'credentials mode' with:
-
-        if (httpRequest is BrowserLikeHttpRequest) {
-          httpRequest.useCorsCredentials = true;
-        }
-
-    Did the server send the following mandatory headers?
-      * Access-Control-Allow-Origin: http://source.com
-        * OR '*'
-      * Access-Control-Allow-Methods: PUT
-
-### HttpServer
-  * Requires sockets.
-
-### Platform
-  * In browser, variables are determined by browser APIs such as _navigator.userAgent_.
-  * Elsewhere (e.g. Node.JS), appears like Linux environment.
-
-### Files
-  * Any attempt to use these APIs will throw _UnimplementedError_.
-
-### Sockets
-  * Any attempt to use these APIs will throw _UnimplementedError_.
-
-## Writing your own driver?
-```dart
-import 'package:universal_io/prefer_universal/io.dart';
-import 'package:universal_io/driver.dart';
-import 'package:universal_io/driver_base.dart';
-
-void main() {
-  exampleIODriver.enable();
-}
-
-/// Let's change 'Platform' implementation (in browser).
-final exampleIODriver = IODriver(
-  platformDriver: PlatformDriver(localeName:"en-US"),
-).fillMissingFeaturesFrom(defaultIODriver);
 ```
+BrowserHttpClient received an error from XMLHttpRequest (which doesn't tell
+reason for the error).
+
+HTTP method:   PUT
+URL:           http://destination.com/path/example
+Origin:        http://source.com
+
+Cross-origin request!
+CORS 'credentials mode' is disabled (the browser will not send cookies).
+You can enable 'credentials mode' with:
+
+    if (httpRequest is BrowserHttpClientRequest) {
+      httpRequest.credentialsMode = BrowserHttpClientCredentialsMode.include;
+    }
+
+Did the server send the following mandatory headers?
+  * Access-Control-Allow-Origin: http://source.com
+    * OR '*'
+  * Access-Control-Allow-Methods: PUT
+```
+
+### Streaming responses
+The underlying XHR supports streaming only for text responses. You can enable streaming by changing
+response type:
+
+```dart
+Future<void> main() async {
+    // ...
+
+    // Change response type
+    if (request is BrowserHttpClientRequest) {
+      request.responseType = BrowserHttpClientResponseType.text;
+    }
+
+    // Stream chunks
+    final response = await request.close();
+    response.listen((chunk) {
+      // ...
+    });
+}
+```
+
+## Platform
+The [implementation](https://github.com/dint-dev/universal_io/blob/master/packages/universal_io/lib/src/driver/default_impl_browser.dart)
+supports APIs such as:
+  * `Platform.isWindows`
+  * `Platform.operatingSystem`
+  * `Platform.locale`
