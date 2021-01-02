@@ -92,7 +92,7 @@ class InternetAddress {
   /// If the address in [address] is not a numeric IPv4
   /// (dotted-decimal notation) or IPv6 (hexadecimal representation).
   /// address [ArgumentError] is thrown.
-  factory InternetAddress(String address) {
+  factory InternetAddress(String address, {InternetAddressType type}) {
     return InternetAddress._(ip_utils.parseIp(address), address: address);
   }
 

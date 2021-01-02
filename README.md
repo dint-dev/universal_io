@@ -1,18 +1,15 @@
 [![Pub Package](https://img.shields.io/pub/v/universal_io.svg)](https://pub.dartlang.org/packages/universal_io)
 [![Github Actions CI](https://github.com/dint-dev/universal_io/workflows/Dart%20CI/badge.svg)](https://github.com/dint-dev/universal_io/actions?query=workflow%3A%22Dart+CI%22)
-[![Build Status](https://travis-ci.org/dint-dev/universal_io.svg?branch=master)](https://travis-ci.org/dint-dev/universal_io)
 
 # Overview
 A cross-platform _dart:io_ that works in all platforms (browsers, Flutter, and VM).
 
+The API is exactly the same API as _dart:io_. You can simply replace _dart:io_ imports with
+_package:universal_io/io.dart_.
+
 Licensed under the [Apache License 2.0](LICENSE).
 Much of the source code is derived [from Dart SDK](https://github.com/dart-lang/sdk/tree/master/sdk/lib/io),
 which was obtained under the BSD-style license of Dart SDK. See LICENSE file for details.
-
-Other Pub packages in this repository include:
-  * [chrome_os_io](packages/chrome_os_io) (adapter for Chrome OS sockets API)
-  * [nodejs_io](packages/nodejs_io) (adapter for Node.JS)
-  * [test_io](test_io) (helpers for unit tests)
 
 ## Links
   * [Pub package](https://pub.dev/packages/universal_io)
@@ -22,11 +19,12 @@ Other Pub packages in this repository include:
 ## Similar packages
   * [universal_html](https://pub.dev/packages/universal_html) (cross-platform _dart:html_)
 
+
 # Getting started
 ### pubspec.yaml
 ```yaml
 dependencies:
-  universal_io: ^1.0.0
+  universal_io: ^1.0.2
 ```
 
 The may also consider [chrome_os_io](https://pub.dev/packages/chrome_os_io) (if you use Chrome OS)
@@ -49,7 +47,7 @@ will compile fine. You can try to eliminate warnings by importing
 `"package:universal_io/prefer_universal/io.dart"` or `"package:universal_io/prefer_sdk/io.dart"`
 
 
-# Browser driver behavior
+# Browser driver
 ## HTTP client
 HTTP client is implemented using [XMLHttpRequest (XHR)](https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest)
 (in _dart:html_, the class is [HttpRequest](https://api.dart.dev/stable/2.7.1/dart-html/HttpRequest-class.html)).
@@ -58,11 +56,14 @@ XHR causes the following differences with _dart:io_:
   * HTTP connection is created only after `request.close()` has been called.
   * Same-origin policy limitations. For making cross-origin requests, see documentation below.
 
-### CORS
-If the HTTP request is cross-origin and _Authorization_ header is present, the request will
-automatically use [CORS credentials mode](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS).
-For other requests, you can manually enable credentials mode using:
+### CORS in browsers
+If you do cross-origin requests in browsers, you may want to use
+[CORS credentials mode](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS).
+
+You can control credentials mode with the following technique:
 ```dart
+final client = HttpClient();
+final request = client.openUrl(Url.parse('https://example/path'));
 if (request is BrowserHttpClientRequest) {
   request.credentialsMode = BrowserHttpClientCredentialsMode.include;
 }

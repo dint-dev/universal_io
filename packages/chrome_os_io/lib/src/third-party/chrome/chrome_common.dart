@@ -82,7 +82,7 @@ List listify(JsObject obj, [Function transformer]) {
   if (obj == null) {
     return null;
   } else {
-    var l = List(obj['length']);
+    var l = List.filled(obj['length'], null);
 
     for (var i = 0; i < l.length; i++) {
       if (transformer != null) {

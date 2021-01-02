@@ -33,7 +33,7 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
           if (httpClient is prefer_sdk.BrowserHttpClient) {
             expect(
               httpClient.credentialsMode,
-              prefer_sdk.BrowserHttpClientCredentialsMode.automatic,
+              prefer_sdk.BrowserHttpClientCredentialsMode.omit,
             );
             httpClient.credentialsMode =
                 prefer_sdk.BrowserHttpClientCredentialsMode.include;
@@ -50,7 +50,7 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
           if (request is prefer_sdk.BrowserHttpClientRequest) {
             expect(
               request.credentialsMode,
-              prefer_sdk.BrowserHttpClientCredentialsMode.automatic,
+              prefer_sdk.BrowserHttpClientCredentialsMode.omit,
             );
             request.credentialsMode =
                 prefer_sdk.BrowserHttpClientCredentialsMode.include;
@@ -75,7 +75,7 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
           if (httpClient is prefer_universal.BrowserHttpClient) {
             expect(
               httpClient.credentialsMode,
-              prefer_universal.BrowserHttpClientCredentialsMode.automatic,
+              prefer_universal.BrowserHttpClientCredentialsMode.omit,
             );
             httpClient.credentialsMode =
                 prefer_universal.BrowserHttpClientCredentialsMode.include;
@@ -92,7 +92,7 @@ void testHttpClient({bool isBrowser = false, bool hybrid = false}) {
           if (request is prefer_universal.BrowserHttpClientRequest) {
             expect(
               request.credentialsMode,
-              prefer_universal.BrowserHttpClientCredentialsMode.automatic,
+              prefer_universal.BrowserHttpClientCredentialsMode.omit,
             );
             request.credentialsMode =
                 prefer_universal.BrowserHttpClientCredentialsMode.include;

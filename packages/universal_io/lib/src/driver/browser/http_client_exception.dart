@@ -15,33 +15,6 @@
 part of universal_io.browser_driver;
 
 class _BrowserHttpClientException implements SocketException {
-  static bool _isCorsRequired(HttpClientRequest request) {
-    if (!_isCrossOriginUrl(request.uri.toString())) {
-      return false;
-    }
-    if (request.headers.value(HttpHeaders.authorizationHeader) != null) {
-      return true;
-    }
-    return false;
-  }
-
-  /// Tells whether the request is cross-origin.
-  static bool _isCrossOriginUrl(String url, {String origin}) {
-    origin ??= html.window.origin;
-
-    // Add '/' so 'http://example.com' and 'http://example.com.other.com'
-    // will be different.
-    if (!origin.endsWith('/')) {
-      origin = '$origin/';
-    }
-
-    if (!url.endsWith('/')) {
-      url = '$url/';
-    }
-
-    return !url.startsWith(origin);
-  }
-
   /// Can be used to disable verbose messages.
   static bool verbose = true;
 
@@ -88,9 +61,10 @@ class _BrowserHttpClientException implements SocketException {
       sb.write('-');
     }
     sb.write('\n');
-    sb.write("""
-BrowserHttpClient received an error from XMLHttpRequest (which doesn't tell
-reason for the error).\n""");
+    sb.write('''
+BrowserHttpClient sent a XMLHttpRequest, which failed.
+Browsers do not tell reasons for request failures. It may have been a problem in
+the server-side or a problem in the client-side - we can not know.\n''');
     // Write a line
     sb.write('\n');
 
@@ -101,19 +75,23 @@ reason for the error).\n""");
       sb.write('\n');
     }
 
-    final headerNames = <String>[];
-    headers.forEach((name, values) {
-      headerNames.add(name);
-    });
-    headerNames.sort();
-
-    addEntry('HTTP method: ', method);
-    addEntry('URL: ', url);
-    addEntry('Origin: ', origin);
+    final parsedUrl = Uri.parse(url);
+    addEntry('Request HTTP method: ', method);
+    addEntry('Request URL: ', url);
+    addEntry('Request URL origin: ', parsedUrl.origin);
+    addEntry('Browser origin: ', origin);
 
     // Warn about possible problem with missing CORS headers
-    if (_isCrossOriginUrl(url, origin: origin) ||
-        browserCredentialsMode == BrowserHttpClientCredentialsMode.include) {
+    if (parsedUrl.origin != html.window.origin) {
+
+      // List of header name that the server may need to whitelist
+      final allowHeadersList = <String>[];
+      headers.forEach((name, values) {
+        allowHeadersList.add(name);
+      });
+      allowHeadersList.sort();
+      final allowHeaders = allowHeadersList.isEmpty ? '' : allowHeadersList.join(', ');
+
       sb.write('\n');
       sb.write('Cross-origin request!\n');
       if (browserCredentialsMode == BrowserHttpClientCredentialsMode.include) {
@@ -125,18 +103,18 @@ reason for the error).\n""");
         sb.write("    * In credentials mode, '*' would fail!\n");
         sb.write('  * Access-Control-Allow-Methods: $method\n');
         sb.write("    * In credentials mode, '*' would fail!\n");
-        if (headerNames.isNotEmpty) {
-          final joined = headerNames.join(', ');
-          sb.write('  * Access-Control-Allow-Headers: $joined\n');
+        if (allowHeaders.isNotEmpty) {
+          sb.write('  * Access-Control-Allow-Headers: $allowHeaders\n');
           sb.write("    * In credentials mode, '*' would fail!\n");
         }
       } else {
         sb.write("""
 XmlHttpRequest 'credentials mode' is disabled. It affects cookies and headers.
-You can enable 'credentials mode' with:
+If you think you need to enable 'credentials mode', do the following:
 
-    if (httpRequest is BrowserHttpClientRequest) {
-      httpRequest.credentialsMode = BrowserCredentialsMode.include;
+    final httpClientRequest = ...;
+    if (httpClientRequest is BrowserHttpClientRequest) {
+      httpClientRequest.credentialsMode = BrowserHttpClientCredentialsMode.include;
     }
 """);
       }
@@ -149,9 +127,8 @@ You can enable 'credentials mode' with:
         sb.write('  * Access-Control-Allow-Methods: $method\n');
         sb.write("    * OR '*'\n");
       }
-      if (headerNames.isNotEmpty) {
-        final joined = headerNames.join(', ');
-        sb.write('  * Access-Control-Allow-Headers: $joined\n');
+      if (allowHeaders.isNotEmpty) {
+        sb.write('  * Access-Control-Allow-Headers: $allowHeaders\n');
         sb.write("    * OR '*'\n");
       }
     }

@@ -21,7 +21,7 @@ abstract class BrowserHttpClient implements HttpClient {
   /// Whether [CORS credentials mode](https://developer.mozilla.org/en-US/docs/Web/API/Request/credentials)
   /// is enabled.
   BrowserHttpClientCredentialsMode credentialsMode =
-      BrowserHttpClientCredentialsMode.automatic;
+      BrowserHttpClientCredentialsMode.omit;
 
   @Deprecated('Use credentialsMode instead')
   bool get useCredentialsMode =>
@@ -43,8 +43,10 @@ abstract class BrowserHttpClient implements HttpClient {
 abstract class BrowserHttpClientRequest implements HttpClientRequest {
   /// Whether [CORS credentials mode](https://developer.mozilla.org/en-US/docs/Web/API/Request/credentials)
   /// is enabled.
+  ///
+  /// By default, credentials mode is disabled.
   BrowserHttpClientCredentialsMode credentialsMode =
-      BrowserHttpClientCredentialsMode.automatic;
+      BrowserHttpClientCredentialsMode.omit;
 
   BrowserHttpClientResponseType responseType =
       BrowserHttpClientResponseType.bytes;
@@ -55,11 +57,9 @@ abstract class BrowserHttpClientRequest implements HttpClientRequest {
 
   @Deprecated('Use credentialsMode instead')
   set useCredentialsMode(bool value) {
-    if (value) {
-      credentialsMode = BrowserHttpClientCredentialsMode.include;
-    } else {
-      credentialsMode = BrowserHttpClientCredentialsMode.sameOrigin;
-    }
+    credentialsMode = value
+        ? BrowserHttpClientCredentialsMode.include
+        : BrowserHttpClientCredentialsMode.omit;
   }
 }
 
@@ -86,8 +86,4 @@ enum BrowserHttpClientCredentialsMode {
 
   /// Enables CORS credentials mode.
   include,
-
-  /// Automatically enables CORS credentials when HTTP request is cross-origin
-  /// and has header 'Authorization'.
-  automatic,
 }

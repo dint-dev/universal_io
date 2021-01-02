@@ -1,3 +1,12 @@
+# 1.0.2
+  * Fixes issue [#11](https://github.com/dint-dev/universal_io/issues/11) (InternetAddress
+    parameter).
+  * Fixes issue [#12](https://github.com/dint-dev/universal_io/issues/12) (CORS credentials mode).
+    Eliminates legacy, complicated behavior. Developers should choose either _omit_ or _include_.
+    Improves error messages and documentation related to it.
+  * Replaces MD5/SHA1 implementations used by some of the source code copied from _dart:io_. It now
+    uses _package:crypto_ instead of implementations copied from _dart:io_.
+
 # 1.0.0
   * Implements recent changes in 'dart:io' (Dart SDK 2.8).
   * HttpDriver is replaced by 'dart:io' HttpOverrides.

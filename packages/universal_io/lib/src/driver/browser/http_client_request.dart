@@ -75,15 +75,13 @@ class _BrowserHttpClientRequest extends BaseHttpClientRequest
       switch (credentialsMode) {
         case BrowserHttpClientCredentialsMode.omit:
           break;
+        // ignore: deprecated_member_use
         case BrowserHttpClientCredentialsMode.sameOrigin:
+          final isSameOrigin = uri.origin == html.window.origin;
+          xhr.withCredentials = isSameOrigin;
           break;
         case BrowserHttpClientCredentialsMode.include:
           xhr.withCredentials = true;
-          break;
-        case BrowserHttpClientCredentialsMode.automatic:
-          if (_BrowserHttpClientException._isCorsRequired(this)) {
-            xhr.withCredentials = true;
-          }
           break;
       }
 

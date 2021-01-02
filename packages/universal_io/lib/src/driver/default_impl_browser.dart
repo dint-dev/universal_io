@@ -41,18 +41,18 @@ final IODriver defaultIODriver = IODriver(
 );
 
 String _operatingSystemFromUserAgent(String userAgent) {
-  final userAgent = html.window.navigator.userAgent;
-  if (userAgent.contains('Mac OS X')) {
+  final userAgent = html.window.navigator.userAgent.toLowerCase();
+  if (userAgent.contains('iphone') || userAgent.contains('ipad') || userAgent.contains('ipod')) {
+    return 'ios';
+  }
+  if (userAgent.contains('mac os x')) {
     return 'macos';
   }
-  if (userAgent.contains('CrOS')) {
-    return 'linux';
-  }
-  if (userAgent.contains('Android')) {
+  if (userAgent.contains('android')) {
     return 'android';
   }
-  if (userAgent.contains('iPhone')) {
-    return 'ios';
+  if (userAgent.contains('croS')) {
+    return 'linux';
   }
   return 'windows';
 }

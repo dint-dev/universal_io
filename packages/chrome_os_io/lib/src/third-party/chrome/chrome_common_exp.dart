@@ -73,7 +73,7 @@ class ArrayBuffer extends ChromeObject {
     } else {
       var int8View = JsObject(context['Uint8Array'], [jsProxy]);
 
-      final result = List<int>(int8View['length']);
+      final result = List<int>.filled(int8View['length'], null);
 
       // TODO: this is _very_ slow
       // can we instead do: jsArray = Array.apply([], int8View);

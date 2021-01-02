@@ -472,9 +472,7 @@ class _WebSocketImpl extends Stream with _ServiceObject implements WebSocket {
       if (accept == null) {
         error("Response did not contain a 'Sec-WebSocket-Accept' header");
       }
-      var sha1 = _SHA1();
-      sha1.add('$nonce$_webSocketGUID'.codeUnits);
-      var expectedAccept = sha1.close();
+      var expectedAccept = sha1.convert('$nonce$_webSocketGUID'.codeUnits).bytes;
       var receivedAccept = _CryptoUtils.base64StringToBytes(accept);
       if (expectedAccept.length != receivedAccept.length) {
         error("Reasponse header 'Sec-WebSocket-Accept' is the wrong length");
@@ -883,7 +881,7 @@ class _WebSocketProtocolTransformer extends StreamTransformerBase<List<int>,
   EventSink<dynamic /*List<int>|_WebSocketPing|_WebSocketPong*/ > _eventSink;
 
   final bool _serverSide;
-  final List _maskingBytes = List(4);
+  final List _maskingBytes = List<int>.filled(4,0);
   final BytesBuilder _payload = BytesBuilder(copy: false);
 
   final _WebSocketPerMessageDeflate _deflate;
@@ -1297,9 +1295,7 @@ class _WebSocketTransformerImpl
         ..headers.add(HttpHeaders.connectionHeader, 'Upgrade')
         ..headers.add(HttpHeaders.upgradeHeader, 'websocket');
       var key = request.headers.value('Sec-WebSocket-Key');
-      var sha1 = _SHA1();
-      sha1.add('$key$_webSocketGUID'.codeUnits);
-      var accept = _CryptoUtils.bytesToBase64(sha1.close());
+      var accept = _CryptoUtils.bytesToBase64(sha1.convert('$key$_webSocketGUID'.codeUnits).bytes);
       response.headers.add('Sec-WebSocket-Accept', accept);
       if (protocol != null) {
         response.headers.add('Sec-WebSocket-Protocol', protocol);

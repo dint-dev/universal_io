@@ -59,6 +59,7 @@ import 'dart:collection'
 import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
+import 'package:crypto/crypto.dart' show md5, sha1;
 
 import 'package:universal_io/src/driver/driver_impl_js.dart';
 

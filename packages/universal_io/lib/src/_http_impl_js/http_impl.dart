@@ -307,7 +307,9 @@ class _HttpRequest extends _HttpInboundMessage implements HttpRequest {
       var proto = headers['x-forwarded-proto'];
       var scheme = proto != null
           ? proto.first
-          : _httpConnection._socket is SecureSocket ? 'https' : 'http';
+          : _httpConnection._socket is SecureSocket
+              ? 'https'
+              : 'http';
       var hostList = headers['x-forwarded-host'];
       String host;
       if (hostList != null) {
@@ -3200,13 +3202,14 @@ abstract class _Credentials {
       // http://tools.ietf.org/html/draft-reschke-basicauth-enc-06. For
       // now always use UTF-8 encoding.
       _HttpClientDigestCredentials creds = credentials;
-      var hasher = _MD5()
-        ..add(utf8.encode(creds.username))
-        ..add([_CharCode.COLON])
-        ..add(realm.codeUnits)
-        ..add([_CharCode.COLON])
-        ..add(utf8.encode(creds.password));
-      ha1 = _CryptoUtils.bytesToHex(hasher.close());
+      final hash = md5.convert(<int>[
+        ...utf8.encode(creds.username),
+        _CharCode.COLON,
+        ...utf8.encode(realm),
+        _CharCode.COLON,
+        ...utf8.encode(creds.password),
+      ]);
+      ha1 = _CryptoUtils.bytesToHex(hash.bytes);
     }
   }
 
@@ -3316,39 +3319,46 @@ class _HttpClientDigestCredentials extends _HttpClientCredentials
 
   String authorization(_Credentials credentials, _HttpClientRequest request) {
     var requestUri = request._requestUri();
-    var hasher = _MD5()
-      ..add(request.method.codeUnits)
-      ..add([_CharCode.COLON])
-      ..add(requestUri.codeUnits);
-    var ha2 = _CryptoUtils.bytesToHex(hasher.close());
+    final hash = md5.convert(<int>[
+      ...request.method.codeUnits,
+      _CharCode.COLON,
+      ...requestUri.codeUnits,
+    ]);
+    var ha2 = _CryptoUtils.bytesToHex(hash.bytes);
 
     String qop;
     String cnonce;
     String nc;
-    hasher = _MD5()..add(credentials.ha1.codeUnits)..add([_CharCode.COLON]);
+    List<int> h;
     if (credentials.qop == 'auth') {
       qop = credentials.qop;
       cnonce = _CryptoUtils.bytesToHex(_CryptoUtils.getRandomBytes(4));
       ++credentials.nonceCount;
       nc = credentials.nonceCount.toRadixString(16);
       nc = '00000000'.substring(0, 8 - nc.length + 1) + nc;
-      hasher
-        ..add(credentials.nonce.codeUnits)
-        ..add([_CharCode.COLON])
-        ..add(nc.codeUnits)
-        ..add([_CharCode.COLON])
-        ..add(cnonce.codeUnits)
-        ..add([_CharCode.COLON])
-        ..add(credentials.qop.codeUnits)
-        ..add([_CharCode.COLON])
-        ..add(ha2.codeUnits);
+      h = md5.convert(<int>[
+        ...credentials.ha1.codeUnits,
+        _CharCode.COLON,
+        ...credentials.nonce.codeUnits,
+        _CharCode.COLON,
+        ...nc.codeUnits,
+        _CharCode.COLON,
+        ...cnonce.codeUnits,
+         _CharCode.COLON,
+        ...credentials.qop.codeUnits,
+        _CharCode.COLON,
+        ...ha2.codeUnits,
+    ]).bytes;
     } else {
-      hasher
-        ..add(credentials.nonce.codeUnits)
-        ..add([_CharCode.COLON])
-        ..add(ha2.codeUnits);
+      h = md5.convert(<int>[
+        ...credentials.ha1.codeUnits,
+        _CharCode.COLON,
+        ...credentials.nonce.codeUnits,
+        _CharCode.COLON,
+        ...ha2.codeUnits,
+      ]).bytes;
     }
-    var response = _CryptoUtils.bytesToHex(hasher.close());
+    var response = _CryptoUtils.bytesToHex(h);
 
     var buffer = StringBuffer()
       ..write('Digest ')

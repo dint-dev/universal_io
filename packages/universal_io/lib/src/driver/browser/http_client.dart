@@ -37,7 +37,11 @@ class _BrowserHttpClient extends BaseHttpClient with BrowserHttpClient {
         case 'https':
           break;
         default:
-          throw ArgumentError.value("Unsupported scheme '$scheme'");
+          throw ArgumentError.value(
+            url,
+            'url',
+            'Unsupported scheme',
+          );
       }
     }
     if (needsNewUrl) {
