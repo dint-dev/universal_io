@@ -24,11 +24,8 @@ which was obtained under the BSD-style license of Dart SDK. See LICENSE file for
 ### pubspec.yaml
 ```yaml
 dependencies:
-  universal_io: ^1.0.2
+  universal_io: ^2.0.0
 ```
-
-The may also consider [chrome_os_io](https://pub.dev/packages/chrome_os_io) (if you use Chrome OS)
-and [nodejs_io](https://pub.dev/packages/nodejs_io) (if you use Node.JS).
 
 ### main.dart
 
@@ -36,6 +33,7 @@ and [nodejs_io](https://pub.dev/packages/nodejs_io) (if you use Node.JS).
 import 'package:universal_io/io.dart';
 
 Future<void> main() async {
+  // HttpClient works
   final httpClient = HttpClient();
   final request = await httpClient.getUrl(Uri.parse("http://google.com"));
   final response = await request.close();
@@ -56,19 +54,7 @@ XHR causes the following differences with _dart:io_:
   * HTTP connection is created only after `request.close()` has been called.
   * Same-origin policy limitations. For making cross-origin requests, see documentation below.
 
-### CORS in browsers
-If you do cross-origin requests in browsers, you may want to use
-[CORS credentials mode](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS).
-
-You can control credentials mode with the following technique:
-```dart
-final client = HttpClient();
-final request = client.openUrl(Url.parse('https://example/path'));
-if (request is BrowserHttpClientRequest) {
-  request.credentialsMode = BrowserHttpClientCredentialsMode.include;
-}
-```
-
+### Cross-origin requests
 If any cross-origin request fails, error message contains a detailed description how to fix
 possible issues like missing cross-origin headers. The error messages look like:
 
@@ -76,9 +62,11 @@ possible issues like missing cross-origin headers. The error messages look like:
 BrowserHttpClient received an error from XMLHttpRequest (which doesn't tell
 reason for the error).
 
-HTTP method:   PUT
-URL:           http://destination.com/path/example
-Origin:        http://source.com
+HTTP method:      PUT
+HTTP URL:         http://destination.com/path/example
+Origin:           http://source.com
+Cross-origin:     true
+Credentials mode: true
 
 Cross-origin request!
 CORS 'credentials mode' is disabled (the browser will not send cookies).
@@ -94,17 +82,34 @@ Did the server send the following mandatory headers?
   * Access-Control-Allow-Methods: PUT
 ```
 
-### Streaming responses
-The underlying XHR supports streaming only for text responses. You can enable streaming by changing
-response type:
+Sometimes when you do cross-origin requests in browsers, you want to use
+[CORS "credentials mode"](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS). This can be
+achieved with the following pattern:
+```dart
+Future<void> main() async {
+    final client = HttpClient();
+    final request = client.getUrl(Url.parse('http://host/path'));
+    if (request is BrowserHttpClientRequest) {
+      request.browserCredentialsMode = true;
+    }
+    final response = await request.close();
+    // ...
+}
+```
 
+### Streaming text responses
+The underlying XMLHttpRequest (XHR) API supports response streaming only when _responseType_ is
+"text". If HTTP request header "Accept" contains only text MIMEs ("text/plain", etc.), this package
+uses _responseType_ "text".
+
+You can manually set response type:
 ```dart
 Future<void> main() async {
     // ...
 
     // Change response type
     if (request is BrowserHttpClientRequest) {
-      request.responseType = BrowserHttpClientResponseType.text;
+      request.browserResponseType = 'text';
     }
 
     // Stream chunks

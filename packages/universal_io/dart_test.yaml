@@ -1,3 +1,0 @@
-platforms: [vm, chrome, node]
-tags:
-  ipv6:
