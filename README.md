@@ -24,7 +24,7 @@ which was obtained under the BSD-style license of Dart SDK. See LICENSE file for
 ### pubspec.yaml
 ```yaml
 dependencies:
-  universal_io: ^2.0.0
+  universal_io: ^2.0.0-nullsafety.1
 ```
 
 ### main.dart
@@ -33,53 +33,60 @@ dependencies:
 import 'package:universal_io/io.dart';
 
 Future<void> main() async {
-  // HttpClient works
+  // HttpClient can be used in browser too!
   final httpClient = HttpClient();
-  final request = await httpClient.getUrl(Uri.parse("http://google.com"));
+  final request = await httpClient.getUrl(Uri.parse("http://example/url"));
   final response = await request.close();
 }
 ```
 
-In some situations, Dart development tools (your IDE) may give warnings, but your application
-will compile fine. You can try to eliminate warnings by importing
-`"package:universal_io/prefer_universal/io.dart"` or `"package:universal_io/prefer_sdk/io.dart"`
-
-
 # Browser driver
 ## HTTP client
-HTTP client is implemented using [XMLHttpRequest (XHR)](https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest)
+HTTP client is implemented with [XMLHttpRequest (XHR)](https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest)
 (in _dart:html_, the class is [HttpRequest](https://api.dart.dev/stable/2.7.1/dart-html/HttpRequest-class.html)).
 
 XHR causes the following differences with _dart:io_:
   * HTTP connection is created only after `request.close()` has been called.
   * Same-origin policy limitations. For making cross-origin requests, see documentation below.
 
-### Cross-origin requests
-If any cross-origin request fails, error message contains a detailed description how to fix
-possible issues like missing cross-origin headers. The error messages look like:
+### Helpful error messages
+When requests fail and assertions are enabled, error messages contains descriptions how to fix
+possible issues such as missing cross-origin headers.
 
+The error messages look like the following:
 ```
-BrowserHttpClient received an error from XMLHttpRequest (which doesn't tell
-reason for the error).
+XMLHttpRequest error.
+-------------------------------------------------------------------------------
+HTTP method:             PUT
+HTTP URL:                http://destination.com/example
+Origin:                  http://source.com
+Cross-origin:            true
+browserCredentialsMode:  false
+browserResponseType:     arraybuffer
 
-HTTP method:      PUT
-HTTP URL:         http://destination.com/path/example
-Origin:           http://source.com
-Cross-origin:     true
-Credentials mode: true
+THE REASON FOR THE XHR ERROR IS UNKNOWN.
+(For security reasons, browsers do not explain XHR errors.)
 
-Cross-origin request!
-CORS 'credentials mode' is disabled (the browser will not send cookies).
-You can enable 'credentials mode' with:
+Is the server down? Did the server have an internal error?
 
-    if (httpRequest is BrowserHttpClientRequest) {
-      httpRequest.credentialsMode = BrowserHttpClientCredentialsMode.include;
+Enabling credentials mode would enable use of some HTTP headers in both the
+request and the response. For example, credentials mode is required for
+sending/receiving cookies. If you think you need to enable 'credentials mode',
+do the following:
+
+    final httpClientRequest = ...;
+    if (httpClientRequest is BrowserHttpClientRequest) {
+      httpClientRequest.browserCredentialsMode = true;
     }
 
-Did the server send the following mandatory headers?
+Did the server respond to a cross-origin "preflight" (OPTIONS) request?
+
+Did the server send the following headers?
   * Access-Control-Allow-Origin: http://source.com
-    * OR '*'
+    * You can also use wildcard ("*").
+    * Always required for cross-origin requests!
   * Access-Control-Allow-Methods: PUT
+    * You can also use wildcard ("*").
 ```
 
 Sometimes when you do cross-origin requests in browsers, you want to use
@@ -88,41 +95,52 @@ achieved with the following pattern:
 ```dart
 Future<void> main() async {
     final client = HttpClient();
-    final request = client.getUrl(Url.parse('http://host/path'));
+    final request = client.getUrl(Url.parse('http://example/url'));
+
+    // Enable credentials mode
     if (request is BrowserHttpClientRequest) {
       request.browserCredentialsMode = true;
     }
+
+    // Close request
     final response = await request.close();
     // ...
 }
 ```
+
+See [source code](https://github.com/dint-dev/universal_io/blob/master/lib/src/browser/http_client_request.dart).
 
 ### Streaming text responses
 The underlying XMLHttpRequest (XHR) API supports response streaming only when _responseType_ is
-"text". If HTTP request header "Accept" contains only text MIMEs ("text/plain", etc.), this package
-uses _responseType_ "text".
+"text". This package automatically uses _responseType_ "text" in some cases based on value of the
+HTTP request header "Accept".
 
-You can manually set response type:
+If you want to always have arraybuffer / text responses, use:
 ```dart
 Future<void> main() async {
-    // ...
+    final client = HttpClient();
+    final request = client.getUrl(Url.parse('http://example/url'));
 
-    // Change response type
+    // The following causes XHR responseType 'text' to be used when request is closed.
+    request.headers.set('Accept', 'text/plain');
+
+    // Use XHR responseType 'arraybuffer'.
     if (request is BrowserHttpClientRequest) {
-      request.browserResponseType = 'text';
+      request.browserResponseType = 'arrayBuffer';
     }
 
-    // Stream chunks
+    // Close request
     final response = await request.close();
-    response.listen((chunk) {
-      // ...
-    });
+    // ...
 }
 ```
 
+See [source code](https://github.com/dint-dev/universal_io/blob/master/lib/src/browser/http_client_request.dart).
+
 ## Platform
-The [implementation](https://github.com/dint-dev/universal_io/blob/master/packages/universal_io/lib/src/driver/default_impl_browser.dart)
-supports APIs such as:
+Supported `Platform` APIs include:
   * `Platform.isWindows`
   * `Platform.operatingSystem`
   * `Platform.locale`
+
+See [source code](https://github.com/dint-dev/universal_io/blob/master/lib/src/browser/platform.dart).

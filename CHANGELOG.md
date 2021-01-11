@@ -1,3 +1,7 @@
+# 2.0.0-nullsafety.1
+  * Improves documentation.
+  * Improves BrowserHttpClientException messages.
+
 # 2.0.0-nullsafety.0
   * The first null-safe version.
   * Makes changes in BrowserHttpClient / BrowserHttpClientRequest API:

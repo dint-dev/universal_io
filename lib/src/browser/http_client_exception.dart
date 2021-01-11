@@ -17,23 +17,14 @@ import 'dart:html' as html;
 import '../io.dart';
 
 class BrowserHttpClientException implements SocketException {
-  /// Can be used to disable verbose messages.
-  static bool verbose = _isDebugMode;
+  /// Can be used to disable verbose messages in development mode.
+  static bool verbose = true;
 
   static final Set<String> _corsSimpleMethods = const {
     'GET',
     'HEAD',
     'POST',
   };
-
-  static bool get _isDebugMode {
-    var result = false;
-    assert(() {
-      result = true;
-      return true;
-    }());
-    return result;
-  }
 
   final String method;
   final String url;
@@ -61,78 +52,78 @@ class BrowserHttpClientException implements SocketException {
   });
 
   @override
-  String get message => 'XMLHttpRequest error';
+  String get message => 'XMLHttpRequest (XHR) error';
 
   @override
   String toString() {
-    if (!verbose) {
-      return 'XMLHttpRequest error';
-    }
     final sb = StringBuffer();
-    sb.write('XMLHttpRequest error.\n');
-    for (var i = 0; i < 80; i++) {
-      sb.write('-');
-    }
-    sb.write('\n');
+    sb.write('XMLHttpRequest (XHR) error.');
+    if (verbose) {
+      assert(() {
+        sb.write('\n');
+        for (var i = 0; i < 80; i++) {
+          sb.write('-');
+        }
+        sb.write('\n');
 
-    // Write key details
-    void addEntry(String key, String? value) {
-      sb.write(key.padRight(30));
-      sb.write(value);
-      sb.write('\n');
-    }
+        // Write key details
+        void addEntry(String key, String? value) {
+          sb.write(key.padRight(30));
+          sb.write(value);
+          sb.write('\n');
+        }
 
-    final parsedUrl = Uri.parse(url);
-    final isCrossOrigin = parsedUrl.origin != html.window.origin;
-    addEntry('Request method: ', method);
-    addEntry('Request URL: ', url);
-    addEntry('Origin: ', origin);
-    addEntry('Cross-origin: ', '$isCrossOrigin');
-    addEntry('browserCredentialsMode: ', '$browserCredentialsMode');
-    addEntry('browserResponseType: ', '$browserResponseType');
-    sb.write('''
+        final parsedUrl = Uri.parse(url);
+        final isCrossOrigin = parsedUrl.origin != html.window.origin;
+        addEntry('Request method: ', method);
+        addEntry('Request URL: ', url);
+        addEntry('Origin: ', origin);
+        addEntry('Cross-origin: ', '$isCrossOrigin');
+        addEntry('browserCredentialsMode: ', '$browserCredentialsMode');
+        addEntry('browserResponseType: ', '$browserResponseType');
+        sb.write('''
 
-THE REASON FOR THE FAILURE IS UNKNOWN.
-(For security reasons, browser APIs do not reveal the reason.)
+THE REASON FOR THE XHR ERROR IS UNKNOWN.
+(For security reasons, browsers do not explain XHR errors.)
 
-Is the server down? Did it have an internal error?
+Is the server down? Did the server have an internal error?
 
 ''',
-    );
-
-    // Warn about possible problem with missing CORS headers
-    if (isCrossOrigin) {
-      // List of header name that the server may need to whitelist
-      final sortedHeaderNames = <String>[];
-      headers.forEach((name, values) {
-        sortedHeaderNames.add(name);
-      });
-      sortedHeaderNames.sort();
-      if (browserCredentialsMode) {
-        if (method != 'HEAD' && method != 'GET') {
-          sb.write(
-            'Did the server respond to a cross-origin "preflight" (OPTIONS) request?\n'
-            '\n',
-          );
-        }
-        sb.write(
-          'Did the server send the following headers?\n'
-          '  * Access-Control-Allow-Credentials: true\n'
-          '    * Alternatively, disable "credentials mode".\n'
-          '  * Access-Control-Allow-Origin: $origin\n'
-          '    * In credentials mode, wildcard ("*") would not work!\n'
-          '  * Access-Control-Allow-Methods: $method\n'
-          '    * In credentials mode, wildcard ("*") would not work!\n',
         );
-        if (sortedHeaderNames.isNotEmpty) {
-          final joinedHeaderNames = sortedHeaderNames.join(', ');
-          sb.write(
-            '  * Access-Control-Allow-Headers: $joinedHeaderNames\n'
-            '    * In credentials mode, wildcard ("*") would not work!\n',
-          );
-        }
-      } else {
-        sb.write("""
+
+        // Warn about possible problem with missing CORS headers
+        if (isCrossOrigin) {
+          // List of header name that the server may need to whitelist
+          final sortedHeaderNames = <String>[];
+          headers.forEach((name, values) {
+            sortedHeaderNames.add(name);
+          });
+          sortedHeaderNames.sort();
+          if (browserCredentialsMode) {
+            if (method != 'HEAD' && method != 'GET') {
+              sb.write(
+                'Did the server respond to a cross-origin "preflight" (OPTIONS) request?\n'
+                    '\n',
+              );
+            }
+            sb.write(
+              'Did the server respond with the following headers?\n'
+                  '  * Access-Control-Allow-Credentials: true\n'
+                  '    * Alternatively, disable "credentials mode".\n'
+                  '  * Access-Control-Allow-Origin: $origin\n'
+                  '    * In credentials mode, wildcard ("*") would not work!\n'
+                  '  * Access-Control-Allow-Methods: $method\n'
+                  '    * In credentials mode, wildcard ("*") would not work!\n',
+            );
+            if (sortedHeaderNames.isNotEmpty) {
+              final joinedHeaderNames = sortedHeaderNames.join(', ');
+              sb.write(
+                '  * Access-Control-Allow-Headers: $joinedHeaderNames\n'
+                    '    * In credentials mode, wildcard ("*") would not work!\n',
+              );
+            }
+          } else {
+            sb.write("""
 Enabling credentials mode would enable use of some HTTP headers in both the
 request and the response. For example, credentials mode is required for
 sending/receiving cookies. If you think you need to enable 'credentials mode',
@@ -144,44 +135,47 @@ do the following:
     }
 
 """);
-        if (method != 'HEAD' && method != 'GET') {
-          sb.write(
-            'Did the server respond to a cross-origin "preflight" (OPTIONS) request?\n'
-            '\n',
-          );
+            if (method != 'HEAD' && method != 'GET') {
+              sb.write(
+                'Did the server respond to a cross-origin "preflight" (OPTIONS) request?\n'
+                    '\n',
+              );
+            }
+            sb.write(
+              'Did the server respond with the following headers?\n'
+                  '  * Access-Control-Allow-Origin: $origin\n'
+                  '    * You can also use wildcard ("*").\n'
+                  '    * Always required for cross-origin requests!\n',
+            );
+            if (!_corsSimpleMethods.contains(method)) {
+              sb.write(
+                '  * Access-Control-Allow-Methods: $method\n'
+                    '    * You can also use wildcard ("*").\n',
+              );
+            }
+
+            if (sortedHeaderNames.isNotEmpty) {
+              final joinedHeaderNames = sortedHeaderNames.join(', ');
+              sb.write(
+                '  * Access-Control-Allow-Headers: $joinedHeaderNames\n'
+                    '    * You can also use wildcard ("*").\n',
+              );
+            }
+          }
         }
         sb.write(
-          'Did the server send the following headers?\n'
-          '  * Access-Control-Allow-Origin: $origin\n'
-          '    * You can also use wildcard ("*").\n'
-          '    * Always required for cross-origin requests!\n',
+          '\n'
+              'Want shorter error messages? Set the following static field:\n'
+              '    BrowserHttpException.verbose = false;\n',
         );
-        if (!_corsSimpleMethods.contains(method)) {
-          sb.write(
-            '  * Access-Control-Allow-Methods: $method\n'
-            '    * You can also use wildcard ("*").\n',
-          );
+        // Write a line
+        for (var i = 0; i < 80; i++) {
+          sb.write('-');
         }
-
-        if (sortedHeaderNames.isNotEmpty) {
-          final joinedHeaderNames = sortedHeaderNames.join(', ');
-          sb.write(
-            '  * Access-Control-Allow-Headers: $joinedHeaderNames\n'
-            '    * You can also use wildcard ("*").\n',
-          );
-        }
-      }
+        sb.write('\n');
+        return true;
+      }());
     }
-    sb.write(
-      '\n'
-      'Want shorter error messages? Set the following static field:\n'
-      '    BrowserHttpException.verbose = false;\n',
-    );
-    // Write a line
-    for (var i = 0; i < 80; i++) {
-      sb.write('-');
-    }
-    sb.write('\n');
     return sb.toString();
   }
 }

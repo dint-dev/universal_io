@@ -47,7 +47,7 @@ abstract class BrowserHttpClient implements HttpClient {
 
 /// May be thrown by [BrowserHttpClientRequest.close()] in browsers.
 abstract class BrowserHttpClientException implements SocketException {
-  /// Can be used to disable verbose messages.
+  /// Can be used to disable verbose messages in development mode.
   static bool verbose = true;
 
   BrowserHttpClientException._();
@@ -69,7 +69,6 @@ abstract class BrowserHttpClientException implements SocketException {
 
   /// URL of the HTTP request.
   String get url;
-
 }
 
 /// Implemented by [HttpClientRequest] when the application runs in browser.
