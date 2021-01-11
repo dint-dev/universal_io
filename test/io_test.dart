@@ -40,19 +40,25 @@ void main() {
 }
 
 void testBrowser(String name) {
-  test('Test suite in "$name" (in a separate process, only failures reported): $name', () async {
-    final process = await Process.start('dart', ['test', '--platform=$name', 'test/browser.dart']);
-    process.stdout.listen((data) {
-      stdout.add(data);
-    });
-    process.stderr.listen((data) {
-      stderr.add(data);
-    });
-    final exitCode = await process.exitCode;
-    if (exitCode!=0) {
-      fail('Exit code: $exitCode');
-    }
-  }, timeout: Timeout(const Duration(minutes: 2)));
+  test(
+    'Test suite in "$name" (in a separate process, only failures reported): $name',
+    () async {
+      final process = await Process.start(
+          'dart', ['test', '--platform=$name', 'test/browser.dart']);
+      process.stdout.listen((data) {
+        stdout.add(data);
+      });
+      process.stderr.listen((data) {
+        stderr.add(data);
+      });
+      final exitCode = await process.exitCode;
+      if (exitCode != 0) {
+        fail('Exit code: $exitCode');
+      }
+    },
+    timeout: Timeout(const Duration(minutes: 2)),
+    tags: ['browser', name],
+  );
 }
 
 void runServer() {

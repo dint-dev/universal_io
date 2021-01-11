@@ -17,4 +17,4 @@ jobs:
         run: pub get
 
       - name: Run tests
-        run: pub run test --platform vm --exclude-tags "ipv6"
+        run: pub run test --platform vm --exclude-tags "browser"
