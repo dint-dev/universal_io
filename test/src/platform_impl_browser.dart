@@ -1,7 +1,7 @@
 import 'dart:html' hide Platform;
 
 import 'package:test/test.dart';
-import 'package:universal_io/prefer_universal/io.dart';
+import 'package:universal_io/io.dart';
 
 // Conditionally imported by 'env.dart'.
 void testPlatformInBrowser() {

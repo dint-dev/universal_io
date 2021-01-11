@@ -16,8 +16,10 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:test/test.dart';
+// ignore: deprecated_member_use_from_same_package
 import 'package:universal_io/prefer_sdk/io.dart' as prefer_sdk;
 import 'package:universal_io/io.dart';
+// ignore: deprecated_member_use_from_same_package
 import 'package:universal_io/prefer_universal/io.dart' as prefer_universal;
 
 const secureServerPort = 5002;

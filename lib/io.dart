@@ -12,16 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// Cross-platform implementation of 'dart:io'.
+/// Cross-platform implementation of "dart:io" that works in browsers too.
 ///
-/// To deal with limitations of conditional imports/exports in Dart, developers
-/// can choose from three slightly libraries:
-///   * 'package:universal_io/prefer_sdk/io.dart'
-///     * Exports SDK version by default
-///   * 'package:universal_io/prefer_universal/io.dart'
-///     * Exports non-SDK version by default
-///   * 'package:universal_io/io.dart'
-///     * Exports either one of the above libraries.
+/// # Usage
+/// Replace imports of "dart:io" with:
+/// ```
+/// import 'package:universal_io/io.dart';
+/// ```
 library universal_io;
 
-export 'prefer_sdk/io.dart';
+export 'src/io_in_vm.dart' if (dart.library.js) 'src/io.dart';

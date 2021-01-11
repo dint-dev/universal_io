@@ -1,6 +1,8 @@
 # 2.0.0-nullsafety.1
   * Improves documentation.
   * Improves BrowserHttpClientException messages.
+  * Deprecates libraries _prefer_sdk/io.dart_ and _prefer_universal/io.dart_. Developers should
+    import just _io.dart_.
 
 # 2.0.0-nullsafety.0
   * The first null-safe version.

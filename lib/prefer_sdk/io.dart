@@ -13,6 +13,7 @@
 // limitations under the License.
 
 /// {@nodoc}
+@Deprecated('Use "package:universal_io/io.dart" instead.')
 library universal_io.prefer_sdk.io;
 
 export '../src/io_in_vm.dart' if (dart.library.js) '../src/io.dart';

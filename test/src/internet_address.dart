@@ -15,7 +15,7 @@
 import 'dart:typed_data';
 
 import 'package:test/test.dart';
-import 'package:universal_io/prefer_universal/io.dart';
+import 'package:universal_io/io.dart';
 
 void testInternetAddress() {
   group('InternetAddress', () {
