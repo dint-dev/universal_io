@@ -13,34 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - name: packages/universal_io - Install dependencies
+      - name: Install dependencies
         run: pub get
-        working-directory: ./packages/universal_io
 
-      - name: packages/universal_io - Run tests
+      - name: Run tests
         run: pub run test --platform vm --exclude-tags "ipv6"
-        working-directory: ./packages/universal_io
-
-      - name: packages/test_io - Install dependencies
-        run: pub get
-        working-directory: ./packages/test_io
-
-      - name: packages/test_io - Run tests
-        run: pub run test --platform vm
-        working-directory: ./packages/test_io
-
-      - name: packages/nodejs_io - Install dependencies
-        run: pub get
-        working-directory: ./packages/nodejs_io
-
-      - name: packages/chrome_os_io - Install dependencies
-        run: pub get
-        working-directory: ./packages/chrome_os_io
-
-      - name: samples/chrome_app_example - Install dependencies
-        run: pub get
-        working-directory: ./samples/chrome_app_example
-
-      - name: samples/chrome_app_example - Build
-        run: pub run webdev build
-        working-directory: ./samples/chrome_app_example
