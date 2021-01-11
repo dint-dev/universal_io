@@ -1,3 +1,6 @@
+# 2.0.0-nullsafety.2
+  * Eliminated unnecessary dependencies.
+
 # 2.0.0-nullsafety.1
   * Improves documentation.
   * Improves BrowserHttpClientException messages.
