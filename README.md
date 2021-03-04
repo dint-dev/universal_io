@@ -24,7 +24,7 @@ which was obtained under the BSD-style license of Dart SDK. See LICENSE file for
 ### pubspec.yaml
 ```yaml
 dependencies:
-  universal_io: ^2.0.0-nullsafety.1
+  universal_io: ^2.0.0
 ```
 
 ### main.dart
