@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export 'browser/http_client.dart';
-export 'browser/http_client_exception.dart';
-export 'browser/http_client_request.dart';
-export 'browser/http_client_response.dart';
+// export 'browser_http_client.dart';
 export 'http/http.dart' hide HttpHeadersImpl;
 export 'io/bytes_builder.dart';
 export 'io/data_transformer.dart';

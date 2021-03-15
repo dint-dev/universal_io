@@ -65,8 +65,7 @@ class CompressionOptions {
   /// * `serverNoContextTakeover`: false
   /// * `clientMaxWindowBits`: null (default maximal window size of 15 bits)
   /// * `serverMaxWindowBits`: null (default maximal window size of 15 bits)
-  static const CompressionOptions compressionDefault =
-      CompressionOptions();
+  static const CompressionOptions compressionDefault = CompressionOptions();
   @Deprecated('Use compressionDefault instead')
   static const CompressionOptions DEFAULT = compressionDefault;
 
@@ -143,15 +142,8 @@ abstract class WebSocket
   @Deprecated('Use closed instead')
   static const int CLOSED = closed;
 
-  static String? _userAgent;
-
   /// Gets the user agent used for WebSocket connections.
-  static String? get userAgent => _userAgent;
-
-  /// Sets the user agent to use for WebSocket connections.
-  static set userAgent(String? userAgent) {
-    _userAgent = userAgent;
-  }
+  static String? userAgent;
 
   /// The interval between ping signals.
   ///

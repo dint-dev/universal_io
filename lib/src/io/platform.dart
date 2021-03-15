@@ -44,7 +44,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'dart:html' as html;
+import '../choose.dart' as choose;
 
 /// Information about the environment in which the current program is running.
 ///
@@ -156,7 +156,7 @@ class Platform {
   static List<String> get executableArguments => [];
 
   /// Get the name of the current locale.
-  static String get localeName => html.window.navigator.language;
+  static String get localeName => choose.language;
 
   /// The local hostname for the system.
   static String get localHostname => 'localhost';

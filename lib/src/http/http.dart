@@ -53,7 +53,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import '../annotations.dart';
-import '../browser/http_client.dart' show BrowserHttpClient;
+import '../choose.dart' as choose;
 import '../io.dart';
 import 'http_status_codes.dart';
 
@@ -394,21 +394,11 @@ abstract class HttpClient {
   @Deprecated('Use defaultHttpsPort instead')
   static const int DEFAULT_HTTPS_PORT = defaultHttpsPort;
 
-  static bool _enableTimelineLogging = false;
-
   /// Current state of HTTP request logging from all [HttpClient]s to the
   /// developer timeline.
   ///
   /// Default is `false`.
-  static bool get enableTimelineLogging => _enableTimelineLogging;
-
-  /// Enable logging of HTTP requests from all [HttpClient]s to the developer
-  /// timeline.
-  ///
-  /// Default is `false`.
-  static set enableTimelineLogging(bool value) {
-    _enableTimelineLogging = value;
-  }
+  static bool enableTimelineLogging = false;
 
   /// Gets and sets the idle timeout of non-active persistent (keep-alive)
   /// connections.
@@ -474,7 +464,7 @@ abstract class HttpClient {
   factory HttpClient({SecurityContext? context}) {
     var overrides = HttpOverrides.current;
     if (overrides == null) {
-      return BrowserHttpClient();
+      return choose.newHttpClient();
     }
     return overrides.createHttpClient(context);
   }

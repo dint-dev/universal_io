@@ -12,17 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// Cross-platform implementation of "dart:io" that works in browsers too.
-///
-/// # Usage
-/// Replace imports of "dart:io" with:
-/// ```
-/// import 'package:universal_io/io.dart';
-/// ```
-library universal_io;
+import 'io.dart';
+import 'browser/http_client.dart';
+import 'dart:html' as html;
 
-export 'src/io_in_vm.dart'
-    if (dart.library.io) 'src/io_in_vm.dart'
-    if (dart.library.js) 'src/io.dart';
+HttpClient newHttpClient() {
+  return BrowserHttpClient();
+}
 
-export 'src/browser_http_client.dart';
+String get language => html.window.navigator.language;

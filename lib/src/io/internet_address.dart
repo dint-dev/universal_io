@@ -316,7 +316,7 @@ class InternetAddress {
     final rawAddress = this.rawAddress;
     if (type == InternetAddressType.IPv6) {
       // First 10 bits is 0xFE80
-      return rawAddress[0] == 0xFE && ((0x80|0x40) & rawAddress[1]) == 0x80;
+      return rawAddress[0] == 0xFE && ((0x80 | 0x40) & rawAddress[1]) == 0x80;
     }
     return false;
   }

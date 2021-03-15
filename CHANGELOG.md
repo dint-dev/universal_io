@@ -1,3 +1,9 @@
+# 2.0.1
+  * Fixes issues in Node.JS.
+
+# 2.0.0
+  * Finishes migration to null safety.
+
 # 2.0.0-nullsafety.2
   * Eliminated unnecessary dependencies.
 

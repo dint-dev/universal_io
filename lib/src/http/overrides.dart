@@ -92,7 +92,7 @@ abstract class HttpOverrides {
   /// When this override is installed, this function overrides the behavior of
   /// `new HttpClient`.
   HttpClient createHttpClient(SecurityContext? context) {
-    return BrowserHttpClient();
+    return choose.newHttpClient();
   }
 
   /// Resolves the proxy server to be used for HTTP connections.

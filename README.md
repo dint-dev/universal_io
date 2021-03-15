@@ -2,19 +2,21 @@
 [![Github Actions CI](https://github.com/dint-dev/universal_io/workflows/Dart%20CI/badge.svg)](https://github.com/dint-dev/universal_io/actions?query=workflow%3A%22Dart+CI%22)
 
 # Overview
-A cross-platform _dart:io_ that works in all platforms (browsers, Flutter, and VM).
+A cross-platform _dart:io_ that works in all platforms (browsers, mobile, desktop, and server-side,
+and Node.JS).
 
 The API is exactly the same API as _dart:io_. You can simply replace _dart:io_ imports with
-_package:universal_io/io.dart_.
+_package:universal_io/io.dart_. Normal _dart:io_ will continue to be used when your application runs
+in non-Javascript platforms.
 
 Licensed under the [Apache License 2.0](LICENSE).
 Much of the source code is derived [from Dart SDK](https://github.com/dart-lang/sdk/tree/master/sdk/lib/io),
 which was obtained under the BSD-style license of Dart SDK. See LICENSE file for details.
 
 ## Links
-  * [Pub package](https://pub.dev/packages/universal_io)
-  * [Issue tracker](https://github.com/dint-dev/universal_io/issues)
-  * [Create a pull request](https://github.com/dint-dev/universal_io/pull/new/master)
+  * [API reference](https://pub.dev/documentation/universal_io/latest/)
+  * [Github project](https://github.com/dint-dev/universal_io)
+    * We appreciate feedback, issue reports, and pull requests.
 
 ## Similar packages
   * [universal_html](https://pub.dev/packages/universal_html) (cross-platform _dart:html_)
@@ -24,7 +26,7 @@ which was obtained under the BSD-style license of Dart SDK. See LICENSE file for
 ### pubspec.yaml
 ```yaml
 dependencies:
-  universal_io: ^2.0.0
+  universal_io: ^2.0.1
 ```
 
 ### main.dart
@@ -136,11 +138,3 @@ Future<void> main() async {
 ```
 
 See [source code](https://github.com/dint-dev/universal_io/blob/master/lib/src/browser/http_client_request.dart).
-
-## Platform
-Supported `Platform` APIs include:
-  * `Platform.isWindows`
-  * `Platform.operatingSystem`
-  * `Platform.locale`
-
-See [source code](https://github.com/dint-dev/universal_io/blob/master/lib/src/browser/platform.dart).

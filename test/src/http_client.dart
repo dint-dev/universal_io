@@ -16,18 +16,14 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:test/test.dart';
-// ignore: deprecated_member_use_from_same_package
-import 'package:universal_io/prefer_sdk/io.dart' as prefer_sdk;
 import 'package:universal_io/io.dart';
-// ignore: deprecated_member_use_from_same_package
-import 'package:universal_io/prefer_universal/io.dart' as prefer_universal;
 
 const secureServerPort = 5002;
 const serverPort = 5001;
 
 class _HttpOverrides extends HttpOverrides {
   @override
-  prefer_sdk.HttpClient createHttpClient(prefer_sdk.SecurityContext? context) {
+  HttpClient createHttpClient(SecurityContext? context) {
     throw StateError('ERROR');
   }
 }
@@ -52,81 +48,42 @@ void testHttpClient({bool isBrowser = false}) async {
   });
 
   group('HttpClient:', () {
-    group('in "package:universal_io/prefer_sdk/io.dart":', () {
-      final client = prefer_sdk.HttpClient();
-      if (isBrowser) {
-        test('does implement BrowserHttpClient', () async {
-          expect(client, isA<BrowserHttpClient>());
-          if (client is prefer_sdk.BrowserHttpClient) {
-            expect(client.onBrowserHttpClientRequestClose, isNull);
-          }
-        });
-        test('requests implement BrowserHttpClientRequest', () async {
-          if (client is prefer_sdk.BrowserHttpClient) {
-            client.onBrowserHttpClientRequestClose = expectAsync1(
-              (request) {
-                request.browserResponseType = 'text';
-              },
-              count: 1,
-            );
-          }
-          final request = await client.openUrl(
-            'GET',
-            Uri.parse('http://localhost:$serverPort/greeting'),
-          );
-          expect(request, isA<prefer_sdk.BrowserHttpClientRequest>());
-          if (request is prefer_sdk.BrowserHttpClientRequest) {
-            expect(request.browserCredentialsMode, isFalse);
-            expect(request.browserResponseType, isNull);
-            await request.close();
-            expect(request.browserCredentialsMode, isFalse);
-            expect(request.browserResponseType, 'text');
-          }
-        });
-      } else {
-        test('does NOT implement BrowserHttpClient', () async {
-          expect(client, isNot(isA<BrowserHttpClient>()));
-        });
-      }
-    });
+    test('In VM: does NOT implement BrowserHttpClient', () async {
+      final client = HttpClient();
+      expect(client, isNot(isA<BrowserHttpClient>()));
+    }, testOn: '!browser');
 
-    group('in "package:universal_io/prefer_universal/io.dart":', () {
-      final client = prefer_universal.HttpClient();
-      if (isBrowser) {
-        test('does implement BrowserHttpClient', () async {
-          expect(client, isA<BrowserHttpClient>());
-          if (client is prefer_universal.BrowserHttpClient) {
-            expect(client.onBrowserHttpClientRequestClose, isNull);
-          }
-        });
-        test('requests implement BrowserHttpClientRequest', () async {
-          if (client is prefer_universal.BrowserHttpClient) {
-            client.onBrowserHttpClientRequestClose = expectAsync1(
-              (request) {
-                request.browserResponseType = 'text';
-              },
-              count: 1,
-            );
-          }
-          final request = await client.openUrl(
-            'GET',
-            Uri.parse('http://localhost:$serverPort/greeting'),
-          );
-          expect(request, isA<prefer_universal.BrowserHttpClientRequest>());
-          if (request is prefer_universal.BrowserHttpClientRequest) {
-            expect(request.browserCredentialsMode, isFalse);
-            expect(request.browserResponseType, isNull);
-            await request.close();
-            expect(request.browserCredentialsMode, isFalse);
-            expect(request.browserResponseType, 'text');
-          }
-        });
-      } else {
-        test('does NOT implement BrowserHttpClient', () {
-          expect(client, isNot(isA<BrowserHttpClient>()));
-        });
+    test('In browser: does implement BrowserHttpClient', () async {
+      final client = HttpClient();
+      expect(client, isA<BrowserHttpClient>());
+      if (client is BrowserHttpClient) {
+        expect(client.onBrowserHttpClientRequestClose, isNull);
       }
-    });
+    }, testOn: 'browser');
+
+    test('In browser: requests implement BrowserHttpClientRequest', () async {
+      final client = HttpClient();
+      if (client is BrowserHttpClient) {
+        client.onBrowserHttpClientRequestClose = expectAsync1(
+          (request) {
+            request.browserResponseType = 'text';
+          },
+          count: 1,
+        );
+      }
+      final request = await client.openUrl(
+        'GET',
+        Uri.parse('http://localhost:$serverPort/greeting'),
+      );
+      expect(request, isA<BrowserHttpClientRequest>());
+      if (request is BrowserHttpClientRequest) {
+        expect(request.browserCredentialsMode, isFalse);
+        expect(request.browserResponseType, isNull);
+        await request.close();
+        expect(request.browserCredentialsMode, isFalse);
+        expect(request.browserResponseType, 'text');
+      }
+    }, testOn: 'browser');
 
     test('findProxyFromEnvironment', () {
       final proxy = HttpClient.findProxyFromEnvironment(
@@ -167,7 +124,7 @@ void testHttpClient({bool isBrowser = false}) async {
       final client = HttpClient();
       final request = await client.openUrl(
         'GET',
-        Uri.parse('http://localhost:${serverPort}/slow'),
+        Uri.parse('http://localhost:$serverPort/slow'),
       );
       if (request is BrowserHttpClientRequest) {
         request.browserResponseType = 'text';

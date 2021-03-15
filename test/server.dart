@@ -57,7 +57,7 @@ void _handleHttpRequest(HttpRequest request) async {
     }
     final origin = request.headers.value('Origin') ?? '*';
     final userAgent = request.headers.value('User-Agent') ?? '';
-    if (origin=='*' && !userAgent.contains('Dart')) {
+    if (origin == '*' && !userAgent.contains('Dart')) {
       print('INVALID ORIGIN: $origin');
     }
     response.headers.set(
@@ -72,7 +72,8 @@ void _handleHttpRequest(HttpRequest request) async {
       'Access-Control-Expose-Headers',
       '*',
     );
-    final isCredentialsMode = request.uri.queryParameters['credentials'] == 'true';
+    final isCredentialsMode =
+        request.uri.queryParameters['credentials'] == 'true';
     if (isCredentialsMode) {
       response.headers.set(
         'Access-Control-Allow-Origin',

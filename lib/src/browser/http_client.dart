@@ -71,7 +71,8 @@ class BrowserHttpClient implements HttpClient {
 
   /// Enables you to set [BrowserHttpClientRequest.browserRequestType] before
   /// any _XHR_ request is sent to the server.
-  FutureOr<void> Function(BrowserHttpClientRequest request)? onBrowserHttpClientRequestClose;
+  FutureOr<void> Function(BrowserHttpClientRequest request)?
+      onBrowserHttpClientRequestClose;
 
   @override
   void addCredentials(

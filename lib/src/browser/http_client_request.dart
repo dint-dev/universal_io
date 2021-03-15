@@ -98,7 +98,7 @@ class BrowserHttpClientRequest extends HttpClientRequest with IOSinkBase {
   String? get browserResponseType => _browserResponseType;
 
   set browserResponseType(String? value) {
-    if (value!=null) {
+    if (value != null) {
       const validValues = <String>{
         'arraybuffer',
         'blob',
@@ -190,10 +190,10 @@ class BrowserHttpClientRequest extends HttpClientRequest with IOSinkBase {
     }
 
     // Callback
-    if (browserResponseType==null) {
+    if (browserResponseType == null) {
       browserResponseType = 'arraybuffer';
       final accept = headers.value('Accept');
-      if (accept!=null) {
+      if (accept != null) {
         final isText = isTextContentType(accept);
         if (isText) {
           browserResponseType = 'text';
@@ -202,7 +202,7 @@ class BrowserHttpClientRequest extends HttpClientRequest with IOSinkBase {
     }
 
     final callback = client.onBrowserHttpClientRequestClose;
-    if (callback!=null) {
+    if (callback != null) {
       await Future(() => callback(this));
     }
     try {

@@ -81,7 +81,8 @@ class BrowserHttpClientException implements SocketException {
         addEntry('Cross-origin: ', '$isCrossOrigin');
         addEntry('browserCredentialsMode: ', '$browserCredentialsMode');
         addEntry('browserResponseType: ', '$browserResponseType');
-        sb.write('''
+        sb.write(
+          '''
 
 THE REASON FOR THE XHR ERROR IS UNKNOWN.
 (For security reasons, browsers do not explain XHR errors.)
@@ -103,23 +104,23 @@ Is the server down? Did the server have an internal error?
             if (method != 'HEAD' && method != 'GET') {
               sb.write(
                 'Did the server respond to a cross-origin "preflight" (OPTIONS) request?\n'
-                    '\n',
+                '\n',
               );
             }
             sb.write(
               'Did the server respond with the following headers?\n'
-                  '  * Access-Control-Allow-Credentials: true\n'
-                  '    * Alternatively, disable "credentials mode".\n'
-                  '  * Access-Control-Allow-Origin: $origin\n'
-                  '    * In credentials mode, wildcard ("*") would not work!\n'
-                  '  * Access-Control-Allow-Methods: $method\n'
-                  '    * In credentials mode, wildcard ("*") would not work!\n',
+              '  * Access-Control-Allow-Credentials: true\n'
+              '    * Alternatively, disable "credentials mode".\n'
+              '  * Access-Control-Allow-Origin: $origin\n'
+              '    * In credentials mode, wildcard ("*") would not work!\n'
+              '  * Access-Control-Allow-Methods: $method\n'
+              '    * In credentials mode, wildcard ("*") would not work!\n',
             );
             if (sortedHeaderNames.isNotEmpty) {
               final joinedHeaderNames = sortedHeaderNames.join(', ');
               sb.write(
                 '  * Access-Control-Allow-Headers: $joinedHeaderNames\n'
-                    '    * In credentials mode, wildcard ("*") would not work!\n',
+                '    * In credentials mode, wildcard ("*") would not work!\n',
               );
             }
           } else {
@@ -138,19 +139,19 @@ do the following:
             if (method != 'HEAD' && method != 'GET') {
               sb.write(
                 'Did the server respond to a cross-origin "preflight" (OPTIONS) request?\n'
-                    '\n',
+                '\n',
               );
             }
             sb.write(
               'Did the server respond with the following headers?\n'
-                  '  * Access-Control-Allow-Origin: $origin\n'
-                  '    * You can also use wildcard ("*").\n'
-                  '    * Always required for cross-origin requests!\n',
+              '  * Access-Control-Allow-Origin: $origin\n'
+              '    * You can also use wildcard ("*").\n'
+              '    * Always required for cross-origin requests!\n',
             );
             if (!_corsSimpleMethods.contains(method)) {
               sb.write(
                 '  * Access-Control-Allow-Methods: $method\n'
-                    '    * You can also use wildcard ("*").\n',
+                '    * You can also use wildcard ("*").\n',
               );
             }
 
@@ -158,15 +159,15 @@ do the following:
               final joinedHeaderNames = sortedHeaderNames.join(', ');
               sb.write(
                 '  * Access-Control-Allow-Headers: $joinedHeaderNames\n'
-                    '    * You can also use wildcard ("*").\n',
+                '    * You can also use wildcard ("*").\n',
               );
             }
           }
         }
         sb.write(
           '\n'
-              'Want shorter error messages? Set the following static field:\n'
-              '    BrowserHttpException.verbose = false;\n',
+          'Want shorter error messages? Set the following static field:\n'
+          '    BrowserHttpException.verbose = false;\n',
         );
         // Write a line
         for (var i = 0; i < 80; i++) {

@@ -83,30 +83,19 @@ StdioType stdioType(object) {
 ///
 /// Mixing synchronous and asynchronous reads is undefined.
 abstract class Stdin implements Stream<List<int>> {
-  bool _echoMode = false;
-
-  bool _lineMode = false;
   /// Check if echo mode is enabled on [stdin].
-  bool get echoMode => _echoMode;
-
-  /// Enable or disable echo mode on [stdin].
   ///
   /// If disabled, input from to console will not be echoed.
   ///
   /// Default depends on the parent process, but usually enabled.
   ///
   /// On Windows this mode can only be enabled if [lineMode] is enabled as well.
-  set echoMode(bool enabled) {
-    _echoMode = enabled;
-  }
+  bool echoMode = false;
 
   /// Returns true if there is a terminal attached to stdin.
   bool get hasTerminal => false;
 
   /// Check if line mode is enabled on [stdin].
-  bool get lineMode => _lineMode;
-
-  /// Enable or disable line mode on [stdin].
   ///
   /// If enabled, characters are delayed until a new-line character is entered.
   /// If disabled, characters will be available as typed.
@@ -114,9 +103,7 @@ abstract class Stdin implements Stream<List<int>> {
   /// Default depends on the parent process, but usually enabled.
   ///
   /// On Windows this mode can only be disabled if [echoMode] is disabled as well.
-  set lineMode(bool enabled) {
-    _lineMode = enabled;
-  }
+  bool lineMode = false;
 
   /// Whether connected to a terminal that supports ANSI escape sequences.
   ///

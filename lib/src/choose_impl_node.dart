@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// {@nodoc}
-@Deprecated('Use "package:universal_io/io.dart" instead.')
-library universal_io.prefer_sdk.io;
+import 'io.dart';
 
-export '../src/io_in_vm.dart' if (dart.library.js) '../src/io.dart';
+HttpClient newHttpClient() {
+  throw UnimplementedError();
+}
+
+String get language => 'en-US';
