@@ -50,7 +50,7 @@ import 'dart:typed_data';
 import 'package:collection/collection.dart';
 
 import '../annotations.dart';
-import '../io.dart';
+import '../io_impl_js.dart';
 
 String _stringFromIp(Uint8List bytes) {
   switch (bytes.length) {

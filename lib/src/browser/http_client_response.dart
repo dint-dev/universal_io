@@ -16,7 +16,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import '../http/http.dart' show HttpHeadersImpl;
-import '../io.dart';
+import '../io_impl_js.dart';
 import 'http_client_request.dart';
 
 /// Used by [_BrowserHttpClient].

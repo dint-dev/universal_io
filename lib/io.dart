@@ -17,12 +17,14 @@
 /// # Usage
 /// Replace imports of "dart:io" with:
 /// ```
-/// import 'package:universal_io/io.dart';
+/// import 'package:universal_io/io_impl_js.dart';
 /// ```
 library universal_io;
 
-export 'src/io_in_vm.dart'
-    if (dart.library.io) 'src/io_in_vm.dart'
-    if (dart.library.js) 'src/io.dart';
+// ignore: invalid_export_of_internal_element
+export 'src/io_impl_vm.dart'
+    if (dart.library.io) 'src/io_impl_vm.dart'
+    if (dart.library.js) 'src/io_impl_js.dart'
+    if (dart.library.html) 'src/io_impl_js.dart';
 
 export 'src/browser_http_client.dart';

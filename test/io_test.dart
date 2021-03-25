@@ -12,96 +12,58 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@TestOn('dart-vm')
-@Timeout(Duration(seconds: 5))
-library vm_test;
+library main_test;
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'package:test/test.dart';
+import 'dart:typed_data';
 
-import 'src/all.dart';
+import 'package:async/async.dart';
+import 'package:test/test.dart';
+import 'package:universal_io/io.dart';
+
+import 'helpers_impl_default.dart'
+    if (dart.library.html) 'helpers_impl_browser.dart';
+
+part 'src/file.dart';
+part 'src/http_client.dart';
+part 'src/internet_address.dart';
+part 'src/platform.dart';
+
+var serverPort = -1;
+var secureServerPort = -1;
 
 void main() {
-  runServer();
-
-  group('Test suite in VM:', () {
-    testAll();
-  });
-
-  testBrowser('chrome');
-
-  // if (Platform.isMacOS) {
-  //   testBrowser('safari');
-  // }
-
-  // testBrowser('firefox');
-}
-
-void testBrowser(String name) {
-  test(
-    'Test suite in "$name" (in a separate process, only failures reported): $name',
-    () async {
-      final process = await Process.start(
-          'dart', ['test', '--platform=$name', 'test/browser.dart']);
-      process.stdout.listen((data) {
-        stdout.add(data);
-      });
-      process.stderr.listen((data) {
-        stderr.add(data);
-      });
-      final exitCode = await process.exitCode;
-      if (exitCode != 0) {
-        fail('Exit code: $exitCode');
-      }
-    },
-    timeout: Timeout(const Duration(minutes: 2)),
-    tags: ['browser', name],
-  );
-}
-
-void runServer() {
-  late Process process;
   setUpAll(() async {
-    process = await Process.start(
-      'dart',
-      [
-        'run',
-        'test/server.dart',
-      ],
-    );
-    final serverStartedCompleter = Completer<void>();
-    final collectedStdout = <int>[];
-    process.stdout.listen((data) {
-      collectedStdout.addAll(data);
-      try {
-        final s = utf8.decode(collectedStdout);
-        if (s.contains('SERVER STARTED AT: localhost:$serverPort\n')) {
-          serverStartedCompleter.complete();
-        }
-      } catch (e) {
-        // Ignore
-      }
-      stdout.add(data);
+    final channel = spawnHybridUri('server.dart', message: {});
+    final streamQueue = StreamQueue(channel.stream);
+    serverPort = ((await streamQueue.next) as num).toInt();
+    secureServerPort = ((await streamQueue.next) as num).toInt();
+
+    addTearDown(() {
+      channel.sink.close();
+      streamQueue.cancel();
     });
-    process.stderr.listen((data) {
-      stdout.add(data);
-    });
-    await Future.any([
-      serverStartedCompleter.future,
-      process.exitCode,
-    ]);
   });
-  setUp(() async {
-    try {
-      await process.exitCode.timeout(Duration(milliseconds: 1));
-      fail('Server process has exited with code: $exitCode');
-    } on TimeoutException {
-      // Ignore
-    }
-  });
-  tearDownAll(() {
-    process.kill();
-  });
+
+  group('Chrome', () {
+    _testFile();
+    _testInternetAddress();
+    _testPlatform();
+    _testHttpClient(isBrowser: true);
+  }, testOn: 'chrome');
+
+  group('VM:', () {
+    _testFile();
+    _testInternetAddress();
+    _testPlatform();
+    _testHttpClient(isBrowser: false);
+  }, testOn: 'vm');
+
+
+  group('Node.JS', () {
+    _testFile();
+    _testInternetAddress();
+    _testPlatform();
+  }, testOn: 'node');
 }

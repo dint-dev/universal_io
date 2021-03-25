@@ -47,7 +47,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import '../io.dart';
+import '../io_impl_js.dart';
 
 /// The standard output stream of errors written by this program.
 ///

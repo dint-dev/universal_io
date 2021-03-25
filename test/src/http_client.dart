@@ -12,14 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'dart:async';
-import 'dart:convert';
-
-import 'package:test/test.dart';
-import 'package:universal_io/io.dart';
-
-const secureServerPort = 5002;
-const serverPort = 5001;
+part of main_test;
 
 class _HttpOverrides extends HttpOverrides {
   @override
@@ -28,7 +21,7 @@ class _HttpOverrides extends HttpOverrides {
   }
 }
 
-void testHttpClient({bool isBrowser = false}) async {
+void _testHttpClient({required bool isBrowser}) async {
   group('HttpOverrides', () {
     setUp(() {
       HttpOverrides.global = _HttpOverrides();

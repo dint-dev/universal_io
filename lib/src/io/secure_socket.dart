@@ -48,7 +48,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import '../annotations.dart';
-import '../io.dart';
+import '../io_impl_js.dart';
 import 'exceptions.dart';
 import 'security_context.dart';
 import 'socket.dart';

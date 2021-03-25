@@ -47,7 +47,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import '../io.dart';
+import '../io_impl_js.dart';
 
 /// [Link] objects are references to filesystem links.
 ///

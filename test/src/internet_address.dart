@@ -12,12 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'dart:typed_data';
+part of main_test;
 
-import 'package:test/test.dart';
-import 'package:universal_io/io.dart';
-
-void testInternetAddress() {
+void _testInternetAddress() {
   group('InternetAddress', () {
     test('== / hashCode', () {
       final value = InternetAddress('10.0.0.1');

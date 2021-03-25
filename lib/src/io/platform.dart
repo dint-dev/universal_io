@@ -44,7 +44,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import '../choose.dart' as choose;
+import '../internals_for_browser_or_node.dart' as choose;
 
 /// Information about the environment in which the current program is running.
 ///

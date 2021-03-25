@@ -21,7 +21,7 @@ import 'package:meta/meta.dart';
 import 'package:typed_data/typed_buffers.dart';
 
 import '../http/http.dart' show HttpHeadersImpl;
-import '../io.dart';
+import '../io_impl_js.dart';
 import 'http_client.dart';
 import 'http_client_exception.dart';
 import 'http_client_response.dart';

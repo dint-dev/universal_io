@@ -48,7 +48,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import '../annotations.dart';
-import '../io.dart';
+import '../io_impl_js.dart';
 
 /// Returned by the `startConnect` methods on client-side socket types `S`,
 /// `ConnectionTask<S>` allows cancelling an attempt to connect to a host.

@@ -48,7 +48,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import '../io.dart';
+import '../io_impl_js.dart';
 
 /// A reference to a directory (or _folder_) on the file system.
 ///

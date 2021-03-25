@@ -12,10 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'io_in_vm.dart'
+// Annotate as 'internal' so developers don't accidentally import this.
+@internal
+library universal_io.browser_http_client.impl_others;
+
+import 'dart:async';
+
+import 'package:meta/meta.dart';
+
+import 'io_impl_vm.dart'
     if (dart.library.io) 'io_in_vm.dart'
     if (dart.library.js) 'io.dart';
-import 'dart:async';
 
 /// Implemented by [HttpClient] when the application runs in browser.
 abstract class BrowserHttpClient implements HttpClient {

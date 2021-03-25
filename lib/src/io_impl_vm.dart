@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export 'choose_impl_browser.dart'
-    if (dart.library.html) 'choose_impl_browser.dart'
-    if (dart.library.js) 'choose_impl_node.dart';
+// Annotate as 'internal' so developers don't accidentally import this.
+@internal
+library universal_io.io.impl_vm;
+
+import 'package:meta/meta.dart';
+
+export 'dart:io';

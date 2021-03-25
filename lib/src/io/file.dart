@@ -48,7 +48,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import '../io.dart';
+import '../io_impl_js.dart';
 
 /// The mode for opening a file for reading and writing to the
 /// end of it. The file is created if it does not already exist.

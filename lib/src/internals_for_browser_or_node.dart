@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'io.dart';
-import 'browser/http_client.dart';
-import 'dart:html' as html;
+// Annotate as 'internal' so developers don't accidentally import this.
+@internal
+library universal_io.internals_for_browser_or_node;
 
-HttpClient newHttpClient() {
-  return BrowserHttpClient();
-}
+import 'package:meta/meta.dart';
 
-String get language => html.window.navigator.language;
+export 'internals_for_browser_or_node_impl_browser.dart'
+    if (dart.library.html) 'internals_for_browser_or_node_impl_browser.dart'
+    if (dart.library.js) 'internals_for_browser_or_node_impl_node.dart';

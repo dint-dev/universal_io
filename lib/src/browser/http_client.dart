@@ -14,7 +14,7 @@
 
 import 'dart:async';
 
-import '../io.dart';
+import '../io_impl_js.dart';
 import 'http_client_request.dart';
 
 /// Browser implementation of _dart:io_ [HttpClient].

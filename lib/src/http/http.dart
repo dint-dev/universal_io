@@ -53,8 +53,8 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import '../annotations.dart';
-import '../choose.dart' as choose;
-import '../io.dart';
+import '../internals_for_browser_or_node.dart' as choose;
+import '../io_impl_js.dart';
 import 'http_status_codes.dart';
 
 export 'http_status_codes.dart';

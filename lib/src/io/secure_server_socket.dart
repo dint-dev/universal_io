@@ -46,7 +46,7 @@
 
 import 'dart:async';
 
-import '../io.dart';
+import '../io_impl_js.dart';
 
 /// The RawSecureServerSocket is a server socket, providing a stream of low-level
 /// [RawSecureSocket]s.

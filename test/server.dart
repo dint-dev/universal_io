@@ -15,8 +15,9 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:stream_channel/stream_channel.dart';
 
-Future<void> main() async {
+void hybridMain(StreamChannel streamChannel, Object message) async {
   final securityContext = SecurityContext();
   const testSuitePath = 'test/src';
   securityContext.useCertificateChain(
@@ -28,15 +29,19 @@ Future<void> main() async {
 
   final server = await HttpServer.bind(
     'localhost',
-    5001,
+    0,
   );
+  print('Server #1 is listening at: http://localhost:${server.port}/');
+  streamChannel.sink.add(server.port);
+
   final secureServer = await HttpServer.bindSecure(
     'localhost',
-    5002,
+    0,
     securityContext,
   );
-  print('SERVER STARTED AT: localhost:${server.port}');
-  print('SERVER STARTED AT: localhost:${secureServer.port}');
+  print('Server #2 is listening at: https://localhost:${secureServer.port}/');
+  streamChannel.sink.add(secureServer.port);
+
   try {
     final f0 = server.listen(_handleHttpRequest).asFuture();
     final f1 = secureServer.listen(_handleHttpRequest).asFuture();

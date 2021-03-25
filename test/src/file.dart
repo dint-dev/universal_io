@@ -12,14 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'package:test/test.dart';
+part of main_test;
 
-import 'src/all.dart';
-
-void main() {
-  group('Test suite in browsers:', () {
-    testInternetAddress();
-    testPlatform();
-    testHttpClient(isBrowser: true);
+void _testFile() {
+  test('File', () {
+    expect(() => File('x'), throwsUnimplementedError);
   });
 }

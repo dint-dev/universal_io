@@ -14,7 +14,7 @@
 
 import 'dart:html' as html;
 
-import '../io.dart';
+import '../io_impl_js.dart';
 
 class BrowserHttpClientException implements SocketException {
   /// Can be used to disable verbose messages in development mode.

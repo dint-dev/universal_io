@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Annotate as 'internal' so developers don't accidentally import this.
-@internal
-library universal_io.browser_http_client.impl_browser;
+/// {@nodoc}
+@Deprecated('Use "package:universal_io/io.dart" instead.')
+library universal_io.prefer_sdk.io;
 
-import 'package:meta/meta.dart';
+// ignore: invalid_export_of_internal_element
+export '../src/io_impl_vm.dart'
+    if (dart.library.io) '../src/io_impl_vm.dart'
+    if (dart.library.html) '../src/io_impl_js.dart'
+    if (dart.library.js) '../src/io_impl_js.dart';
 
-export 'browser/http_client.dart';
-export 'browser/http_client_exception.dart';
-export 'browser/http_client_request.dart';
-export 'browser/http_client_response.dart';
+export '../src/browser_http_client.dart';

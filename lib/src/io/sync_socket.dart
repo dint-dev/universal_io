@@ -44,7 +44,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import '../io.dart';
+import '../io_impl_js.dart';
 
 /// A low-level class for communicating synchronously over a TCP socket.
 ///

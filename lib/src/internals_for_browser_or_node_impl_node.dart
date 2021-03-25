@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'http_client.dart';
-import 'internet_address.dart';
-import 'platform.dart';
+// Annotate as 'internal' so developers don't accidentally import this.
+@internal
+library universal_io.choose.node;
 
-export 'http_client.dart';
-export 'internet_address.dart';
-export 'platform.dart';
+import 'package:meta/meta.dart';
 
-void testAll({bool isBrowser = false}) {
-  testInternetAddress();
-  testHttpClient(isBrowser: isBrowser);
-  testPlatform();
+import 'io_impl_js.dart';
+
+HttpClient newHttpClient() {
+  throw UnimplementedError();
 }
+
+String get language => 'en-US';

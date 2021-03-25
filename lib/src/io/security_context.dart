@@ -48,7 +48,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import '../io.dart';
+import '../io_impl_js.dart';
 
 /// The object containing the certificates to trust when making
 /// a secure client connection, and the certificate chain and

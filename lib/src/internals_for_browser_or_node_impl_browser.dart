@@ -12,10 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'io.dart';
+// Annotate as 'internal' so developers don't accidentally import this.
+@internal
+library universal_io.choose.browser;
+
+import 'package:meta/meta.dart';
+
+import 'io_impl_js.dart';
+import 'browser/http_client.dart';
+import 'dart:html' as html;
 
 HttpClient newHttpClient() {
-  throw UnimplementedError();
+  return BrowserHttpClient();
 }
 
-String get language => 'en-US';
+String get language => html.window.navigator.language;

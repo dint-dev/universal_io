@@ -47,7 +47,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'package:universal_io/io.dart';
+import 'package:universal_io/src/io_impl_js.dart';
 
 /// A FileStat object represents the result of calling the POSIX stat() function
 /// on a file system object.  It is an immutable object, representing the

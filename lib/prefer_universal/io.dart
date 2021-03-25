@@ -12,6 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export 'dart:io';
+/// {@nodoc}
+@Deprecated('Use "package:universal_io/io.dart" instead.')
+library universal_io.prefer_universal.io;
 
-// export 'browser_http_client_impl_others.dart';
+// ignore: invalid_export_of_internal_element
+export '../src/io_impl_js.dart'
+    if (dart.library.io) '../src/io_impl_vm.dart'
+    if (dart.library.html) '../src/io_impl_js.dart'
+    if (dart.library.js) '../src/io_impl_js.dart';
+
+export '../src/browser_http_client.dart';

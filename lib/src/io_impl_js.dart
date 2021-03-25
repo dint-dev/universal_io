@@ -12,7 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// export 'browser_http_client.dart';
+// Annotate as 'internal' so developers don't accidentally import this.
+@internal
+library universal_io.io.impl_js;
+
+import 'package:meta/meta.dart';
+
 export 'http/http.dart' hide HttpHeadersImpl;
 export 'io/bytes_builder.dart';
 export 'io/data_transformer.dart';

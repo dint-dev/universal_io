@@ -15,7 +15,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import '../io.dart';
+import '../io_impl_js.dart';
 
 /// A base class for [IOSink] subclasses.
 abstract class IOSinkBase implements IOSink {

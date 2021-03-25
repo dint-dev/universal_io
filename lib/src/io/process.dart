@@ -49,7 +49,7 @@
 
 import 'dart:convert';
 
-import '../io.dart';
+import '../io_impl_js.dart';
 
 /// Get the global exit code for the Dart VM.
 ///

@@ -1,6 +1,12 @@
-import 'package:universal_io/io.dart' as prefer_default;
+import 'package:universal_io/io.dart';
 
 void main() {
-  // Ensure Dart2js visits the dependency
-  print(prefer_default.HttpClient().toString());
+  try {
+    HttpClient().getUrl(Uri.parse('example'));
+    File('x').openRead();
+    Directory('x').exists();
+    Socket.connect('localhost', 12345);
+  } catch (e) {
+    // ...
+  }
 }
