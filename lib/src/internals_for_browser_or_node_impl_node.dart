@@ -24,4 +24,10 @@ HttpClient newHttpClient() {
   throw UnimplementedError();
 }
 
-String get language => 'en-US';
+String get locale {
+  return 'en-US';
+}
+
+String get platform {
+  return 'linux';
+}

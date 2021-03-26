@@ -21,8 +21,8 @@ import 'dart:async';
 import 'package:meta/meta.dart';
 
 import 'io_impl_vm.dart'
-    if (dart.library.io) 'io_in_vm.dart'
-    if (dart.library.js) 'io.dart';
+    if (dart.library.io) 'io_impl_vm.dart'
+    if (dart.library.js) 'io_impl_js.dart';
 
 /// Implemented by [HttpClient] when the application runs in browser.
 abstract class BrowserHttpClient implements HttpClient {

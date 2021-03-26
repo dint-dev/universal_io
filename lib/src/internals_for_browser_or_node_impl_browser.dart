@@ -16,14 +16,40 @@
 @internal
 library universal_io.choose.browser;
 
+import 'dart:html' as html;
+
 import 'package:meta/meta.dart';
 
-import 'io_impl_js.dart';
 import 'browser/http_client.dart';
-import 'dart:html' as html;
+import 'io_impl_js.dart';
+
+String get locale {
+  final languages = html.window.navigator.languages;
+  if (languages!=null && languages.isNotEmpty) {
+    return languages.first;
+  }
+  return 'en-US';
+}
+
+String get platform {
+  final s = html.window.navigator.platform?.toLowerCase() ?? html.window.navigator.userAgent;
+  if (s.contains('iphone') ||
+      s.contains('ipad') ||
+      s.contains('ipod')) {
+    return 'ios';
+  }
+  if (s.contains('mac')) {
+    return 'macos';
+  }
+  if (s.contains('android')) {
+    return 'android';
+  }
+  if (s.contains('linux')) {
+    return 'linux';
+  }
+  return 'windows';
+}
 
 HttpClient newHttpClient() {
   return BrowserHttpClient();
 }
-
-String get language => html.window.navigator.language;

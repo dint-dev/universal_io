@@ -15,7 +15,11 @@
 part of main_test;
 
 void _testFile() {
-  test('File', () {
+  test('File (browser)', () {
     expect(() => File('x'), throwsUnimplementedError);
-  });
+  }, testOn: 'browser');
+
+  test('File (VM)', () {
+    File('x');
+  }, testOn: 'vm');
 }

@@ -44,7 +44,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import '../internals_for_browser_or_node.dart' as choose;
+import '../internals_for_browser_or_node.dart' as browser_or_node;
 
 /// Information about the environment in which the current program is running.
 ///
@@ -156,7 +156,7 @@ class Platform {
   static List<String> get executableArguments => [];
 
   /// Get the name of the current locale.
-  static String get localeName => choose.language;
+  static String get localeName => browser_or_node.locale;
 
   /// The local hostname for the system.
   static String get localHostname => 'localhost';
@@ -165,7 +165,7 @@ class Platform {
   static int get numberOfProcessors => 1;
 
   /// A string representing the operating system or platform.
-  static String get operatingSystem => '';
+  static String get operatingSystem => browser_or_node.platform;
 
   /// A string representing the version of the operating system or platform.
   static String get operatingSystemVersion => '';
