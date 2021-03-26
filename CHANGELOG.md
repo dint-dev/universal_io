@@ -1,3 +1,6 @@
+# 2.0.3
+  * Fixes various issues.
+
 # 2.0.2
   * Fixes issue [#17](https://github.com/dint-dev/universal_io/issues/17).
 
