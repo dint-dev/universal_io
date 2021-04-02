@@ -25,7 +25,8 @@ void testPlatformInBrowser() {
     });
   }
 
-  if ((window.navigator.platform ?? '').contains('Mac')) {
+  final userAgent = (window.navigator.userAgent ?? '').toLowerCase();
+  if (userAgent.contains('mac os x')) {
     test('Platform.isMacOS == true', () {
       expect(Platform.isMacOS, true);
     });
@@ -35,9 +36,10 @@ void testPlatformInBrowser() {
     test('Platform.isLinux == false', () {
       expect(Platform.isLinux, false);
     });
-  }
-
-  if ((window.navigator.platform ?? '').contains('Win')) {
+    test('Platform.operatingSystemVersion', () {
+      expect(Platform.operatingSystemVersion, isNotEmpty);
+    });
+  } else if (userAgent.contains('windows')) {
     test('Platform.isMacOS == false', () {
       expect(Platform.isMacOS, false);
     });
@@ -47,17 +49,21 @@ void testPlatformInBrowser() {
     test('Platform.isLinux == false', () {
       expect(Platform.isLinux, false);
     });
-
-    if ((window.navigator.platform ?? '').contains('Linux')) {
-      test('Platform.isMacOS == true', () {
-        expect(Platform.isMacOS, false);
-      });
-      test('Platform.isWindows == false', () {
-        expect(Platform.isWindows, false);
-      });
-      test('Platform.isLinux == true', () {
-        expect(Platform.isLinux, true);
-      });
-    }
+    test('Platform.operatingSystemVersion', () {
+      expect(Platform.operatingSystemVersion, isNotEmpty);
+    });
+  } else if (userAgent.contains('linux')) {
+    test('Platform.isMacOS == false', () {
+      expect(Platform.isMacOS, false);
+    });
+    test('Platform.isWindows == false', () {
+      expect(Platform.isWindows, false);
+    });
+    test('Platform.isLinux == true', () {
+      expect(Platform.isLinux, true);
+    });
+    test('Platform.operatingSystemVersion', () {
+      expect(Platform.operatingSystemVersion, isNotEmpty);
+    });
   }
 }

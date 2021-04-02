@@ -2,8 +2,7 @@
 [![Github Actions CI](https://github.com/dint-dev/universal_io/workflows/Dart%20CI/badge.svg)](https://github.com/dint-dev/universal_io/actions?query=workflow%3A%22Dart+CI%22)
 
 # Overview
-A cross-platform _dart:io_ that works in all platforms (browsers, mobile, desktop, and server-side,
-and Node.JS).
+A cross-platform _dart:io_ that works in all platforms (browsers, mobile, desktop, and server-side).
 
 The API is exactly the same API as _dart:io_. You can simply replace _dart:io_ imports with
 _package:universal_io/io.dart_. Normal _dart:io_ will continue to be used when your application runs
@@ -23,13 +22,13 @@ which was obtained under the BSD-style license of Dart SDK. See LICENSE file for
 
 
 # Getting started
-### pubspec.yaml
+## 1.Add dependency
 ```yaml
 dependencies:
-  universal_io: ^2.0.3
+  universal_io: ^2.0.4
 ```
 
-### main.dart
+## 2.Use APIs
 
 ```dart
 import 'package:universal_io/io.dart';
@@ -42,10 +41,17 @@ Future<void> main() async {
 }
 ```
 
-# Browser driver
+# Behavior in browsers
+## Platform
+The following [Platform](https://api.dart.dev/stable/2.12.2/dart-io/Platform-class.html) APIs work
+in browsers:
+  * Platform.locale
+  * Platform.operatingSystem
+  * Platform.operatingSystemVersion
+
 ## HTTP client
 HTTP client is implemented with [XMLHttpRequest (XHR)](https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest)
-(in _dart:html_, the class is [HttpRequest](https://api.dart.dev/stable/2.7.1/dart-html/HttpRequest-class.html)).
+(in _dart:html_, the class is [HttpRequest](https://api.dart.dev/stable/2.12.2/dart-html/HttpRequest-class.html)).
 
 XHR causes the following differences with _dart:io_:
   * HTTP connection is created only after `request.close()` has been called.

@@ -28,6 +28,10 @@ String get locale {
   return 'en-US';
 }
 
-String get platform {
+String get operatingSystem {
   return 'linux';
+}
+
+String get operatingSystemVersion {
+  return '';
 }

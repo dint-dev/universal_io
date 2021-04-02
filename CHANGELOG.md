@@ -1,3 +1,6 @@
+# 2.0.4
+  * Fixes Platform.operatingSystemVersion ([issue #9](https://github.com/dint-dev/universal_io/issues/9)).
+
 # 2.0.3
   * Fixes various issues.
 
