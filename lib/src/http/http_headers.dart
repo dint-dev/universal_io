@@ -666,6 +666,13 @@ class _ContentType extends _HeaderValue implements ContentType {
     _subType = emptyIfNull(_subType);
     _value = '$_primaryType/$_subType';
     // TODO(40614): Remove once non-nullability is sound.
+    parameters.forEach((String key, String? value) {
+      var lowerCaseKey = key.toLowerCase();
+      if (lowerCaseKey == 'charset') {
+        value = value?.toLowerCase();
+      }
+      _ensureParameters()[lowerCaseKey] = value;
+    });
     if (charset != null) {
       _ensureParameters()['charset'] = charset.toLowerCase();
     }
