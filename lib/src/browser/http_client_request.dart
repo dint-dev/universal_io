@@ -148,6 +148,9 @@ class BrowserHttpClientRequest extends HttpClientRequest with IOSinkBase {
 
   @override
   Future<void> addStream(Stream<List<int>> stream) async {
+    if (!_supportsBody) {
+      throw StateError('HTTP method $method does not support body');
+    }
     if (_completer.isCompleted) {
       throw StateError('StreamSink is closed');
     }
@@ -155,7 +158,7 @@ class BrowserHttpClientRequest extends HttpClientRequest with IOSinkBase {
       throw StateError('StreamSink is bound to a stream');
     }
     final future = stream.listen((item) {
-      add(item);
+      _buffer.addAll(item);
     }, onError: (error) {
       addError(error);
     }, cancelOnError: true).asFuture(null);
