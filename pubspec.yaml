@@ -1,9 +1,9 @@
 name: universal_io
-version: 2.0.5
+version: 2.1.0
 description: Cross-platform 'dart:io' that works in all platforms (browsers, Flutter, and VM).
 homepage: https://github.com/dart-io-packages/universal_io
 false_secrets:
-  - /test/src/localhost.key
+  - /test/localhost.key
 
 environment:
   sdk: '>=2.16.0 <3.0.0'
