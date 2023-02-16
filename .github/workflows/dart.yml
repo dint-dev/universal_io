@@ -19,6 +19,6 @@ jobs:
         with:
           sdk: ${{ matrix.sdk }}
       - name: Install dependencies
-        run: pub get
+        run: dart pub get
       - name: Run tests
-        run: pub run test --platform vm --exclude-tags "browser"
+        run: dart pub run test --platform vm
