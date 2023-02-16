@@ -15,11 +15,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:stream_channel/stream_channel.dart';
 
 void hybridMain(StreamChannel streamChannel, Object message) async {
   final securityContext = SecurityContext();
-  const testSuitePath = 'test/src';
+  const testSuitePath = 'test';
   securityContext.useCertificateChain(
     '$testSuitePath/localhost.crt',
   );

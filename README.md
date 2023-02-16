@@ -2,14 +2,25 @@
 [![Github Actions CI](https://github.com/dint-dev/universal_io/workflows/Dart%20CI/badge.svg)](https://github.com/dint-dev/universal_io/actions?query=workflow%3A%22Dart+CI%22)
 
 # Overview
-A cross-platform _dart:io_ that works in all platforms (browsers, mobile, desktop, and server-side).
+A cross-platform [dart:io](https://api.dart.dev/stable/2.9.0/dart-io/dart-io-library.html) that
+works in all platforms (browsers, mobile, desktop, and server-side).
 
-The API is exactly the same API as _dart:io_. You can simply replace _dart:io_ imports with
-_package:universal_io/io.dart_. Normal _dart:io_ will continue to be used when your application runs
-in non-Javascript platforms.
+The API is exactly the same API as [dart:io](https://api.dart.dev/stable/2.9.0/dart-io/dart-io-library.html).
+You can simply replace _dart:io_ imports with _package:universal_io/io.dart_. Normal _dart:io_ will
+continue to be used when your application runs in non-Javascript platforms.
+
+The behavior of the following classes is changed:
+  * [HttpClient](https://api.dart.dev/stable/2.9.0/dart-io/HttpClient-class.html)
+    * Makes it works in the browsers too (by using _XmlHttpRequest_ API in browsers).
+  * [Platform](https://api.dart.dev/stable/2.9.0/dart-io/Platform-class.html)
+    * Makes methods like `isAndroid` and `isMacOS` work in the browsers too.
+  * [InternetAddress](https://api.dart.dev/stable/2.9.0/dart-io/InternetAddress-class.html)
+    * Makes it works in the browsers too.
+  * [BytesBuilder](https://api.dart.dev/stable/2.9.0/dart-io/BytesBuilder-class.html)
+    * Makes it works in the browsers too.
 
 Licensed under the [Apache License 2.0](LICENSE).
-Much of the source code is derived [from Dart SDK](https://github.com/dart-lang/sdk/tree/master/sdk/lib/io),
+Some of the source code was derived [from Dart SDK](https://github.com/dart-lang/sdk/tree/master/sdk/lib/io),
 which was obtained under the BSD-style license of Dart SDK. See LICENSE file for details.
 
 ## Links
@@ -25,7 +36,7 @@ which was obtained under the BSD-style license of Dart SDK. See LICENSE file for
 ## 1.Add dependency
 ```yaml
 dependencies:
-  universal_io: ^2.0.4
+  universal_io: ^2.1.0
 ```
 
 ## 2.Use APIs
@@ -36,20 +47,12 @@ import 'package:universal_io/io.dart';
 Future<void> main() async {
   // HttpClient can be used in browser too!
   final httpClient = HttpClient();
-  final request = await httpClient.getUrl(Uri.parse("http://example/url"));
+  final request = await httpClient.getUrl(Uri.parse("https://dart.dev/"));
   final response = await request.close();
 }
 ```
 
-# Behavior in browsers
-## Platform
-The following [Platform](https://api.dart.dev/stable/2.12.2/dart-io/Platform-class.html) APIs work
-in browsers:
-  * Platform.locale
-  * Platform.operatingSystem
-  * Platform.operatingSystemVersion
-
-## HTTP client
+# HTTP client behavior
 HTTP client is implemented with [XMLHttpRequest (XHR)](https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest)
 (in _dart:html_, the class is [HttpRequest](https://api.dart.dev/stable/2.12.2/dart-html/HttpRequest-class.html)).
 
@@ -57,7 +60,7 @@ XHR causes the following differences with _dart:io_:
   * HTTP connection is created only after `request.close()` has been called.
   * Same-origin policy limitations. For making cross-origin requests, see documentation below.
 
-### Helpful error messages
+## Helpful error messages
 When requests fail and assertions are enabled, error messages contains descriptions how to fix
 possible issues such as missing cross-origin headers.
 
@@ -118,7 +121,7 @@ Future<void> main() async {
 
 See [source code](https://github.com/dint-dev/universal_io/blob/master/lib/src/browser/http_client_request.dart).
 
-### Streaming text responses
+## Streaming text responses
 The underlying XMLHttpRequest (XHR) API supports response streaming only when _responseType_ is
 "text". This package automatically uses _responseType_ "text" in some cases based on value of the
 HTTP request header "Accept".

@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// Cross-platform implementation of "dart:io" that works in browsers too.
-///
-/// # Usage
-/// Replace imports of "dart:io" with:
-/// ```
-/// import 'package:universal_io/io_impl_js.dart';
-/// ```
-library universal_io;
+export 'dart:io' hide HttpClient, BytesBuilder, InternetAddress, Platform;
 
-export 'src/vm/_exports.dart'
-    if (dart.library.html) 'src/browser/_exports.dart'
-    if (dart.library.js) 'src/nodejs/_exports.dart';
+export 'browser_http_client.dart';
+export 'browser_http_client_exception.dart';
+export 'browser_http_client_request.dart';
+export 'browser_http_client_response.dart';
+export 'bytes_builder.dart';
+export 'http_client.dart';
+export 'internet_address.dart';
+export 'platform.dart';

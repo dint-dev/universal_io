@@ -1,3 +1,11 @@
+# 2.1.0
+  * Removes lots of unnecessary stuff.
+  * This has some breaking changes, but it's unlikely that anyone is using the removed stuff.
+    The package continues to follow the Dart SDK "dart:io" API.
+
+# 2.0.5
+  * Fixes various small issues.
+
 # 2.0.4
   * Fixes Platform.operatingSystemVersion ([issue #9](https://github.com/dint-dev/universal_io/issues/9)).
 

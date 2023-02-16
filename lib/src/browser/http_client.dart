@@ -11,202 +11,196 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
+// ------------------------------------------------------------------
+// THIS FILE WAS DERIVED FROM SOURCE CODE UNDER THE FOLLOWING LICENSE
+// ------------------------------------------------------------------
+//
+// Copyright 2012, the Dart project authors. All rights reserved.
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are
+// met:
+//     * Redistributions of source code must retain the above copyright
+//       notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above
+//       copyright notice, this list of conditions and the following
+//       disclaimer in the documentation and/or other materials provided
+//       with the distribution.
+//     * Neither the name of Google Inc. nor the names of its
+//       contributors may be used to endorse or promote products derived
+//       from this software without specific prior written permission.
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'dart:async';
+import 'dart:io' as dart_io;
 
-import '../io_impl_js.dart';
-import 'http_client_request.dart';
+import '_exports.dart';
 
-/// Browser implementation of _dart:io_ [HttpClient].
-class BrowserHttpClient implements HttpClient {
-  /// Enables [CORS "credentials mode"](https://developer.mozilla.org/en-US/docs/Web/API/Request/credentials)
-  /// for all _XHR_ requests. Disabled by default.
+/// A client that receives content, such as web pages, from
+/// a server using the HTTP protocol.
+///
+/// HttpClient contains a number of methods to send an [HttpClientRequest]
+/// to an Http server and receive an [HttpClientResponse] back.
+/// For example, you can use the [get], [getUrl], [post], and [postUrl] methods
+/// for GET and POST requests, respectively.
+///
+/// ## Making a simple GET request: an example
+///
+/// A `getUrl` request is a two-step process, triggered by two [Future]s.
+/// When the first future completes with a [HttpClientRequest], the underlying
+/// network connection has been established, but no data has been sent.
+/// In the callback function for the first future, the HTTP headers and body
+/// can be set on the request. Either the first write to the request object
+/// or a call to [close] sends the request to the server.
+///
+/// When the HTTP response is received from the server,
+/// the second future, which is returned by close,
+/// completes with an [HttpClientResponse] object.
+/// This object provides access to the headers and body of the response.
+/// The body is available as a stream implemented by HttpClientResponse.
+/// If a body is present, it must be read. Otherwise, it leads to resource
+/// leaks. Consider using [HttpClientResponse.drain] if the body is unused.
+///
+///     HttpClient client = HttpClient();
+///     client.getUrl(Uri.parse("http://www.example.com/"))
+///         .then((HttpClientRequest request) {
+///           // Optionally set up headers...
+///           // Optionally write to the request object...
+///           // Then call close.
+///           ...
+///           return request.close();
+///         })
+///         .then((HttpClientResponse response) {
+///           // Process the response.
+///           ...
+///         });
+///
+/// The future for [HttpClientRequest] is created by methods such as
+/// [getUrl] and [open].
+///
+/// ## HTTPS connections
+///
+/// An HttpClient can make HTTPS requests, connecting to a server using
+/// the TLS (SSL) secure networking protocol. Calling [getUrl] with an
+/// https: scheme will work automatically, if the server's certificate is
+/// signed by a root CA (certificate authority) on the default list of
+/// well-known trusted CAs, compiled by Mozilla.
+///
+/// To add a custom trusted certificate authority, or to send a client
+/// certificate to servers that request one, pass a [SecurityContext] object
+/// as the optional `context` argument to the `HttpClient` constructor.
+/// The desired security options can be set on the [SecurityContext] object.
+///
+/// ## Headers
+///
+/// All HttpClient requests set the following header by default:
+///
+///     Accept-Encoding: gzip
+///
+/// This allows the HTTP server to use gzip compression for the body if
+/// possible. If this behavior is not desired set the
+/// `Accept-Encoding` header to something else.
+/// To turn off gzip compression of the response, clear this header:
+///
+///      request.headers.removeAll(HttpHeaders.acceptEncodingHeader)
+///
+/// ## Closing the HttpClient
+///
+/// The HttpClient supports persistent connections and caches network
+/// connections to reuse them for multiple requests whenever
+/// possible. This means that network connections can be kept open for
+/// some time after a request has completed. Use HttpClient.close
+/// to force the HttpClient object to shut down and to close the idle
+/// network connections.
+///
+/// ## Turning proxies on and off
+///
+/// By default the HttpClient uses the proxy configuration available
+/// from the environment, see [findProxyFromEnvironment]. To turn off
+/// the use of proxies set the [findProxy] property to
+/// `null`.
+///
+///     HttpClient client = HttpClient();
+///     client.findProxy = null;
+abstract class HttpClient implements dart_io.HttpClient {
+  static const int defaultHttpPort = 80;
+  static const int defaultHttpsPort = 443;
+
+  /// Current state of HTTP request logging from all [HttpClient]s to the
+  /// developer timeline.
   ///
-  /// "Credentials mode" causes cookies and other credentials to be sent and
-  /// received. It has complicated implications for CORS headers required from
-  /// the server.
+  /// Default is `false`.
+  static bool enableTimelineLogging = false;
+
+  factory HttpClient({SecurityContext? context}) {
+    var overrides = HttpOverrides.current;
+    if (overrides == null) {
+      return BrowserHttpClient();
+    }
+    return overrides.createHttpClient(context) as HttpClient;
+  }
+
+  /// Function for resolving the proxy server to be used for a HTTP
+  /// connection from the proxy configuration specified through
+  /// environment variables.
   ///
-  /// # Example
-  /// ```
-  /// Future<void> main() async {
-  ///   final client = HttpClient();
-  ///   if (client is BrowserHttpClient) {
-  ///     client.browserCredentialsMode = true;
-  ///   }
-  ///   // ...
-  /// }
-  ///  ```
-  bool browserCredentialsMode = false;
-
-  @override
-  Duration idleTimeout = Duration(seconds: 15);
-
-  @override
-  Duration? connectionTimeout;
-
-  @override
-  int? maxConnectionsPerHost;
-
-  @override
-  bool autoUncompress = true;
-
-  @override
-  String? userAgent;
-
-  @override
-  Future<bool> Function(Uri url, String scheme, String realm)? authenticate;
-
-  @override
-  Future<bool> Function(String host, int port, String scheme, String realm)?
-      authenticateProxy;
-
-  @override
-  bool Function(X509Certificate cert, String host, int port)?
-      badCertificateCallback;
-
-  @override
-  String Function(Uri url)? findProxy;
-
-  bool _isClosed = false;
-
-  /// Enables you to set [BrowserHttpClientRequest.browserRequestType] before
-  /// any _XHR_ request is sent to the server.
-  FutureOr<void> Function(BrowserHttpClientRequest request)?
-      onBrowserHttpClientRequestClose;
-
-  @override
-  void addCredentials(
-      Uri url, String realm, HttpClientCredentials credentials) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void addProxyCredentials(
-      String host, int port, String realm, HttpClientCredentials credentials) {}
-
-  @override
-  void close({bool force = false}) {
-    _isClosed = true;
-  }
-
-  @override
-  Future<HttpClientRequest> delete(String host, int? port, String path) {
-    return open('DELETE', host, port, path);
-  }
-
-  @override
-  Future<HttpClientRequest> deleteUrl(Uri url) {
-    return openUrl('DELETE', url);
-  }
-
-  @override
-  Future<HttpClientRequest> get(String host, int? port, String path) {
-    return open('GET', host, port, path);
-  }
-
-  @override
-  Future<HttpClientRequest> getUrl(Uri url) {
-    return openUrl('GET', url);
-  }
-
-  @override
-  Future<HttpClientRequest> head(String host, int? port, String path) {
-    return open('HEAD', host, port, path);
-  }
-
-  @override
-  Future<HttpClientRequest> headUrl(Uri url) {
-    return openUrl('HEAD', url);
-  }
-
-  @override
-  Future<HttpClientRequest> open(
-      String method, String host, int? port, String path) {
-    String? query;
-    final i = path.indexOf('?');
-    if (i >= 0) {
-      query = path.substring(i + 1);
-      path = path.substring(0, i);
-    }
-    final uri = Uri(
-      scheme: 'http',
-      host: host,
-      port: port,
-      path: path,
-      query: query,
-      fragment: null,
-    );
-    return openUrl(method, uri);
-  }
-
-  @override
-  Future<HttpClientRequest> openUrl(String method, Uri url) async {
-    if (_isClosed) {
-      throw StateError('HTTP client is closed');
-    }
-    var scheme = url.scheme;
-    var needsNewUrl = false;
-    if (scheme.isEmpty) {
-      scheme = 'https';
-      needsNewUrl = true;
-    } else {
-      switch (scheme) {
-        case '':
-          scheme = 'https';
-          needsNewUrl = true;
-          break;
-        case 'http':
-          break;
-        case 'https':
-          break;
-        default:
-          throw ArgumentError.value(
-            url,
-            'url',
-            'Unsupported scheme',
-          );
-      }
-    }
-    if (needsNewUrl) {
-      url = Uri(
-        scheme: scheme,
-        userInfo: url.userInfo,
-        host: url.host,
-        port: url.port,
-        query: url.query,
-        fragment: url.fragment,
-      );
-    }
-    return BrowserHttpClientRequest(this, method, url);
-  }
-
-  @override
-  Future<HttpClientRequest> patch(String host, int? port, String path) {
-    return open('PATCH', host, port, path);
-  }
-
-  @override
-  Future<HttpClientRequest> patchUrl(Uri url) {
-    return openUrl('PATCH', url);
-  }
-
-  @override
-  Future<HttpClientRequest> post(String host, int? port, String path) {
-    return open('POST', host, port, path);
-  }
-
-  @override
-  Future<HttpClientRequest> postUrl(Uri url) {
-    return openUrl('POST', url);
-  }
-
-  @override
-  Future<HttpClientRequest> put(String host, int? port, String path) {
-    return open('PUT', host, port, path);
-  }
-
-  @override
-  Future<HttpClientRequest> putUrl(Uri url) {
-    return openUrl('PUT', url);
+  /// The following environment variables are taken into account:
+  ///
+  ///     http_proxy
+  ///     https_proxy
+  ///     no_proxy
+  ///     HTTP_PROXY
+  ///     HTTPS_PROXY
+  ///     NO_PROXY
+  ///
+  /// [:http_proxy:] and [:HTTP_PROXY:] specify the proxy server to use for
+  /// http:// urls. Use the format [:hostname:port:]. If no port is used a
+  /// default of 1080 will be used. If both are set the lower case one takes
+  /// precedence.
+  ///
+  /// [:https_proxy:] and [:HTTPS_PROXY:] specify the proxy server to use for
+  /// https:// urls. Use the format [:hostname:port:]. If no port is used a
+  /// default of 1080 will be used. If both are set the lower case one takes
+  /// precedence.
+  ///
+  /// [:no_proxy:] and [:NO_PROXY:] specify a comma separated list of
+  /// postfixes of hostnames for which not to use the proxy
+  /// server. E.g. the value "localhost,127.0.0.1" will make requests
+  /// to both "localhost" and "127.0.0.1" not use a proxy. If both are set
+  /// the lower case one takes precedence.
+  ///
+  /// To activate this way of resolving proxies assign this function to
+  /// the [findProxy] property on the [HttpClient].
+  ///
+  ///     HttpClient client = HttpClient();
+  ///     client.findProxy = HttpClient.findProxyFromEnvironment;
+  ///
+  /// If you don't want to use the system environment you can use a
+  /// different one by wrapping the function.
+  ///
+  ///     HttpClient client = HttpClient();
+  ///     client.findProxy = (url) {
+  ///       return HttpClient.findProxyFromEnvironment(
+  ///           url, environment: {"http_proxy": ..., "no_proxy": ...});
+  ///     }
+  ///
+  /// If a proxy requires authentication it is possible to configure
+  /// the username and password as well. Use the format
+  /// [:username:password@hostname:port:] to include the username and
+  /// password. Alternatively the API [addProxyCredentials] can be used
+  /// to set credentials for proxies which require authentication.
+  static String findProxyFromEnvironment(Uri url,
+      {Map<String, String>? environment}) {
+    return 'DIRECT';
   }
 }
