@@ -20,31 +20,16 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 import 'package:typed_data/typed_buffers.dart';
 
-import '_exports.dart';
+import '_browser_http_client_response_impl.dart';
+import '_exports_in_browser.dart';
 import '_http_headers_impl.dart';
 import '_io_sink_base.dart';
 
-class BrowserHttpClientRequest extends HttpClientRequest with IOSinkBase {
+class BrowserHttpClientRequestImpl extends IOSinkBase
+    implements BrowserHttpClientRequest {
   final BrowserHttpClient client;
 
   String? _browserResponseType;
-
-  /// Enables [CORS "credentials mode"](https://developer.mozilla.org/en-US/docs/Web/API/Request/credentials)
-  /// in _XHR_ request. Disabled by default.
-  ///
-  /// # Example
-  /// ```
-  /// Future<void> main() async {
-  ///   final client = HttpClient();
-  ///   final request = client.getUrl(Url.parse('http://host/path'));
-  ///   if (request is BrowserHttpClientRequest) {
-  ///     request.browserCredentialsMode = true;
-  ///   }
-  ///   final response = await request.close();
-  ///   // ...
-  /// }
-  ///  ```
-  bool browserCredentialsMode = false;
 
   @override
   final String method;
@@ -69,8 +54,23 @@ class BrowserHttpClientRequest extends HttpClientRequest with IOSinkBase {
 
   final _buffer = Uint8Buffer();
 
+  @override
+  bool bufferOutput = false;
+
+  @override
+  int contentLength = -1;
+
+  @override
+  bool followRedirects = true;
+
+  @override
+  int maxRedirects = 5;
+
+  @override
+  bool persistentConnection = false;
+
   @internal
-  BrowserHttpClientRequest(this.client, this.method, this.uri)
+  BrowserHttpClientRequestImpl(this.client, this.method, this.uri)
       : _supportsBody = _httpMethodSupportsBody(method) {
     // Add "User-Agent" header
     final userAgent = client.userAgent;
@@ -85,12 +85,10 @@ class BrowserHttpClientRequest extends HttpClientRequest with IOSinkBase {
     bufferOutput = true;
   }
 
-  /// Sets _responseType_ in _XHR_ request.
-  ///
-  /// By default null, which means that the [HttpClientResponse] should contain
-  /// bytes.
+  @override
   String? get browserResponseType => _browserResponseType;
 
+  @override
   set browserResponseType(String? value) {
     if (value != null) {
       const validValues = <String>{
@@ -117,18 +115,6 @@ class BrowserHttpClientRequest extends HttpClientRequest with IOSinkBase {
 
   @override
   void abort([Object? exception, StackTrace? stackTrace]) {}
-
-  void _checkAddRequirements() {
-    if (!_supportsBody) {
-      throw StateError('HTTP method $method does not support body');
-    }
-    if (_completer.isCompleted) {
-      throw StateError('StreamSink is closed');
-    }
-    if (_addStreamFuture != null) {
-      throw StateError('StreamSink is bound to a stream');
-    }
-  }
 
   @override
   void add(List<int> event) {
@@ -171,6 +157,40 @@ class BrowserHttpClientRequest extends HttpClientRequest with IOSinkBase {
     }
   }
 
+  void _checkAddRequirements() {
+    if (!_supportsBody) {
+      throw StateError('HTTP method $method does not support body');
+    }
+    if (_completer.isCompleted) {
+      throw StateError('StreamSink is closed');
+    }
+    if (_addStreamFuture != null) {
+      throw StateError('StreamSink is bound to a stream');
+    }
+  }
+
+  String _chooseBrowserResponseType() {
+    final custom = browserResponseType;
+    if (custom != null) {
+      return custom;
+    }
+    final accept = headers.value('Accept');
+    if (accept != null) {
+      try {
+        final contentType = ContentType.parse(accept);
+        final textMimes = BrowserHttpClient.defaultTextMimes;
+        if ((contentType.primaryType == 'text' &&
+                textMimes.contains('text/*')) ||
+            textMimes.contains(contentType.mimeType)) {
+          return 'text';
+        }
+      } catch (error) {
+        // Ignore error
+      }
+    }
+    return 'arraybuffer';
+  }
+
   Future<HttpClientResponse> _close() async {
     await flush();
 
@@ -181,22 +201,14 @@ class BrowserHttpClientRequest extends HttpClientRequest with IOSinkBase {
       return _completer.future;
     }
 
-    // Callback
-    if (browserResponseType == null) {
-      browserResponseType = 'arraybuffer';
-      final accept = headers.value('Accept');
-      if (accept != null) {
-        final isText = isTextContentType(accept);
-        if (isText) {
-          browserResponseType = 'text';
-        }
-      }
-    }
+    final browserResponseType = _chooseBrowserResponseType();
+    _browserResponseType = browserResponseType;
 
     final callback = client.onBrowserHttpClientRequestClose;
     if (callback != null) {
-      await Future(() => callback(this));
+      await callback(this);
     }
+
     try {
       final xhr = html.HttpRequest();
 
@@ -206,7 +218,6 @@ class BrowserHttpClientRequest extends HttpClientRequest with IOSinkBase {
       xhr.open(method, uriString);
 
       // Set response body type
-      final browserResponseType = this.browserResponseType ?? 'arraybuffer';
       xhr.responseType = browserResponseType;
 
       // Timeout
@@ -228,82 +239,139 @@ class BrowserHttpClientRequest extends HttpClientRequest with IOSinkBase {
       });
 
       final headersCompleter = _completer;
-      final controller = StreamController<Uint8List>();
-      var bodySeenLength = 0;
+      final streamController = StreamController<Uint8List>();
+      streamController.onCancel = () {
+        if (xhr.readyState != html.HttpRequest.DONE) {
+          xhr.abort();
+        }
+      };
+      BrowserHttpClientResponseImpl? currentHttpClientResponse;
 
-      BrowserHttpClientResponse? currentHttpClientResponse;
       void completeHeaders() {
         if (headersCompleter.isCompleted) {
           return;
         }
+        try {
+          // Create HttpClientResponse
+          final httpClientResponse = BrowserHttpClientResponseImpl(
+            this,
+            xhr.status ?? 200,
+            xhr.statusText ?? 'OK',
+            streamController.stream,
+          );
+          currentHttpClientResponse = httpClientResponse;
+          final headers = httpClientResponse.headers;
+          xhr.responseHeaders.forEach((name, value) {
+            headers.add(name, value);
+          });
+          headersCompleter.complete(httpClientResponse);
+          httpClientResponse.browserResponse = xhr.response;
+        } catch (error, stackTrace) {
+          headersCompleter.completeError(error, stackTrace);
+        }
+      }
 
-        // Create HttpClientResponse
-        final httpClientResponse = BrowserHttpClientResponse(
-          this,
-          xhr.status ?? 200,
-          xhr.statusText ?? 'OK',
-          controller.stream,
-        );
-        currentHttpClientResponse = httpClientResponse;
+      if (browserResponseType == 'text') {
+        //
+        // "text"
+        //
+        var seenTextLength = -1;
+        void addTextChunk() {
+          if (!streamController.isClosed) {
+            final response = xhr.response;
+            if (response is String) {
+              final textChunk = seenTextLength < 0
+                  ? response
+                  : response.substring(seenTextLength);
+              seenTextLength = response.length;
+              streamController.add(Utf8Encoder().convert(textChunk));
+            }
+          }
+        }
 
-        final headers = httpClientResponse.headers;
-        xhr.responseHeaders.forEach((name, value) {
-          headers.add(name, value);
+        xhr.onReadyStateChange.listen((event) {
+          switch (xhr.readyState) {
+            case html.HttpRequest.HEADERS_RECEIVED:
+              completeHeaders();
+              break;
+
+            case html.HttpRequest.DONE:
+              currentHttpClientResponse?.browserResponse = xhr.response;
+              if (!streamController.isClosed) {
+                addTextChunk();
+                streamController.close();
+              }
+              break;
+          }
         });
+        streamController.onListen = () {
+          addTextChunk();
+          if (xhr.readyState == html.HttpRequest.DONE) {
+            streamController.close();
+          }
+        };
+        xhr.onProgress.listen((html.ProgressEvent event) {
+          if (streamController.hasListener) {
+            addTextChunk();
+          }
+        });
+      } else if (browserResponseType == 'arraybuffer') {
+        //
+        // "arraybuffer"
+        //
+        xhr.onReadyStateChange.listen((event) {
+          switch (xhr.readyState) {
+            case html.HttpRequest.HEADERS_RECEIVED:
+              completeHeaders();
+              break;
 
-        // Complete the future
-        headersCompleter.complete(httpClientResponse);
+            case html.HttpRequest.DONE:
+              final object = xhr.response;
+              currentHttpClientResponse?.browserResponse = object;
+              if (!streamController.isClosed) {
+                if (object is ByteBuffer) {
+                  // "arraybuffer" response type
+                  streamController.add(Uint8List.view(object));
+                }
+                streamController.close();
+              }
+              break;
+          }
+        });
+      } else {
+        //
+        // Something else than "text" or "arraybuffer"
+        //
+        xhr.onReadyStateChange.listen((event) {
+          switch (xhr.readyState) {
+            case html.HttpRequest.HEADERS_RECEIVED:
+              completeHeaders();
+              break;
+
+            case html.HttpRequest.DONE:
+              currentHttpClientResponse?.browserResponse = xhr.response;
+              if (!streamController.isClosed) {
+                streamController.close();
+              }
+              break;
+          }
+        });
       }
-
-      void addChunk() {
-        currentHttpClientResponse?.browserResponse = xhr.response;
-
-        // Close stream
-        if (!headersCompleter.isCompleted || controller.isClosed) {
-          return;
-        }
-        final body = xhr.response;
-        if (body == null) {
-          return;
-        } else if (body is String) {
-          final chunk = body.substring(bodySeenLength);
-          bodySeenLength = body.length;
-          controller.add(Utf8Encoder().convert(chunk));
-        } else if (body is ByteBuffer) {
-          final chunk = Uint8List.view(body, bodySeenLength);
-          bodySeenLength = body.lengthInBytes;
-          controller.add(chunk);
-        } else {
-          return;
-        }
-      }
-
-      xhr.onReadyStateChange.listen((event) {
-        switch (xhr.readyState) {
-          case html.HttpRequest.HEADERS_RECEIVED:
-            // Complete future
-            completeHeaders();
-            break;
-        }
-      });
-
-      xhr.onProgress.listen((html.ProgressEvent event) {
-        addChunk();
-      });
-
-      // ignore: unawaited_futures
-      xhr.onLoad.first.then((event) {
-        addChunk();
-        controller.close();
-      });
 
       // ignore: unawaited_futures
       xhr.onTimeout.first.then((event) {
         if (!headersCompleter.isCompleted) {
-          headersCompleter.completeError(TimeoutException('Timeout'));
-        } else {
-          controller.addError(TimeoutException('Timeout'));
-          controller.close();
+          headersCompleter.completeError(
+            TimeoutException(null, timeout),
+            StackTrace.current,
+          );
+        }
+        if (!streamController.isClosed) {
+          streamController.addError(
+            TimeoutException(null, timeout),
+            StackTrace.current,
+          );
+          streamController.close();
         }
       });
 
@@ -325,12 +393,11 @@ class BrowserHttpClientRequest extends HttpClientRequest with IOSinkBase {
         );
 
         if (!headersCompleter.isCompleted) {
-          // Complete future
           headersCompleter.completeError(error, StackTrace.current);
-        } else if (!controller.isClosed) {
-          // Close stream
-          controller.addError(error);
-          controller.close();
+        }
+        if (!streamController.isClosed) {
+          streamController.addError(error, StackTrace.current);
+          streamController.close();
         }
       });
 
@@ -349,24 +416,6 @@ class BrowserHttpClientRequest extends HttpClientRequest with IOSinkBase {
     return _completer.future;
   }
 
-  /// Determines whether the content type is text.
-  static bool isTextContentType(String value) {
-    final contentType = ContentType.parse(value);
-    switch (contentType.primaryType) {
-      case 'application':
-        switch (contentType.subType) {
-          case 'grpc-web':
-            return true;
-          default:
-            return false;
-        }
-      case 'text':
-        return true;
-      default:
-        return false;
-    }
-  }
-
   static bool _httpMethodSupportsBody(String method) {
     switch (method) {
       case 'GET':
@@ -379,4 +428,7 @@ class BrowserHttpClientRequest extends HttpClientRequest with IOSinkBase {
         return true;
     }
   }
+
+  @override
+  bool browserCredentialsMode = false;
 }

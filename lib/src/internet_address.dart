@@ -51,8 +51,6 @@ import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 
-import '_since.dart';
-
 String _stringFromIp(Uint8List bytes) {
   switch (bytes.length) {
     case 4:
@@ -230,8 +228,7 @@ class InternetAddress implements dart_io.InternetAddress {
   ///
   /// To create a Unix domain address, [type] should be
   /// [InternetAddressType.unix] and [address] should be a string.
-  factory InternetAddress(String address,
-      {@Since('2.8') InternetAddressType? type}) {
+  factory InternetAddress(String address, {InternetAddressType? type}) {
     if (type == InternetAddressType.unix) {
       if (!address.startsWith('/')) {
         throw ArgumentError.value(address, 'address');
@@ -262,7 +259,7 @@ class InternetAddress implements dart_io.InternetAddress {
   /// 16, in which case the type defaults to [InternetAddressType.IPv4] or
   /// [InternetAddressType.IPv6] respectively.
   factory InternetAddress.fromRawAddress(Uint8List rawAddress,
-      {@Since('2.8') InternetAddressType? type}) {
+      {InternetAddressType? type}) {
     if (type == InternetAddressType.unix) {
       return InternetAddress(utf8.decode(rawAddress), type: type);
     }

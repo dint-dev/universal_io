@@ -44,7 +44,7 @@
 import 'dart:async';
 import 'dart:io' as dart_io;
 
-import '_exports.dart';
+import 'package:universal_io/io.dart';
 
 /// A client that receives content, such as web pages, from
 /// a server using the HTTP protocol.
@@ -145,7 +145,7 @@ abstract class HttpClient implements dart_io.HttpClient {
   factory HttpClient({SecurityContext? context}) {
     var overrides = HttpOverrides.current;
     if (overrides == null) {
-      return BrowserHttpClient();
+      return newUniversalHttpClient() as HttpClient;
     }
     return overrides.createHttpClient(context) as HttpClient;
   }

@@ -15,20 +15,18 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import '_exports.dart';
+import '_browser_http_client_request_impl.dart';
+import '_exports_in_browser.dart';
 import '_http_headers_impl.dart';
 
 /// Used by [_BrowserHttpClient].
-class BrowserHttpClientResponse extends Stream<List<int>>
-    implements HttpClientResponse {
+class BrowserHttpClientResponseImpl extends Stream<List<int>>
+    implements BrowserHttpClientResponse {
   @override
   final HttpHeaders headers = HttpHeadersImpl('1.1');
-  final BrowserHttpClientRequest request;
+  final BrowserHttpClientRequestImpl request;
 
-  /// Response object of _XHR_ request.
-  ///
-  /// You need to finish reading this [HttpClientResponse] to get the final
-  /// value.
+  @override
   dynamic browserResponse;
 
   List<Cookie>? _cookies;
@@ -41,7 +39,7 @@ class BrowserHttpClientResponse extends Stream<List<int>>
   @override
   final int statusCode;
 
-  BrowserHttpClientResponse(
+  BrowserHttpClientResponseImpl(
     this.request,
     this.statusCode,
     this.reasonPhrase,

@@ -1,3 +1,6 @@
+# 2.2.0
+  * Refactoring, better documentation, and some additional APIs in BrowserHttpClient.
+
 # 2.1.0
   * Removes lots of unnecessary stuff.
   * This has some breaking changes, but it's unlikely that anyone is using the removed stuff.

@@ -12,12 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export 'dart:io' hide HttpClient, BytesBuilder, InternetAddress, Platform;
-
-export 'browser_http_client.dart';
-export 'browser_http_client_exception.dart';
-export 'browser_http_client_request.dart';
-export 'browser_http_client_response.dart';
+export '_exports_in_vm.dart'
+    hide HttpClient, BytesBuilder, InternetAddress, Platform;
 export 'bytes_builder.dart';
 export 'http_client.dart';
 export 'internet_address.dart';

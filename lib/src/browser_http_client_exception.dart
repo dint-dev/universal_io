@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'dart:html' as html;
+import 'package:universal_io/io.dart';
 
-import '_exports.dart';
+import '_helpers.dart' as helpers;
 
+/// May be thrown by [BrowserHttpClientRequest.close].
 class BrowserHttpClientException implements SocketException {
   /// Can be used to disable verbose messages in development mode.
   static bool verbose = true;
@@ -26,11 +27,22 @@ class BrowserHttpClientException implements SocketException {
     'POST',
   };
 
+  /// HTTP method ("GET, "POST, etc.)
   final String method;
+
+  /// URL of the HTTP request.
   final String url;
+
+  /// Origin of the HTTP request.
   final String? origin;
+
+  /// HTTP headers
   final HttpHeaders headers;
+
+  /// Browser "credentials mode".
   final bool browserCredentialsMode;
+
+  /// Browser response type.
   final String browserResponseType;
 
   @override
@@ -74,7 +86,7 @@ class BrowserHttpClientException implements SocketException {
         }
 
         final parsedUrl = Uri.parse(url);
-        final isCrossOrigin = parsedUrl.origin != html.window.origin;
+        final isCrossOrigin = parsedUrl.origin != helpers.htmlWindowOrigin;
         addEntry('Request method: ', method);
         addEntry('Request URL: ', url);
         addEntry('Origin: ', origin);

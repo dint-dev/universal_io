@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'dart:io';
+
+String? get htmlWindowOrigin => null;
+
 String get locale {
   return 'en-US';
 }
@@ -23,3 +27,5 @@ String get operatingSystem {
 String get operatingSystemVersion {
   return '';
 }
+
+HttpClient newHttpClient() => HttpClient();

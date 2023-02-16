@@ -14,29 +14,11 @@
 
 import 'dart:async';
 
-import '_exports.dart';
+import '_browser_http_client_request_impl.dart';
+import '_exports_in_browser.dart';
 
 /// Browser implementation of _dart:io_ [HttpClient].
-class BrowserHttpClient implements HttpClient {
-  /// Enables [CORS "credentials mode"](https://developer.mozilla.org/en-US/docs/Web/API/Request/credentials)
-  /// for all _XHR_ requests. Disabled by default.
-  ///
-  /// "Credentials mode" causes cookies and other credentials to be sent and
-  /// received. It has complicated implications for CORS headers required from
-  /// the server.
-  ///
-  /// # Example
-  /// ```
-  /// Future<void> main() async {
-  ///   final client = HttpClient();
-  ///   if (client is BrowserHttpClient) {
-  ///     client.browserCredentialsMode = true;
-  ///   }
-  ///   // ...
-  /// }
-  ///  ```
-  bool browserCredentialsMode = false;
-
+class BrowserHttpClientImpl extends BrowserHttpClient {
   @override
   Duration idleTimeout = Duration(seconds: 15);
 
@@ -68,10 +50,20 @@ class BrowserHttpClient implements HttpClient {
 
   bool _isClosed = false;
 
-  /// Enables you to set [BrowserHttpClientRequest.browserRequestType] before
-  /// any _XHR_ request is sent to the server.
-  FutureOr<void> Function(BrowserHttpClientRequest request)?
-      onBrowserHttpClientRequestClose;
+  BrowserHttpClientImpl() : super.constructor();
+
+  @override
+  set connectionFactory(
+      Future<ConnectionTask<Socket>> Function(
+              Uri url, String? proxyHost, int? proxyPort)?
+          f) {
+    // TODO: implement connectionFactory
+  }
+
+  @override
+  set keyLog(Function(String line)? callback) {
+    // TODO: implement keyLog
+  }
 
   @override
   void addCredentials(
@@ -176,7 +168,7 @@ class BrowserHttpClient implements HttpClient {
         fragment: url.fragment,
       );
     }
-    return BrowserHttpClientRequest(this, method, url);
+    return BrowserHttpClientRequestImpl(this, method, url);
   }
 
   @override
@@ -207,18 +199,5 @@ class BrowserHttpClient implements HttpClient {
   @override
   Future<HttpClientRequest> putUrl(Uri url) {
     return openUrl('PUT', url);
-  }
-
-  @override
-  set connectionFactory(
-      Future<ConnectionTask<Socket>> Function(
-              Uri url, String? proxyHost, int? proxyPort)?
-          f) {
-    // TODO: implement connectionFactory
-  }
-
-  @override
-  set keyLog(Function(String line)? callback) {
-    // TODO: implement keyLog
   }
 }

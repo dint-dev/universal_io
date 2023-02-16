@@ -14,6 +14,12 @@
 
 import 'dart:html' as html;
 
+import 'package:universal_io/io.dart';
+
+import '_browser_http_client_impl.dart';
+
+String? get htmlWindowOrigin => html.window.origin;
+
 String get locale {
   final languages = html.window.navigator.languages;
   if (languages != null && languages.isNotEmpty) {
@@ -103,3 +109,5 @@ String get operatingSystemVersion {
 
   return '';
 }
+
+HttpClient newHttpClient() => BrowserHttpClientImpl();

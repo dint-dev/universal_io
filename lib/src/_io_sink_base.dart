@@ -15,7 +15,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import '_exports.dart';
+import 'package:universal_io/io.dart';
 
 /// A base class for [IOSink] subclasses.
 abstract class IOSinkBase implements IOSink {
@@ -28,7 +28,7 @@ abstract class IOSinkBase implements IOSink {
       add(data);
     }, onError: (error, stackTrace) {
       addError(error, stackTrace);
-    }).asFuture();
+    }, cancelOnError: true).asFuture();
   }
 
   @override
@@ -38,7 +38,7 @@ abstract class IOSinkBase implements IOSink {
 
   @override
   void write(Object? obj) {
-    add(const Utf8Encoder().convert('$obj'));
+    add(const Utf8Encoder().convert(obj.toString()));
   }
 
   @override

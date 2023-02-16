@@ -1,10 +1,6 @@
-name: Dart
+name: Dart CI
 
-on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+on: [push, pull_request]
 
 jobs:
   test:
@@ -21,4 +17,8 @@ jobs:
       - name: Install dependencies
         run: dart pub get
       - name: Run tests
-        run: dart pub run test --platform vm
+        run: dart test --platform vm
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
+      - name: Analyze project source
+        run: dart analyze

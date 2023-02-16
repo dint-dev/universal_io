@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// Cross-platform implementation of "dart:io" that works on browsers too.
-///
-/// # Usage
-/// Replace imports of "dart:io" with:
-/// ```
-/// import 'package:universal_io/io.dart';
-/// ```
-library universal_io;
+import 'package:universal_io/io.dart';
 
-export 'src/_exports_in_vm.dart'
-    if (dart.library.html) 'src/_exports_in_browser.dart'
-    if (dart.library.js) 'src/_exports_in_nodejs.dart';
+/// Implemented by [HttpClientResponse] when the application runs in browser.
+abstract class BrowserHttpClientResponse extends HttpClientResponse {
+  /// Response object of _XHR_ request.
+  ///
+  /// You need to finish reading this [HttpClientResponse] to get the final
+  /// value.
+  dynamic get browserResponse;
+}

@@ -44,8 +44,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'platform_impl_elsewhere.dart'
-    if (dart.library.html) 'platform_impl_browser.dart' as impl;
+import '_helpers.dart' as impl;
 
 /// Information about the environment in which the current program is running.
 ///
