@@ -386,7 +386,10 @@ class HttpHeadersImpl implements HttpHeaders {
           if (fold) {
             sb.write(', ');
           } else {
-            sb..write('\n')..write(originalName)..write(': ');
+            sb
+              ..write('\n')
+              ..write(originalName)
+              ..write(': ');
           }
         }
         sb.write(values[i]);
@@ -765,19 +768,30 @@ class _Cookie implements Cookie {
   @override
   String toString() {
     final sb = StringBuffer();
-    sb..write(_name)..write('=')..write(_value);
+    sb
+      ..write(_name)
+      ..write('=')
+      ..write(_value);
     var expires = this.expires;
     if (expires != null) {
-      sb..write('; Expires=')..write(HttpDate.format(expires));
+      sb
+        ..write('; Expires=')
+        ..write(HttpDate.format(expires));
     }
     if (maxAge != null) {
-      sb..write('; Max-Age=')..write(maxAge);
+      sb
+        ..write('; Max-Age=')
+        ..write(maxAge);
     }
     if (domain != null) {
-      sb..write('; Domain=')..write(domain);
+      sb
+        ..write('; Domain=')
+        ..write(domain);
     }
     if (path != null) {
-      sb..write('; Path=')..write(path);
+      sb
+        ..write('; Path=')
+        ..write(path);
     }
     if (secure) sb.write('; Secure');
     if (httpOnly) sb.write('; HttpOnly');
@@ -965,7 +979,9 @@ class _HeaderValue implements HeaderValue {
     var parameters = _parameters;
     if (parameters != null && parameters.isNotEmpty) {
       parameters.forEach((String name, String? value) {
-        sb..write('; ')..write(name);
+        sb
+          ..write('; ')
+          ..write(name);
         if (value != null) {
           sb.write('=');
           if (_isToken(value)) {
@@ -983,7 +999,9 @@ class _HeaderValue implements HeaderValue {
                 start = i;
               }
             }
-            sb..write(value.substring(start))..write('"');
+            sb
+              ..write(value.substring(start))
+              ..write('"');
           }
         }
       });
@@ -1053,7 +1071,7 @@ class _HeaderValue implements HeaderValue {
       }
 
       String parseParameterValue() {
-        if (!done() && s[index] == '\"') {
+        if (!done() && s[index] == '"') {
           // Parse quoted value.
           final sb = StringBuffer();
           index++;
@@ -1063,11 +1081,11 @@ class _HeaderValue implements HeaderValue {
               if (index + 1 == s.length) {
                 throw HttpException('Failed to parse header value');
               }
-              if (preserveBackslash && s[index + 1] != '\"') {
+              if (preserveBackslash && s[index + 1] != '"') {
                 sb.write(char);
               }
               index++;
-            } else if (char == '\"') {
+            } else if (char == '"') {
               index++;
               return sb.toString();
             }
@@ -1129,7 +1147,7 @@ class _HeaderValue implements HeaderValue {
     if (token.isEmpty) {
       return false;
     }
-    final delimiters = '\"(),/:;<=>?@[\]{}';
+    final delimiters = '"(),/:;<=>?@[]{}';
     for (var i = 0; i < token.length; i++) {
       final codeUnit = token.codeUnitAt(i);
       if (codeUnit <= 32 || codeUnit >= 127 || delimiters.contains(token[i])) {

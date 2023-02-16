@@ -488,9 +488,6 @@ Future<HttpClientResponse?> _testClient({
   });
 
   if (httpClientRequest is BrowserHttpClientRequest) {
-    if (request.responseType != null) {
-      httpClientRequest.browserResponseType = request.responseType;
-    }
     httpClientRequest.browserCredentialsMode = request.credentialsMode;
   }
 
@@ -586,7 +583,6 @@ class _Request {
   final String path;
   final Map<String, String> headers;
   final String? body;
-  final String? responseType;
   final bool credentialsMode;
 
   const _Request({
@@ -594,7 +590,6 @@ class _Request {
     required this.path,
     this.headers = const <String, String>{},
     this.body,
-    this.responseType,
     this.credentialsMode = false,
   });
 }

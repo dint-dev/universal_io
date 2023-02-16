@@ -48,8 +48,6 @@ import 'dart:async';
 
 import 'package:universal_io/src/io_impl_js.dart';
 
-import '../io_impl_js.dart';
-
 const _asyncRunZoned = runZoned;
 
 final _ioOverridesToken = Object();

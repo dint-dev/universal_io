@@ -60,7 +60,6 @@ void main() {
     _testHttpClient(isBrowser: false);
   }, testOn: 'vm');
 
-
   group('Node.JS', () {
     _testFile();
     _testInternetAddress();

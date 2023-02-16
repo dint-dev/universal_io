@@ -80,7 +80,7 @@ class BrowserHttpClientException implements SocketException {
         addEntry('Origin: ', origin);
         addEntry('Cross-origin: ', '$isCrossOrigin');
         addEntry('browserCredentialsMode: ', '$browserCredentialsMode');
-        addEntry('browserResponseType: ', '$browserResponseType');
+        addEntry('browserResponseType: ', browserResponseType);
         sb.write(
           '''
 

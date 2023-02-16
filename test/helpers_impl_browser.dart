@@ -25,7 +25,7 @@ void testPlatformInBrowser() {
     });
   }
 
-  final userAgent = (window.navigator.userAgent ?? '').toLowerCase();
+  final userAgent = window.navigator.userAgent.toLowerCase();
   if (userAgent.contains('mac os x')) {
     test('Platform.isMacOS == true', () {
       expect(Platform.isMacOS, true);

@@ -64,11 +64,6 @@ import '../io_impl_js.dart';
 /// implemented. However, the platform's built-in trusted certificates can
 /// be used, by way of [SecurityContext.defaultContext].
 abstract class SecurityContext {
-  /// Whether the platform supports ALPN. This always returns true and will be
-  /// removed in a future release.
-  @deprecated
-  static bool get alpnSupported => throw UnimplementedError();
-
   /// Secure networking classes with an optional `context` parameter
   /// use the [defaultContext] object if the parameter is omitted.
   /// This object can also be accessed, and modified, directly.

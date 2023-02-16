@@ -467,13 +467,13 @@ class ProcessResult {
   /// `stdoutEncoding` argument to `Process.run` determines the type. If
   /// `null` was used this value is of type `List<int>` otherwise it is
   /// of type `String`.
-  final stdout;
+  final int stdout;
 
   /// Standard error from the process. The value used for the
   /// `stderrEncoding` argument to `Process.run` determines the type. If
   /// `null` was used this value is of type `List<int>`
   /// otherwise it is of type `String`.
-  final stderr;
+  final int stderr;
 
   /// Process id of the process.
   final int pid;
@@ -647,7 +647,7 @@ class ProcessStartMode {
 
 class SignalException implements IOException {
   final String message;
-  final osError;
+  final Object? osError;
 
   const SignalException(this.message, [this.osError]);
 

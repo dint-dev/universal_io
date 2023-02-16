@@ -20,7 +20,7 @@ void _testPlatform() {
       expect(Platform.pathSeparator, '/');
     }, testOn: 'posix');
 
-    test("pathSeparator == '\'", () {
+    test("pathSeparator == ''", () {
       expect(Platform.pathSeparator, r'\');
     }, testOn: 'windows');
 

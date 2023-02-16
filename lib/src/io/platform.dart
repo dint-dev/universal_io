@@ -168,7 +168,8 @@ class Platform {
   static String get operatingSystem => browser_or_node.operatingSystem;
 
   /// A string representing the version of the operating system or platform.
-  static String get operatingSystemVersion => browser_or_node.operatingSystemVersion;
+  static String get operatingSystemVersion =>
+      browser_or_node.operatingSystemVersion;
 
   /// The `--packages` flag passed to the executable used to run the script
   /// in this isolate.

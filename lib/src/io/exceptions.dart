@@ -76,12 +76,18 @@ class OSError {
     var sb = StringBuffer();
     sb.write('OS Error');
     if (message.isNotEmpty) {
-      sb..write(': ')..write(message);
+      sb
+        ..write(': ')
+        ..write(message);
       if (errorCode != noErrorCode) {
-        sb..write(', errno = ')..write(errorCode.toString());
+        sb
+          ..write(', errno = ')
+          ..write(errorCode.toString());
       }
     } else if (errorCode != noErrorCode) {
-      sb..write(': errno = ')..write(errorCode.toString());
+      sb
+        ..write(': errno = ')
+        ..write(errorCode.toString());
     }
     return sb.toString();
   }

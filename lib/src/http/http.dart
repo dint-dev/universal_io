@@ -1101,7 +1101,9 @@ class HttpException implements IOException {
 
   @override
   String toString() {
-    var b = StringBuffer()..write('HttpException: ')..write(message);
+    var b = StringBuffer()
+      ..write('HttpException: ')
+      ..write(message);
     var uri = this.uri;
     if (uri != null) {
       b.write(', uri = $uri');

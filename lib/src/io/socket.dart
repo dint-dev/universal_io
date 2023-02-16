@@ -819,7 +819,7 @@ class SocketDirection {
   @Deprecated('Use both instead')
   static const SocketDirection BOTH = both;
 
-  final _value;
+  final int _value;
 
   const SocketDirection._(this._value);
 

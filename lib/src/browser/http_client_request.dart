@@ -68,9 +68,6 @@ class BrowserHttpClientRequest extends HttpClientRequest with IOSinkBase {
 
   final bool _supportsBody;
 
-  @override
-  Encoding encoding = utf8;
-
   Future<HttpClientResponse>? _result;
 
   final _buffer = Uint8Buffer();
@@ -161,7 +158,6 @@ class BrowserHttpClientRequest extends HttpClientRequest with IOSinkBase {
     _addStreamFuture = future;
     await future;
     _addStreamFuture = null;
-    return null;
   }
 
   @override
