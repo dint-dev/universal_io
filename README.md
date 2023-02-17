@@ -54,7 +54,7 @@ The following features may be deprecated in the future versions (3.x) of the pac
 In pubspec.yaml:
 ```yaml
 dependencies:
-  universal_io: '2.2.0
+  universal_io: ^2.2.0
 ```
 
 ## 2.Use HTTP client
