@@ -1,3 +1,6 @@
+# 2.2.1
+  * Fixes pubspec.yaml for Dart 3.x.
+
 # 2.2.0
   * Refactoring, better documentation, and some additional APIs in BrowserHttpClient.
 
