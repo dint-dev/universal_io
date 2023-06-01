@@ -1,3 +1,6 @@
+# 2.2.2
+* Improve dependency constraints.
+
 # 2.2.1
   * Fixes pubspec.yaml for Dart 3.x.
 
