@@ -1,3 +1,7 @@
+# 2.2.3
+
+* Include lineTerminator from Dart 3.1.0 on platform
+
 # 2.2.2
 * Improve dependency constraints.
 
