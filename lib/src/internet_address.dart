@@ -45,8 +45,8 @@
 // limitations under the License.
 
 import 'dart:convert';
-import 'dart:io' show InternetAddressType;
 import 'dart:io' as dart_io;
+import 'dart:io' show InternetAddressType;
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
@@ -328,7 +328,8 @@ class InternetAddress implements dart_io.InternetAddress {
   static Future<List<InternetAddress>> lookup(
     String host, {
     InternetAddressType type = InternetAddressType.any,
-  }) => throw UnimplementedError();
+  }) =>
+      throw UnimplementedError();
 
   /// Attempts to parse [address] as a numeric address.
   ///

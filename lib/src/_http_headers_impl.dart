@@ -49,6 +49,7 @@ final _digitsValidator = RegExp(r"^\d+$");
 
 class HttpHeadersImpl implements HttpHeaders {
   final Map<String, List<String>> _headers;
+
   // The original header names keyed by the lowercase header names.
   Map<String, String>? _originalHeaderNames;
   final String protocolVersion;
@@ -68,8 +69,8 @@ class HttpHeadersImpl implements HttpHeaders {
     this.protocolVersion, {
     int defaultPortForScheme = HttpClient.defaultHttpPort,
     HttpHeadersImpl? initialHeaders,
-  }) : _headers = HashMap<String, List<String>>(),
-       _defaultPortForScheme = defaultPortForScheme {
+  })  : _headers = HashMap<String, List<String>>(),
+        _defaultPortForScheme = defaultPortForScheme {
     if (initialHeaders != null) {
       initialHeaders._headers.forEach((name, value) => _headers[name] = value);
       _contentLength = initialHeaders._contentLength;
@@ -307,10 +308,9 @@ class HttpHeadersImpl implements HttpHeaders {
     // Content-Length header field when the request message does not
     // contain a payload body and the method semantics do not anticipate
     // such a body.
-    String? ignoreHeader =
-        _contentLength == 0 && skipZeroContentLength
-            ? HttpHeaders.contentLengthHeader
-            : null;
+    String? ignoreHeader = _contentLength == 0 && skipZeroContentLength
+        ? HttpHeaders.contentLengthHeader
+        : null;
     _headers.forEach((String name, List<String> values) {
       if (ignoreHeader == name) {
         return;

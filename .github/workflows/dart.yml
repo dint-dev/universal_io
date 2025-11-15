@@ -1,24 +1,32 @@
 name: Dart CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   test:
     runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.sdk != 'stable' }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        sdk: [stable, beta, dev]
+        sdk: [3.4, stable, beta, dev]
     steps:
       - uses: actions/checkout@v3
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: ${{ matrix.sdk }}
+      - name: Print version
+        run: dart --version
       - name: Install dependencies
         run: dart pub get
-      - name: Run tests
-        run: dart test --platform vm
       - name: Verify formatting
-        run: dart format --output=none --set-exit-if-changed .
+        run: dart format --set-exit-if-changed .
       - name: Analyze project source
         run: dart analyze
+      - name: Run tests
+        run: dart test --platform vm

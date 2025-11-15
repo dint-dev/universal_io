@@ -39,11 +39,11 @@ class BrowserHttpClientImpl extends BrowserHttpClient {
 
   @override
   Future<bool> Function(String host, int port, String scheme, String realm)?
-  authenticateProxy;
+      authenticateProxy;
 
   @override
   bool Function(X509Certificate cert, String host, int port)?
-  badCertificateCallback;
+      badCertificateCallback;
 
   @override
   String Function(Uri url)? findProxy;
@@ -58,8 +58,7 @@ class BrowserHttpClientImpl extends BrowserHttpClient {
       Uri url,
       String? proxyHost,
       int? proxyPort,
-    )?
-    f,
+    )? f,
   ) {
     // TODO: implement connectionFactory
   }

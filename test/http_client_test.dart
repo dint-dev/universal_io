@@ -182,24 +182,22 @@ void _testHttpClient({required bool isBrowser}) async {
 
     test('Receiving cookies fails without credentials mode', () async {
       if (isBrowser) {
-        final response =
-            (await _testClient(
-              request: _Request(
-                method: 'GET',
-                path: '/set_cookie?name=x&value=y',
-              ),
-              expectedResponse: _ExpectedResponse(status: HttpStatus.ok),
-            ))!;
+        final response = (await _testClient(
+          request: _Request(
+            method: 'GET',
+            path: '/set_cookie?name=x&value=y',
+          ),
+          expectedResponse: _ExpectedResponse(status: HttpStatus.ok),
+        ))!;
         expect(response.cookies, []);
       } else {
-        final response =
-            (await _testClient(
-              request: _Request(
-                method: 'GET',
-                path: '/set_cookie?name=x&value=y',
-              ),
-              expectedResponse: _ExpectedResponse(status: HttpStatus.ok),
-            ))!;
+        final response = (await _testClient(
+          request: _Request(
+            method: 'GET',
+            path: '/set_cookie?name=x&value=y',
+          ),
+          expectedResponse: _ExpectedResponse(status: HttpStatus.ok),
+        ))!;
         expect(response.cookies, hasLength(1));
         expect(response.cookies.single.name, 'x');
         expect(response.cookies.single.value, 'y');
@@ -408,7 +406,8 @@ void _testHttpClient({required bool isBrowser}) async {
     });
 
     if (!isBrowser) {
-      test('TLS connection to a self-signed server succeeds with'
+      test(
+          'TLS connection to a self-signed server succeeds with'
           " the help of 'badCertificateCallback'", () async {
         final client = HttpClient();
         client.badCertificateCallback = (certificate, host, port) {
@@ -490,8 +489,8 @@ Future<HttpClientResponse?> _testClient({
 
   // Close HTTP request
   final response = await httpClientRequest.close().timeout(
-    const Duration(milliseconds: 500),
-  );
+        const Duration(milliseconds: 500),
+      );
   final actualResponseBody = await utf8
       .decodeStream(response.cast<List<int>>())
       .timeout(const Duration(seconds: 5));
@@ -544,13 +543,12 @@ Future _testClientMethodWithoutUri({
   expect(response.statusCode, 200);
 }
 
-typedef OpenUrlFunction =
-    Future<HttpClientRequest> Function(
-      HttpClient client,
-      String host,
-      int port,
-      String path,
-    );
+typedef OpenUrlFunction = Future<HttpClientRequest> Function(
+  HttpClient client,
+  String host,
+  int port,
+  String path,
+);
 
 class _ExpectedResponse {
   final int status;

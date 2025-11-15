@@ -66,5 +66,8 @@ void main() {
     test('Platform.operatingSystemVersion', () {
       expect(Platform.operatingSystemVersion, isNotEmpty);
     });
+    test('Platform.lineTerminator', () {
+      expect(Platform.lineTerminator, Platform.isWindows ? '\r\n' : '\n');
+    });
   }
 }
