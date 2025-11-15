@@ -1,3 +1,6 @@
+# 2.2.3
+* Fixes a bug in new Dart SDK versions.
+
 # 2.2.2
 * Improve dependency constraints.
 

@@ -68,9 +68,10 @@ void main() {
 
     group('InternetAddress(...) when IPv6', () {
       test("'0123:4567:89ab:cdef:0123:4567:89ab:cdef'", () {
-        final actual = InternetAddress(
-          '0123:4567:89ab:cdef:0123:4567:89ab:cdef',
-        ).rawAddress;
+        final actual =
+            InternetAddress(
+              '0123:4567:89ab:cdef:0123:4567:89ab:cdef',
+            ).rawAddress;
         final expected = Uint8List(16);
         expected[0] = 0x01;
         expected[1] = 0x23;
@@ -165,13 +166,17 @@ void main() {
       });
 
       test("'1:2:3:4:5:6:ff00:0'", () {
-        expect(InternetAddress('1:2:3:4:5:6:ff00:0').address,
-            '1:2:3:4:5:6:ff00:0');
+        expect(
+          InternetAddress('1:2:3:4:5:6:ff00:0').address,
+          '1:2:3:4:5:6:ff00:0',
+        );
       });
 
       test("'1:2:3:4:5:ff00:0:0'", () {
-        expect(InternetAddress('1:2:3:4:5:ff00:0:0').address,
-            '1:2:3:4:5:ff00:0:0');
+        expect(
+          InternetAddress('1:2:3:4:5:ff00:0:0').address,
+          '1:2:3:4:5:ff00:0:0',
+        );
       });
     });
 
@@ -179,14 +184,18 @@ void main() {
       expect(InternetAddress('0.1.2.9').host, '0.1.2.9');
       expect(InternetAddress('::').host, '::');
       expect(
-          InternetAddress('/abc', type: InternetAddressType.unix).host, '/abc');
+        InternetAddress('/abc', type: InternetAddressType.unix).host,
+        '/abc',
+      );
     });
 
     test('type', () {
       expect(InternetAddress('0.1.2.9').type, InternetAddressType.IPv4);
       expect(InternetAddress('::').type, InternetAddressType.IPv6);
-      expect(InternetAddress('/abc', type: InternetAddressType.unix).type,
-          InternetAddressType.unix);
+      expect(
+        InternetAddress('/abc', type: InternetAddressType.unix).type,
+        InternetAddressType.unix,
+      );
     });
 
     test('isLoopback', () {
@@ -194,8 +203,10 @@ void main() {
       expect(InternetAddress('8.8.8.8').isLoopback, isFalse);
       expect(InternetAddress('10.0.0.0').isLoopback, isFalse);
       expect(InternetAddress('::').isLoopback, isFalse);
-      expect(InternetAddress('/abc', type: InternetAddressType.unix).isLoopback,
-          isFalse);
+      expect(
+        InternetAddress('/abc', type: InternetAddressType.unix).isLoopback,
+        isFalse,
+      );
 
       // True
       expect(InternetAddress('127.0.0.1').isLoopback, isTrue);

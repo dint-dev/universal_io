@@ -258,8 +258,10 @@ class InternetAddress implements dart_io.InternetAddress {
   /// If [type] is omitted, the [rawAddress] must have a length of either 4 or
   /// 16, in which case the type defaults to [InternetAddressType.IPv4] or
   /// [InternetAddressType.IPv6] respectively.
-  factory InternetAddress.fromRawAddress(Uint8List rawAddress,
-      {InternetAddressType? type}) {
+  factory InternetAddress.fromRawAddress(
+    Uint8List rawAddress, {
+    InternetAddressType? type,
+  }) {
     if (type == InternetAddressType.unix) {
       return InternetAddress(utf8.decode(rawAddress), type: type);
     }
@@ -323,9 +325,10 @@ class InternetAddress implements dart_io.InternetAddress {
   /// [InternetAddressType.IPv6] it will only lookup addresses of the
   /// specified type. The order of the list can, and most likely will,
   /// change over time.
-  static Future<List<InternetAddress>> lookup(String host,
-          {InternetAddressType type = InternetAddressType.any}) =>
-      throw UnimplementedError();
+  static Future<List<InternetAddress>> lookup(
+    String host, {
+    InternetAddressType type = InternetAddressType.any,
+  }) => throw UnimplementedError();
 
   /// Attempts to parse [address] as a numeric address.
   ///

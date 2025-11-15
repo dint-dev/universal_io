@@ -71,7 +71,7 @@ class BrowserHttpClientRequestImpl extends IOSinkBase
 
   @internal
   BrowserHttpClientRequestImpl(this.client, this.method, this.uri)
-      : _supportsBody = _httpMethodSupportsBody(method) {
+    : _supportsBody = _httpMethodSupportsBody(method) {
     // Add "User-Agent" header
     final userAgent = client.userAgent;
     if (userAgent != null) {
@@ -96,7 +96,7 @@ class BrowserHttpClientRequestImpl extends IOSinkBase
         'blob',
         'document',
         'json',
-        'text'
+        'text',
       };
       if (!validValues.contains(value)) {
         throw ArgumentError.value(value);
@@ -133,11 +133,17 @@ class BrowserHttpClientRequestImpl extends IOSinkBase
   @override
   Future<void> addStream(Stream<List<int>> stream) async {
     _checkAddRequirements();
-    final future = stream.listen((item) {
-      _buffer.addAll(item);
-    }, onError: (error) {
-      addError(error);
-    }, cancelOnError: true).asFuture(null);
+    final future = stream
+        .listen(
+          (item) {
+            _buffer.addAll(item);
+          },
+          onError: (error) {
+            addError(error);
+          },
+          cancelOnError: true,
+        )
+        .asFuture(null);
     _addStreamFuture = future;
     await future;
     _addStreamFuture = null;
@@ -195,9 +201,11 @@ class BrowserHttpClientRequestImpl extends IOSinkBase
     await flush();
 
     if (cookies.isNotEmpty) {
-      _completer.completeError(StateError(
-        'Attempted to send cookies, but XMLHttpRequest does not support them.',
-      ));
+      _completer.completeError(
+        StateError(
+          'Attempted to send cookies, but XMLHttpRequest does not support them.',
+        ),
+      );
       return _completer.future;
     }
 
@@ -280,9 +288,10 @@ class BrowserHttpClientRequestImpl extends IOSinkBase
           if (!streamController.isClosed) {
             final response = xhr.response;
             if (response is String) {
-              final textChunk = seenTextLength < 0
-                  ? response
-                  : response.substring(seenTextLength);
+              final textChunk =
+                  seenTextLength < 0
+                      ? response
+                      : response.substring(seenTextLength);
               seenTextLength = response.length;
               streamController.add(Utf8Encoder().convert(textChunk));
             }
