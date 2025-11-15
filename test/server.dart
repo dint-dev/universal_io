@@ -21,17 +21,10 @@ import 'package:stream_channel/stream_channel.dart';
 void hybridMain(StreamChannel streamChannel, Object message) async {
   final securityContext = SecurityContext();
   const testSuitePath = 'test';
-  securityContext.useCertificateChain(
-    '$testSuitePath/localhost.crt',
-  );
-  securityContext.usePrivateKey(
-    '$testSuitePath/localhost.key',
-  );
+  securityContext.useCertificateChain('$testSuitePath/localhost.crt');
+  securityContext.usePrivateKey('$testSuitePath/localhost.key');
 
-  final server = await HttpServer.bind(
-    'localhost',
-    0,
-  );
+  final server = await HttpServer.bind('localhost', 0);
   print('Server #1 is listening at: http://localhost:${server.port}/');
   streamChannel.sink.add(server.port);
 
@@ -66,29 +59,14 @@ void _handleHttpRequest(HttpRequest request) async {
     if (origin == '*' && !userAgent.contains('Dart')) {
       print('INVALID ORIGIN: $origin');
     }
-    response.headers.set(
-      'Access-Control-Allow-Origin',
-      '*',
-    );
-    response.headers.set(
-      'Access-Control-Allow-Methods',
-      '*',
-    );
-    response.headers.set(
-      'Access-Control-Expose-Headers',
-      '*',
-    );
+    response.headers.set('Access-Control-Allow-Origin', '*');
+    response.headers.set('Access-Control-Allow-Methods', '*');
+    response.headers.set('Access-Control-Expose-Headers', '*');
     final isCredentialsMode =
         request.uri.queryParameters['credentials'] == 'true';
     if (isCredentialsMode) {
-      response.headers.set(
-        'Access-Control-Allow-Origin',
-        origin,
-      );
-      response.headers.set(
-        'Access-Control-Allow-Credentials',
-        'true',
-      );
+      response.headers.set('Access-Control-Allow-Origin', origin);
+      response.headers.set('Access-Control-Allow-Credentials', 'true');
       response.headers.set(
         'Access-Control-Allow-Methods',
         'DELETE, GET, HEAD, PATCH, POST, PUT',
@@ -146,14 +124,8 @@ void _handleHttpRequest(HttpRequest request) async {
         break;
 
       case '/expect_authorization':
-        response.headers.set(
-          'Access-Control-Allow-Credentials',
-          'true',
-        );
-        response.headers.set(
-          'Access-Control-Allow-Headers',
-          'Authorization',
-        );
+        response.headers.set('Access-Control-Allow-Credentials', 'true');
+        response.headers.set('Access-Control-Allow-Headers', 'Authorization');
 
         // Is this a preflight?
         if (request.method == 'OPTIONS') {
@@ -161,8 +133,9 @@ void _handleHttpRequest(HttpRequest request) async {
           return;
         }
 
-        final authorization =
-            request.headers.value(HttpHeaders.authorizationHeader);
+        final authorization = request.headers.value(
+          HttpHeaders.authorizationHeader,
+        );
 
         if (authorization == 'expectedAuthorization') {
           response.statusCode = HttpStatus.ok;

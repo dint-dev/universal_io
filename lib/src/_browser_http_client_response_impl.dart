@@ -100,8 +100,12 @@ class BrowserHttpClientResponseImpl extends Stream<List<int>>
   }
 
   @override
-  StreamSubscription<Uint8List> listen(void Function(Uint8List event)? onData,
-      {Function? onError, void Function()? onDone, bool? cancelOnError}) {
+  StreamSubscription<Uint8List> listen(
+    void Function(Uint8List event)? onData, {
+    Function? onError,
+    void Function()? onDone,
+    bool? cancelOnError,
+  }) {
     return _body.listen(
       onData,
       onError: onError,
@@ -111,12 +115,15 @@ class BrowserHttpClientResponseImpl extends Stream<List<int>>
   }
 
   @override
-  Future<HttpClientResponse> redirect(
-      [String? method, Uri? url, bool? followLoops]) {
+  Future<HttpClientResponse> redirect([
+    String? method,
+    Uri? url,
+    bool? followLoops,
+  ]) {
     final newUrl = url ?? Uri.parse(headers.value(HttpHeaders.locationHeader)!);
-    return request.client
-        .openUrl(method ?? request.method, newUrl)
-        .then((newRequest) {
+    return request.client.openUrl(method ?? request.method, newUrl).then((
+      newRequest,
+    ) {
       request.headers.forEach((name, value) {
         newRequest.headers.add(name, value);
       });

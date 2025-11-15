@@ -21,11 +21,7 @@ class BrowserHttpClientException implements SocketException {
   /// Can be used to disable verbose messages in development mode.
   static bool verbose = true;
 
-  static final Set<String> _corsSimpleMethods = const {
-    'GET',
-    'HEAD',
-    'POST',
-  };
+  static final Set<String> _corsSimpleMethods = const {'GET', 'HEAD', 'POST'};
 
   /// HTTP method ("GET, "POST, etc.)
   final String method;
@@ -93,16 +89,14 @@ class BrowserHttpClientException implements SocketException {
         addEntry('Cross-origin: ', '$isCrossOrigin');
         addEntry('browserCredentialsMode: ', '$browserCredentialsMode');
         addEntry('browserResponseType: ', browserResponseType);
-        sb.write(
-          '''
+        sb.write('''
 
 THE REASON FOR THE XHR ERROR IS UNKNOWN.
 (For security reasons, browsers do not explain XHR errors.)
 
 Is the server down? Did the server have an internal error?
 
-''',
-        );
+''');
 
         // Warn about possible problem with missing CORS headers
         if (isCrossOrigin) {

@@ -15,7 +15,7 @@
 import 'package:universal_io/io.dart';
 
 /// Implemented by [HttpClientRequest] when the application runs in browser.
-abstract class BrowserHttpClientRequest extends HttpClientRequest {
+abstract class BrowserHttpClientRequest implements HttpClientRequest {
   /// Sets _responseType_ in XMLHttpRequest for this _XHR_ request.
   ///
   /// # Possible values

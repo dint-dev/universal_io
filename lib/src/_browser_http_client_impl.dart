@@ -39,11 +39,11 @@ class BrowserHttpClientImpl extends BrowserHttpClient {
 
   @override
   Future<bool> Function(String host, int port, String scheme, String realm)?
-      authenticateProxy;
+  authenticateProxy;
 
   @override
   bool Function(X509Certificate cert, String host, int port)?
-      badCertificateCallback;
+  badCertificateCallback;
 
   @override
   String Function(Uri url)? findProxy;
@@ -54,9 +54,13 @@ class BrowserHttpClientImpl extends BrowserHttpClient {
 
   @override
   set connectionFactory(
-      Future<ConnectionTask<Socket>> Function(
-              Uri url, String? proxyHost, int? proxyPort)?
-          f) {
+    Future<ConnectionTask<Socket>> Function(
+      Uri url,
+      String? proxyHost,
+      int? proxyPort,
+    )?
+    f,
+  ) {
     // TODO: implement connectionFactory
   }
 
@@ -67,13 +71,20 @@ class BrowserHttpClientImpl extends BrowserHttpClient {
 
   @override
   void addCredentials(
-      Uri url, String realm, HttpClientCredentials credentials) {
+    Uri url,
+    String realm,
+    HttpClientCredentials credentials,
+  ) {
     throw UnimplementedError();
   }
 
   @override
   void addProxyCredentials(
-      String host, int port, String realm, HttpClientCredentials credentials) {}
+    String host,
+    int port,
+    String realm,
+    HttpClientCredentials credentials,
+  ) {}
 
   @override
   void close({bool force = false}) {
@@ -112,7 +123,11 @@ class BrowserHttpClientImpl extends BrowserHttpClient {
 
   @override
   Future<HttpClientRequest> open(
-      String method, String host, int? port, String path) {
+    String method,
+    String host,
+    int? port,
+    String path,
+  ) {
     String? query;
     final i = path.indexOf('?');
     if (i >= 0) {
@@ -151,11 +166,7 @@ class BrowserHttpClientImpl extends BrowserHttpClient {
         case 'https':
           break;
         default:
-          throw ArgumentError.value(
-            url,
-            'url',
-            'Unsupported scheme',
-          );
+          throw ArgumentError.value(url, 'url', 'Unsupported scheme');
       }
     }
     if (needsNewUrl) {
