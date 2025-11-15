@@ -1,24 +1,55 @@
 name: Dart CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
-  test:
-    runs-on: ${{ matrix.os }}
+  format:
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dart-lang/setup-dart@v1
+      - name: Print version
+        run: dart --version
+      - name: Verify formatting
+        run: dart format --set-exit-if-changed .
+  analyze:
+    needs: format
+    runs-on: ubuntu-slim
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest]
-        sdk: [stable, beta, dev]
+        sdk: [3.6, stable, dev]
     steps:
       - uses: actions/checkout@v3
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: ${{ matrix.sdk }}
+      - name: Print version
+        run: dart --version
       - name: Install dependencies
         run: dart pub get
-      - name: Run tests
-        run: dart test --platform vm
-      - name: Verify formatting
-        run: dart format --output=none --set-exit-if-changed .
       - name: Analyze project source
         run: dart analyze
+  test:
+    needs: analyze
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dart-lang/setup-dart@v1
+      - uses: browser-actions/setup-chrome@v2
+      - name: Print version
+        run: dart --version
+      - name: Install dependencies
+        run: dart pub get
+      - name: Run tests (VM)
+        run: dart test --platform vm
+      - name: Run tests (Chrome)
+        run: dart test --platform chrome

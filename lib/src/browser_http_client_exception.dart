@@ -17,7 +17,7 @@ import 'package:universal_io/io.dart';
 import '_helpers.dart' as helpers;
 
 /// May be thrown by [BrowserHttpClientRequest.close].
-class BrowserHttpClientException implements SocketException {
+final class BrowserHttpClientException implements SocketException {
   /// Can be used to disable verbose messages in development mode.
   static bool verbose = true;
 

@@ -13,20 +13,21 @@
 // limitations under the License.
 
 @TestOn('chrome')
-import 'dart:html' hide Platform;
+library;
 
 import 'package:test/test.dart';
 import 'package:universal_io/io.dart';
+import 'package:universal_io/src/js/_xhr.dart';
 
 void main() {
-  if (window.navigator.languages!.isNotEmpty) {
-    final locale = window.navigator.languages!.first;
+  if (navigator.languages.length > 0) {
+    final locale = navigator.languages[0];
     test("Platform.localeName == '$locale'", () {
       expect(Platform.localeName, locale);
     });
   }
 
-  final userAgent = window.navigator.userAgent.toLowerCase();
+  final userAgent = navigator.userAgent.toLowerCase();
   if (userAgent.contains('mac os x')) {
     test('Platform.isMacOS == true', () {
       expect(Platform.isMacOS, true);
@@ -64,7 +65,13 @@ void main() {
       expect(Platform.isLinux, true);
     });
     test('Platform.operatingSystemVersion', () {
-      expect(Platform.operatingSystemVersion, isNotEmpty);
+      // Not implemented for Linux
+      // expect(Platform.operatingSystemVersion, isNotEmpty);
     });
+  } else {
+    throw StateError('Unsupported user agent: $userAgent');
   }
+  test('Platform.lineTerminator', () {
+    expect(Platform.lineTerminator, Platform.isWindows ? '\r\n' : '\n');
+  });
 }

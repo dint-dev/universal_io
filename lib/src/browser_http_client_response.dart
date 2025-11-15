@@ -15,10 +15,10 @@
 import 'package:universal_io/io.dart';
 
 /// Implemented by [HttpClientResponse] when the application runs in browser.
-abstract class BrowserHttpClientResponse implements HttpClientResponse {
+abstract base class BrowserHttpClientResponse implements HttpClientResponse {
   /// Response object of _XHR_ request.
   ///
   /// You need to finish reading this [HttpClientResponse] to get the final
   /// value.
-  dynamic get browserResponse;
+  Object? get browserResponse;
 }

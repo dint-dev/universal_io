@@ -47,8 +47,9 @@ import '_exports_in_browser.dart';
 
 final _digitsValidator = RegExp(r"^\d+$");
 
-class HttpHeadersImpl implements HttpHeaders {
+final class HttpHeadersImpl implements HttpHeaders {
   final Map<String, List<String>> _headers;
+
   // The original header names keyed by the lowercase header names.
   Map<String, String>? _originalHeaderNames;
   final String protocolVersion;
@@ -307,10 +308,9 @@ class HttpHeadersImpl implements HttpHeaders {
     // Content-Length header field when the request message does not
     // contain a payload body and the method semantics do not anticipate
     // such a body.
-    String? ignoreHeader =
-        _contentLength == 0 && skipZeroContentLength
-            ? HttpHeaders.contentLengthHeader
-            : null;
+    String? ignoreHeader = _contentLength == 0 && skipZeroContentLength
+        ? HttpHeaders.contentLengthHeader
+        : null;
     _headers.forEach((String name, List<String> values) {
       if (ignoreHeader == name) {
         return;

@@ -18,7 +18,7 @@ import 'dart:convert';
 import 'package:universal_io/io.dart';
 
 /// A base class for [IOSink] subclasses.
-abstract class IOSinkBase implements IOSink {
+abstract mixin class IOSinkBase implements IOSink {
   @override
   Encoding encoding = utf8;
 

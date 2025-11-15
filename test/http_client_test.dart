@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-library main_test;
+library;
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:async/async.dart';
 import 'package:test/test.dart';
@@ -79,32 +80,8 @@ void _testHttpClient({required bool isBrowser}) async {
     }, testOn: '!browser');
 
     test('In browser: does implement BrowserHttpClient', () async {
-      final client = HttpClient();
-      expect(client, isA<BrowserHttpClient>());
-      if (client is BrowserHttpClient) {
-        expect(client.onBrowserHttpClientRequestClose, isNull);
-      }
-    }, testOn: 'browser');
-
-    test('In browser: requests implement BrowserHttpClientRequest', () async {
-      final client = HttpClient();
-      if (client is BrowserHttpClient) {
-        client.onBrowserHttpClientRequestClose = expectAsync1((request) {
-          request.browserResponseType = 'text';
-        }, count: 1);
-      }
-      final request = await client.openUrl(
-        'GET',
-        Uri.parse('http://localhost:$serverPort/greeting'),
-      );
-      expect(request, isA<BrowserHttpClientRequest>());
-      if (request is BrowserHttpClientRequest) {
-        expect(request.browserCredentialsMode, isFalse);
-        expect(request.browserResponseType, isNull);
-        await request.close();
-        expect(request.browserCredentialsMode, isFalse);
-        expect(request.browserResponseType, 'text');
-      }
+      final client = HttpClient() as BrowserHttpClient;
+      expect(client.onBrowserHttpClientRequestClose, isNull);
     }, testOn: 'browser');
 
     test('findProxyFromEnvironment', () {
@@ -134,6 +111,32 @@ void _testHttpClient({required bool isBrowser}) async {
       );
     });
 
+    test('/invalid_utf8', () async {
+      final client = HttpClient() as BrowserHttpClient;
+      client.onBrowserHttpClientRequestClose = expectAsync1(
+        (request) {},
+        count: 1,
+      );
+      final request = await client.openUrl(
+        'GET',
+        Uri.parse('http://localhost:$serverPort/invalid_utf8'),
+      );
+      request.headers.set('accept', 'application/binary');
+      expect(request.browserCredentialsMode, isFalse);
+      expect(request.browserResponseType, isNull);
+      final response = await request.close();
+      expect(request.browserCredentialsMode, isFalse);
+      expect(request.browserResponseType, 'arraybuffer');
+      expect(response.statusCode, 200);
+      await response
+          .listen(
+            expectAsync1((data) {
+              expect(data, [0x80]);
+            }, count: 1),
+          )
+          .asFuture();
+    }, testOn: 'browser');
+
     test('GET', () async {
       await _testClient(
         request: _Request(method: 'GET', path: '/greeting'),
@@ -141,12 +144,12 @@ void _testHttpClient({required bool isBrowser}) async {
       );
     });
 
-    test('GET (multiple chunks)', () async {
+    test('GET (streaming response)', () async {
       // Send HTTP request
       final client = HttpClient();
       final request = await client.openUrl(
         'GET',
-        Uri.parse('http://localhost:$serverPort/slow'),
+        Uri.parse('http://localhost:$serverPort/streaming_response'),
       );
       if (request is BrowserHttpClientRequest) {
         request.browserResponseType = 'text';
@@ -166,11 +169,32 @@ void _testHttpClient({required bool isBrowser}) async {
       await _testClient(
         request: _Request(
           method: 'POST',
-          path: '/greeting',
-          body: 'Hello from client',
+          path: '/report_body',
+          body: 'example',
         ),
-        expectedResponse: _ExpectedResponse(body: 'Hello world! (POST)'),
+        expectedResponse: _ExpectedResponse(body: 'Received: example'),
       );
+    });
+
+    test('POST (streaming response)', () async {
+      // Send HTTP request
+      final client = HttpClient();
+      final request = await client.openUrl(
+        'POST',
+        Uri.parse('http://localhost:$serverPort/streaming_response'),
+      );
+      if (request is BrowserHttpClientRequest) {
+        request.browserResponseType = 'text';
+      }
+      final response = await request.close();
+      final list = await response.toList();
+
+      // Check that the data arrived in multiple parts.
+      expect(list, hasLength(greaterThanOrEqualTo(2)));
+
+      // Check that the content is correct.
+      final bytes = list.fold(<int>[], (dynamic a, b) => a..addAll(b));
+      expect(utf8.decode(bytes), 'First part.\nSecond part.\n');
     });
 
     test('Status 404', () async {
@@ -181,38 +205,25 @@ void _testHttpClient({required bool isBrowser}) async {
     });
 
     test('Receiving cookies fails without credentials mode', () async {
-      if (isBrowser) {
-        final response =
-            (await _testClient(
-              request: _Request(
-                method: 'GET',
-                path: '/set_cookie?name=x&value=y',
-              ),
-              expectedResponse: _ExpectedResponse(status: HttpStatus.ok),
-            ))!;
-        expect(response.cookies, []);
-      } else {
-        final response =
-            (await _testClient(
-              request: _Request(
-                method: 'GET',
-                path: '/set_cookie?name=x&value=y',
-              ),
-              expectedResponse: _ExpectedResponse(status: HttpStatus.ok),
-            ))!;
-        expect(response.cookies, hasLength(1));
-        expect(response.cookies.single.name, 'x');
-        expect(response.cookies.single.value, 'y');
-      }
-    });
+      final response = (await _testClient(
+        request: _Request(
+          method: 'GET',
+          path: '/server_sets_cookie?name=x&value=y',
+        ),
+        expectedResponse: _ExpectedResponse(status: HttpStatus.ok),
+      ))!;
+      expect(response.cookies, []);
+    }, testOn: 'browser');
 
     test('Receiving cookies succeeds with credentials mode', () async {
+      final cookieName = 'cookie${Random().nextInt(1000)}';
+      final cookieValue = 'value${Random().nextInt(1000)}';
       final httpClient = HttpClient();
       await _testClient(
         existingHttpClient: httpClient,
         request: _Request(
           method: 'GET',
-          path: '/expect_cookie?name=x&value=y',
+          path: '/server_receives_cookie?name=$cookieName&value=$cookieValue',
           credentialsMode: true,
         ),
         expectedResponse: _ExpectedResponse(status: HttpStatus.unauthorized),
@@ -221,44 +232,33 @@ void _testHttpClient({required bool isBrowser}) async {
         existingHttpClient: httpClient,
         request: _Request(
           method: 'GET',
-          path: '/set_cookie?name=x&value=y',
+          path: '/server_sets_cookie?name=$cookieName&value=$cookieValue',
           credentialsMode: true,
         ),
+        expectedResponse: _ExpectedResponse(status: HttpStatus.ok),
       );
-      if (isBrowser) {
-        (await _testClient(
-          existingHttpClient: httpClient,
-          request: _Request(
-            method: 'GET',
-            path: '/expect_cookie?name=x&value=y',
-            credentialsMode: true,
-          ),
-        ))!;
-      } else {
-        await _testClient(
-          existingHttpClient: httpClient,
-          request: _Request(
-            method: 'GET',
-            path: '/expect_cookie?name=x&value=y',
-            credentialsMode: true,
-          ),
-          expectedResponse: _ExpectedResponse(status: HttpStatus.unauthorized),
-        );
-      }
-    });
+      (await _testClient(
+        existingHttpClient: httpClient,
+        request: _Request(
+          method: 'GET',
+          path: '/server_receives_cookie?name=$cookieName&value=$cookieValue',
+          credentialsMode: true,
+        ),
+      ))!;
+    }, testOn: 'browser');
 
     test('Sending cookies fails without credentials mode', () async {
-      var expectedStatus = HttpStatus.ok;
-      if (isBrowser) {
-        expectedStatus = HttpStatus.unauthorized;
-      }
+      final cookieName = 'cookie${Random().nextInt(1000)}';
+      final cookieValue = 'value${Random().nextInt(1000)}';
       await _testClient(
         request: _Request(
           method: 'GET',
-          path: '/expect_cookie?name=expectedCookie&value=value',
-          headers: {'Cookie': Cookie('expectedCookie', 'value').toString()},
+          path: '/server_receives_cookie?name=$cookieName&value=$cookieValue',
+          headers: {'Cookie': Cookie(cookieName, cookieValue).toString()},
         ),
-        expectedResponse: _ExpectedResponse(status: expectedStatus),
+        expectedResponse: _ExpectedResponse(
+          status: isBrowser ? HttpStatus.unauthorized : HttpStatus.ok,
+        ),
       );
     });
 
@@ -266,12 +266,12 @@ void _testHttpClient({required bool isBrowser}) async {
       await _testClient(
         request: _Request(
           method: 'POST',
-          path: '/expect_authorization',
-          headers: {HttpHeaders.authorizationHeader: 'expectedAuthorization'},
+          path: '/report_authorization',
+          headers: {HttpHeaders.authorizationHeader: 'example'},
         ),
         expectedResponse: _ExpectedResponse(
           status: HttpStatus.ok,
-          body: 'expectedAuthorization',
+          body: 'example',
         ),
       );
     });
@@ -282,14 +282,15 @@ void _testHttpClient({required bool isBrowser}) async {
     test('client.delete(...)', () async {
       await _testClientMethodWithoutUri(
         method: 'DELETE',
+        path: '/report_method',
         openUrl: (client, host, port, path) => client.delete(host, port, path),
       );
     });
 
     test('client.deleteUrl(...)', () async {
       await _testClient(
-        request: _Request(method: 'DELETE', path: '/greeting'),
-        expectedResponse: _ExpectedResponse(body: 'Hello world! (DELETE)'),
+        request: _Request(method: 'DELETE', path: '/report_method'),
+        expectedResponse: _ExpectedResponse(body: 'Method: DELETE'),
         openUrl: (client, uri) => client.deleteUrl(uri),
       );
     });
@@ -301,6 +302,7 @@ void _testHttpClient({required bool isBrowser}) async {
     test('client.get(...)', () async {
       await _testClientMethodWithoutUri(
         method: 'GET',
+        path: '/report_method',
         openUrl: (client, host, port, path) => client.get(host, port, path),
       );
     });
@@ -320,13 +322,14 @@ void _testHttpClient({required bool isBrowser}) async {
     test('client.head(...)', () async {
       await _testClientMethodWithoutUri(
         method: 'HEAD',
+        path: '/report_method',
         openUrl: (client, host, port, path) => client.head(host, port, path),
       );
     });
 
     test('client.headUrl(...)', () async {
       await _testClient(
-        request: _Request(method: 'HEAD', path: '/greeting'),
+        request: _Request(method: 'HEAD', path: '/report_method'),
         expectedResponse: _ExpectedResponse(
           // HEAD response doesn't have body
           body: '',
@@ -342,14 +345,15 @@ void _testHttpClient({required bool isBrowser}) async {
     test('client.patch(...)', () async {
       await _testClientMethodWithoutUri(
         method: 'PATCH',
+        path: '/report_method',
         openUrl: (client, host, port, path) => client.patch(host, port, path),
       );
     });
 
     test('client.patchUrl(...)', () async {
       await _testClient(
-        request: _Request(method: 'PATCH', path: '/greeting'),
-        expectedResponse: _ExpectedResponse(body: 'Hello world! (PATCH)'),
+        request: _Request(method: 'PATCH', path: '/report_method'),
+        expectedResponse: _ExpectedResponse(body: 'Method: PATCH'),
         openUrl: (client, uri) => client.patchUrl(uri),
       );
     });
@@ -361,14 +365,15 @@ void _testHttpClient({required bool isBrowser}) async {
     test('client.post(...)', () async {
       await _testClientMethodWithoutUri(
         method: 'POST',
+        path: '/report_method',
         openUrl: (client, host, port, path) => client.post(host, port, path),
       );
     });
 
     test('client.postUrl(...)', () async {
       await _testClient(
-        request: _Request(method: 'POST', path: '/greeting'),
-        expectedResponse: _ExpectedResponse(body: 'Hello world! (POST)'),
+        request: _Request(method: 'POST', path: '/report_method'),
+        expectedResponse: _ExpectedResponse(body: 'Method: POST'),
         openUrl: (client, uri) => client.postUrl(uri),
       );
     });
@@ -380,46 +385,51 @@ void _testHttpClient({required bool isBrowser}) async {
     test('client.put(...)', () async {
       await _testClientMethodWithoutUri(
         method: 'PUT',
+        path: '/report_method',
         openUrl: (client, host, port, path) => client.put(host, port, path),
       );
     });
 
     test('client.putUrl(...)', () async {
       await _testClient(
-        request: _Request(method: 'PUT', path: '/greeting'),
-        expectedResponse: _ExpectedResponse(body: 'Hello world! (PUT)'),
+        request: _Request(method: 'PUT', path: '/report_method'),
+        expectedResponse: _ExpectedResponse(body: 'Method: PUT'),
         openUrl: (client, uri) => client.putUrl(uri),
       );
     });
 
-    test('TLS connection to a self-signed server fails', () async {
-      final client = HttpClient();
-      final uri = Uri.parse('https://localhost:$secureServerPort/greeting');
-      if (isBrowser) {
-        // In browser, request is sent only after it's closed.
-        final request = await client.getUrl(uri);
-        expect(() => request.close(), throwsA(TypeMatcher<SocketException>()));
-      } else {
-        expect(
-          () => client.getUrl(uri),
-          throwsA(TypeMatcher<HandshakeException>()),
-        );
-      }
-    });
-
-    if (!isBrowser) {
-      test('TLS connection to a self-signed server succeeds with'
-          " the help of 'badCertificateCallback'", () async {
+    test(
+      'TLS connection to a self-signed server fails: $SocketException',
+      () async {
         final client = HttpClient();
-        client.badCertificateCallback = (certificate, host, port) {
-          return true;
-        };
         final uri = Uri.parse('https://localhost:$secureServerPort/greeting');
         final request = await client.getUrl(uri);
-        final response = await request.close();
-        expect(response.statusCode, 200);
-      });
-    }
+        expect(() => request.close(), throwsA(isA<SocketException>()));
+      },
+      testOn: 'browser',
+    );
+
+    test(
+      'TLS connection to a self-signed server fails: $HandshakeException',
+      () async {
+        final client = HttpClient();
+        final uri = Uri.parse('https://localhost:$secureServerPort/greeting');
+        expect(() => client.getUrl(uri), throwsA(isA<HandshakeException>()));
+      },
+      testOn: '!browser',
+    );
+
+    test('TLS connection to a self-signed server succeeds with'
+        " the help of 'badCertificateCallback'", () async {
+      final client = HttpClient();
+      client.badCertificateCallback = (certificate, host, port) {
+        return true;
+      };
+      final uri = Uri.parse('https://localhost:$secureServerPort/greeting');
+      final request = await client.getUrl(uri);
+      final response = await request.close();
+      expect(response.statusCode, 200);
+    }, testOn: '!browser');
   });
 }
 
@@ -522,6 +532,7 @@ Future<HttpClientResponse?> _testClient({
 /// These should default to TLS.
 Future _testClientMethodWithoutUri({
   required String method,
+  required String path,
   required OpenUrlFunction openUrl,
 }) async {
   // Create a HTTP client
@@ -529,7 +540,6 @@ Future _testClientMethodWithoutUri({
 
   // Create a HTTP request
   final host = 'localhost';
-  final path = '/greeting';
   final request = await openUrl(client, host, serverPort, path);
 
   // Test that the request seems correct

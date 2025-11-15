@@ -1,3 +1,7 @@
+# 2.3.0
+* Adds `Platform.lineTerminator`.
+* Lowers minimum SDK constraint for developers who haven't migrated to the latest SDK.
+
 # 2.2.3
 * Fixes a bug in new Dart SDK versions.
 

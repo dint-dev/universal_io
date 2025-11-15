@@ -3,30 +3,23 @@
 [![Github Actions CI](https://github.com/dint-dev/universal_io/workflows/Dart%20CI/badge.svg)](https://github.com/dint-dev/universal_io/actions)
 
 # Overview
-A cross-platform [dart:io](https://api.dart.dev/stable/2.19.2/dart-io/dart-io-library.html) that
-works on all platforms, including browsers.
+A cross-platform [dart:io](https://api.dart.dev/stable/2.19.2/dart-io/dart-io-library.html) that works on all platforms, including browsers.
 
-You can simply replace _dart:io_ imports with _package:universal_io/io.dart_.
+You can simply replace _dart:io_ imports with _package:universal_io/universal_io.dart_.
 
 Licensed under the [Apache License 2.0](LICENSE).
 Some of the source code was derived [from Dart SDK](https://github.com/dart-lang/sdk/tree/master/sdk/lib/io),
 which was obtained under the BSD-style license of Dart SDK. See LICENSE file for details.
 
 ## APIs added on top of "dart:io"
-* [newUniversalHttpClient](https://pub.dev/documentation/universal_io/latest/universal_io/newUniversalHttpClient.html)
-  * Returns BrowserHttpClient on browsers and the normal "dart:io" HttpClient on other platforms.
 * [BrowserHttpClient](https://pub.dev/documentation/universal_io/latest/universal_io/BrowserHttpClient-class.html)
   * A subclass of "dart:io" [HttpClient](https://api.dart.dev/stable/2.19.2/dart-io/HttpClient-class.html)
-    that works on browsers.
-* [BrowserHttpClientRequest](https://pub.dev/documentation/universal_io/latest/universal_io/BrowserHttpClientRequest-class.html)
-  * A subclass of "dart:io" [HttpClientRequest](https://api.dart.dev/stable/2.19.2/dart-io/HttpClientRequest-class.html)
-    that works on browsers.
-* [BrowserHttpClientResponse](https://pub.dev/documentation/universal_io/latest/universal_io/BrowserHttpClientResponse-class.html)
-  * A subclass of "dart:io" [HttpClientResponse](https://api.dart.dev/stable/2.19.2/dart-io/HttpClientResponse-class.html)
-    that works on browsers.
-* [BrowserHttpClientException](https://pub.dev/documentation/universal_io/latest/universal_io/BrowserHttpClientException-class.html)
-  * An exception that helps you understand why a HTTP request on a browser may have failed
-    (see explanation below).
+    that works in browsers.
+  * See also
+    [BrowserHttpClientRequest](https://pub.dev/documentation/universal_io/latest/universal_io/BrowserHttpClientRequest-class.html),
+    [BrowserHttpClientResponse](https://pub.dev/documentation/universal_io/latest/universal_io/BrowserHttpClientResponse-class.html),
+    and [BrowserHttpClientException](https://pub.dev/documentation/universal_io/latest/universal_io/BrowserHttpClientException-class.html).
+  * Uses XMLHttpRequest in browsers. WASM-compatible.
 
 ## Other features
 The following features may be deprecated in the future versions (3.x) of the package:
@@ -46,7 +39,7 @@ The following features may be deprecated in the future versions (3.x) of the pac
     * We appreciate feedback, issue reports, and pull requests.
 
 ## Similar packages
-  * [universal_html](https://pub.dev/packages/universal_html) (cross-platform _dart:html_)
+  * [universal_html](https://pub.dev/packages/universal_html) (cross-platform DOM, CSS, etc.)
 
 
 # Getting started
@@ -54,16 +47,17 @@ The following features may be deprecated in the future versions (3.x) of the pac
 In pubspec.yaml:
 ```yaml
 dependencies:
-  universal_io: ^2.2.3
+  universal_io: ^2.3.0
 ```
 
 ## 2.Use HTTP client
 ```dart
-import 'package:universal_io/io.dart';
+// Replace 'dart:io' imports with the following:
+import 'package:universal_io/universal_io.dart';
 
 Future<void> main() async {
   // HttpClient can be used in browser too!
-  HttpClient httpClient = newUniversalHttpClient(); // Recommended way of creating HttpClient.
+  final httpClient = HttpClient(); // Recommended way of creating HttpClient.
   final request = await httpClient.getUrl(Uri.parse("https://dart.dev/"));
   final response = await request.close();
 }

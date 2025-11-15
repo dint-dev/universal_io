@@ -68,10 +68,9 @@ void main() {
 
     group('InternetAddress(...) when IPv6', () {
       test("'0123:4567:89ab:cdef:0123:4567:89ab:cdef'", () {
-        final actual =
-            InternetAddress(
-              '0123:4567:89ab:cdef:0123:4567:89ab:cdef',
-            ).rawAddress;
+        final actual = InternetAddress(
+          '0123:4567:89ab:cdef:0123:4567:89ab:cdef',
+        ).rawAddress;
         final expected = Uint8List(16);
         expected[0] = 0x01;
         expected[1] = 0x23;

@@ -12,24 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'dart:html' as html;
+import 'dart:js_interop';
 
 import 'package:universal_io/io.dart';
 
-import '_browser_http_client_impl.dart';
+import '_xhr_http_client.dart';
+import 'js/_xhr.dart';
 
-String? get htmlWindowOrigin => html.window.origin;
+String? get htmlWindowOrigin => windowOrigin;
 
 String get locale {
-  final languages = html.window.navigator.languages;
-  if (languages != null && languages.isNotEmpty) {
-    return languages.first;
+  final languages = navigator.languages;
+  if (languages.length > 0) {
+    return languages[0].toDart;
   }
   return 'en-US';
 }
 
 String get operatingSystem {
-  final s = html.window.navigator.userAgent.toLowerCase();
+  final s = navigator.userAgent.toLowerCase();
   if (s.contains('iphone') ||
       s.contains('ipad') ||
       s.contains('ipod') ||
@@ -55,7 +56,7 @@ String get operatingSystem {
 }
 
 String get operatingSystemVersion {
-  final userAgent = html.window.navigator.userAgent;
+  final userAgent = navigator.userAgent;
 
   // Android?
   {
@@ -110,4 +111,4 @@ String get operatingSystemVersion {
   return '';
 }
 
-HttpClient newHttpClient() => BrowserHttpClientImpl();
+HttpClient newHttpClient() => XhrHttpClient();

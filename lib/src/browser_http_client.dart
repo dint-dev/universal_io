@@ -52,4 +52,51 @@ abstract class BrowserHttpClient implements HttpClient {
   bool browserCredentialsMode = false;
 
   BrowserHttpClient.constructor();
+
+  @override
+  Future<BrowserHttpClientRequest> delete(String host, int? port, String path);
+
+  @override
+  Future<BrowserHttpClientRequest> deleteUrl(Uri url);
+
+  @override
+  Future<BrowserHttpClientRequest> get(String host, int? port, String path);
+
+  @override
+  Future<BrowserHttpClientRequest> getUrl(Uri url);
+
+  @override
+  Future<BrowserHttpClientRequest> head(String host, int? port, String path);
+
+  @override
+  Future<BrowserHttpClientRequest> headUrl(Uri url);
+
+  @override
+  Future<BrowserHttpClientRequest> open(
+    String method,
+    String host,
+    int? port,
+    String path,
+  );
+
+  @override
+  Future<BrowserHttpClientRequest> openUrl(String method, Uri url);
+
+  @override
+  Future<BrowserHttpClientRequest> patch(String host, int? port, String path);
+
+  @override
+  Future<BrowserHttpClientRequest> patchUrl(Uri url);
+
+  @override
+  Future<BrowserHttpClientRequest> post(String host, int? port, String path);
+
+  @override
+  Future<BrowserHttpClientRequest> postUrl(Uri url);
+
+  @override
+  Future<BrowserHttpClientRequest> put(String host, int? port, String path);
+
+  @override
+  Future<BrowserHttpClientRequest> putUrl(Uri url);
 }

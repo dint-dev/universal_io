@@ -14,11 +14,11 @@
 
 import 'dart:async';
 
-import '_browser_http_client_request_impl.dart';
+import '_xhr_http_client_request.dart';
 import '_exports_in_browser.dart';
 
 /// Browser implementation of _dart:io_ [HttpClient].
-class BrowserHttpClientImpl extends BrowserHttpClient {
+final class XhrHttpClient extends BrowserHttpClient {
   @override
   Duration idleTimeout = Duration(seconds: 15);
 
@@ -50,7 +50,7 @@ class BrowserHttpClientImpl extends BrowserHttpClient {
 
   bool _isClosed = false;
 
-  BrowserHttpClientImpl() : super.constructor();
+  XhrHttpClient() : super.constructor();
 
   @override
   set connectionFactory(
@@ -92,37 +92,37 @@ class BrowserHttpClientImpl extends BrowserHttpClient {
   }
 
   @override
-  Future<HttpClientRequest> delete(String host, int? port, String path) {
+  Future<BrowserHttpClientRequest> delete(String host, int? port, String path) {
     return open('DELETE', host, port, path);
   }
 
   @override
-  Future<HttpClientRequest> deleteUrl(Uri url) {
+  Future<BrowserHttpClientRequest> deleteUrl(Uri url) {
     return openUrl('DELETE', url);
   }
 
   @override
-  Future<HttpClientRequest> get(String host, int? port, String path) {
+  Future<BrowserHttpClientRequest> get(String host, int? port, String path) {
     return open('GET', host, port, path);
   }
 
   @override
-  Future<HttpClientRequest> getUrl(Uri url) {
+  Future<BrowserHttpClientRequest> getUrl(Uri url) {
     return openUrl('GET', url);
   }
 
   @override
-  Future<HttpClientRequest> head(String host, int? port, String path) {
+  Future<BrowserHttpClientRequest> head(String host, int? port, String path) {
     return open('HEAD', host, port, path);
   }
 
   @override
-  Future<HttpClientRequest> headUrl(Uri url) {
+  Future<BrowserHttpClientRequest> headUrl(Uri url) {
     return openUrl('HEAD', url);
   }
 
   @override
-  Future<HttpClientRequest> open(
+  Future<BrowserHttpClientRequest> open(
     String method,
     String host,
     int? port,
@@ -146,7 +146,7 @@ class BrowserHttpClientImpl extends BrowserHttpClient {
   }
 
   @override
-  Future<HttpClientRequest> openUrl(String method, Uri url) async {
+  Future<BrowserHttpClientRequest> openUrl(String method, Uri url) async {
     if (_isClosed) {
       throw StateError('HTTP client is closed');
     }
@@ -179,36 +179,36 @@ class BrowserHttpClientImpl extends BrowserHttpClient {
         fragment: url.fragment,
       );
     }
-    return BrowserHttpClientRequestImpl(this, method, url);
+    return XhrHttpClientRequest(this, method, url);
   }
 
   @override
-  Future<HttpClientRequest> patch(String host, int? port, String path) {
+  Future<BrowserHttpClientRequest> patch(String host, int? port, String path) {
     return open('PATCH', host, port, path);
   }
 
   @override
-  Future<HttpClientRequest> patchUrl(Uri url) {
+  Future<BrowserHttpClientRequest> patchUrl(Uri url) {
     return openUrl('PATCH', url);
   }
 
   @override
-  Future<HttpClientRequest> post(String host, int? port, String path) {
+  Future<BrowserHttpClientRequest> post(String host, int? port, String path) {
     return open('POST', host, port, path);
   }
 
   @override
-  Future<HttpClientRequest> postUrl(Uri url) {
+  Future<BrowserHttpClientRequest> postUrl(Uri url) {
     return openUrl('POST', url);
   }
 
   @override
-  Future<HttpClientRequest> put(String host, int? port, String path) {
+  Future<BrowserHttpClientRequest> put(String host, int? port, String path) {
     return open('PUT', host, port, path);
   }
 
   @override
-  Future<HttpClientRequest> putUrl(Uri url) {
+  Future<BrowserHttpClientRequest> putUrl(Uri url) {
     return openUrl('PUT', url);
   }
 }
