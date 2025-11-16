@@ -3,7 +3,7 @@
 [![Github Actions CI](https://github.com/dint-dev/universal_io/workflows/Dart%20CI/badge.svg)](https://github.com/dint-dev/universal_io/actions)
 
 # Overview
-A cross-platform [dart:io](https://api.dart.dev/stable/2.19.2/dart-io/dart-io-library.html) that works on all platforms, including browsers.
+A cross-platform [dart:io](https://api.dart.dev/dart-io/) that works on all platforms, including browsers.
 
 You can simply replace _dart:io_ imports with _package:universal_io/universal_io.dart_.
 
@@ -13,16 +13,13 @@ which was obtained under the BSD-style license of Dart SDK. See LICENSE file for
 
 ## APIs added on top of "dart:io"
 * [BrowserHttpClient](https://pub.dev/documentation/universal_io/latest/universal_io/BrowserHttpClient-class.html)
-  * A subclass of "dart:io" [HttpClient](https://api.dart.dev/stable/2.19.2/dart-io/HttpClient-class.html)
+  * A subclass of "dart:io" [HttpClient](https://api.dart.dev/dart-io/HttpClient-class.html)
     that works in browsers.
   * See also
     [BrowserHttpClientRequest](https://pub.dev/documentation/universal_io/latest/universal_io/BrowserHttpClientRequest-class.html),
     [BrowserHttpClientResponse](https://pub.dev/documentation/universal_io/latest/universal_io/BrowserHttpClientResponse-class.html),
     and [BrowserHttpClientException](https://pub.dev/documentation/universal_io/latest/universal_io/BrowserHttpClientException-class.html).
   * Uses XMLHttpRequest in browsers. WASM-compatible.
-
-## Other features
-The following features may be deprecated in the future versions (3.x) of the package:
 * [HttpClient](https://pub.dev/documentation/universal_io/latest/universal_io/HttpClient-class.html)
     * `HttpClient()` factory is changed so that it returns BrowserHttpClient on browsers.
 * [Platform](https://pub.dev/documentation/universal_io/latest/universal_io/Platform-class.html)
@@ -56,8 +53,8 @@ dependencies:
 import 'package:universal_io/universal_io.dart';
 
 Future<void> main() async {
-  // HttpClient can be used in browser too!
-  final httpClient = HttpClient(); // Recommended way of creating HttpClient.
+  // HttpClient can now be used in browser too!
+  final httpClient = newUniversalHttpClient();
   final request = await httpClient.getUrl(Uri.parse("https://dart.dev/"));
   final response = await request.close();
 }
@@ -115,8 +112,10 @@ Sometimes when you do cross-origin requests in browsers, you want to use
 [CORS "credentials mode"](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS). This can be
 achieved with the following pattern:
 ```dart
+import 'package:universal_io/universal_io.dart';
+
 Future<void> main() async {
-    final client = HttpClient();
+    final client = newUniversalHttpClient();
     final request = client.getUrl(Url.parse('http://example/url'));
 
     // Enable credentials mode
@@ -132,21 +131,24 @@ Future<void> main() async {
 
 ## Streaming text responses
 The underlying XMLHttpRequest (XHR) API supports response streaming only when _responseType_ is
-"text".
+"text". This works for responses that are UTF-8 text.
 
 This package automatically uses _responseType_ "text" based on value of the
 HTTP request header "Accept". These media types are defined
-[BrowserHttpClient.defaultTextMimes](https://pub.dev/documentation/universal_io/latest/universal_io/BrowserHttpClient/defaultTextMimes.html):
-  * "text/*" (any text media type)
-  * "application/grpc-web"
-  * "application/grpc-web+proto"
+[BrowserHttpClient.defaultTextMimes](https://pub.dev/documentation/universal_io/latest/universal_io/BrowserHttpClient/defaultTextMimes.html).
 
 If you want to disable streaming, use the following pattern:
 ```dart
+import 'package:universal_io/universal_io.dart';
+
 Future<void> main() async {
     final client = newUniversalHttpClient();
     if (client is BrowserHttpClient) {
-      client.textMimes = const {};
+      client.onBrowserHttpClientRequestClose = (request) {
+        if (someCondition) {
+          request.browserResponseType = 'text';
+        }
+      };
     }
     // ...
 }

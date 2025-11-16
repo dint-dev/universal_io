@@ -2,22 +2,31 @@ name: Dart CI
 
 on:
   push:
+    tags:
+      # must align with the tag-pattern configured on pub.dev, often just replace
+      # {{version}} with [0-9]+.[0-9]+.[0-9]+
+      - 'v[0-9]+.[0-9]+.[0-9]+' # tag-pattern on pub.dev: 'v{{version}}'
     branches:
       - main
   pull_request:
 
+env:
+  MINIMUM_PANA_SCORE: 150
+
 jobs:
   format:
+    name: Verify code formatting
     runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v3
       - uses: dart-lang/setup-dart@v1
-      - name: Print version
-        run: dart --version
+      - name: Install dependencies
+        run: dart --version && dart pub get
       - name: Verify formatting
         run: dart format --set-exit-if-changed .
-  analyze:
-    needs: format
+  lints:
+    name: Analyze source code
+    needs: [format]
     runs-on: ubuntu-slim
     strategy:
       fail-fast: false
@@ -28,28 +37,41 @@ jobs:
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: ${{ matrix.sdk }}
-      - name: Print version
-        run: dart --version
       - name: Install dependencies
-        run: dart pub get
+        run: dart --version && dart pub get
       - name: Analyze project source
         run: dart analyze
+  package_health:
+    name: Analyze package health
+    needs: [lints]
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dart-lang/setup-dart@v1
+      - name: Install dependencies
+        run: dart --version && dart pub get && dart pub global activate pana
+      - name: Run package analyzer
+        run: dart pub global run pana --exit-code-threshold $MINIMUM_PANA_SCORE
   test:
-    needs: analyze
+    name: Run tests
+    needs: [lints]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+        sdk: [stable, dev]
     steps:
       - uses: actions/checkout@v3
       - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: ${{ matrix.sdk }}
       - uses: browser-actions/setup-chrome@v2
-      - name: Print version
-        run: dart --version
       - name: Install dependencies
-        run: dart pub get
+        run: dart --version && dart pub get
       - name: Run tests (VM)
         run: dart test --platform vm
-      - name: Run tests (Chrome)
-        run: dart test --platform chrome
+      - name: Run tests (Chrome, JS)
+        run: dart test --platform chrome --compiler dart2js
+      - name: Run tests (Chrome, WASM)
+        run: dart test --platform chrome --compiler dart2wasm
