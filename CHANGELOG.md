@@ -1,6 +1,8 @@
 # 2.3.0
+* Makes BrowserHttpClient WASM compatible by making it use "dart:js_interop" rather than "dart:html".
+* Fixes various bugs.
 * Adds `Platform.lineTerminator`.
-* Lowers minimum SDK constraint for developers who haven't migrated to the latest SDK.
+* Lowers minimum SDK constraint to 3.6.
 
 # 2.2.3
 * Fixes a bug in new Dart SDK versions.
