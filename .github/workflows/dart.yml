@@ -9,7 +9,7 @@ on:
   pull_request:
 
 env:
-  MINIMUM_PANA_SCORE: 150
+  PANA_SCORE_THRESHOLD: 10
 
 jobs:
   format:
@@ -47,7 +47,7 @@ jobs:
       - name: Install dependencies
         run: dart --version && dart pub get && dart pub global activate pana
       - name: Run package analyzer
-        run: dart pub global run pana --exit-code-threshold $MINIMUM_PANA_SCORE
+        run: dart pub global run pana --exit-code-threshold $PANA_SCORE_THRESHOLD
   test:
     name: Run tests
     runs-on: ${{ matrix.os }}
