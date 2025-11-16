@@ -45,8 +45,8 @@
 // limitations under the License.
 
 import 'dart:convert';
-import 'dart:io' show InternetAddressType;
 import 'dart:io' as dart_io;
+import 'dart:io' show InternetAddressType;
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';

@@ -15,19 +15,19 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import '_browser_http_client_request_impl.dart';
+import '_xhr_http_client_request.dart';
 import '_exports_in_browser.dart';
 import '_http_headers_impl.dart';
 
 /// Used by [_BrowserHttpClient].
-class BrowserHttpClientResponseImpl extends Stream<List<int>>
-    implements BrowserHttpClientResponse {
+final class XhrHttpClientResponse extends BrowserHttpClientResponse
+    with Stream<List<int>> {
   @override
   final HttpHeaders headers = HttpHeadersImpl('1.1');
-  final BrowserHttpClientRequestImpl request;
+  final XhrHttpClientRequest request;
 
   @override
-  dynamic browserResponse;
+  Object? browserResponse;
 
   List<Cookie>? _cookies;
 
@@ -39,12 +39,12 @@ class BrowserHttpClientResponseImpl extends Stream<List<int>>
   @override
   final int statusCode;
 
-  BrowserHttpClientResponseImpl(
-    this.request,
-    this.statusCode,
-    this.reasonPhrase,
-    this._body,
-  );
+  XhrHttpClientResponse({
+    required this.request,
+    required this.statusCode,
+    required this.reasonPhrase,
+    required Stream<Uint8List> body,
+  }) : _body = body;
 
   @override
   X509Certificate? get certificate => null;

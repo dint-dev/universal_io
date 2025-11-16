@@ -137,7 +137,7 @@ class Platform {
   /// so on Windows the map is case-insensitive and will convert
   /// all keys to upper case.
   /// On other platforms, keys can be distinguished by case.
-  static Map<String, String> get environment => {};
+  static Map<String, String> get environment => const {};
 
   /// The path of the executable used to run the script in this isolate.
   ///
@@ -154,6 +154,17 @@ class Platform {
   /// the script name.
   /// Provides a new list every time the value is read.
   static List<String> get executableArguments => [];
+
+  /// The current operating system's default line terminator.
+  ///
+  /// The default character sequence that the operating system
+  /// uses to separate or terminate text lines.
+  ///
+  /// The line terminator is currently the single line-feed character,
+  /// U+000A or `"\n"`, on all supported operating systems except Windows,
+  /// which uses the carriage-return + line-feed sequence, U+000D U+000A or
+  /// `"\r\n"`
+  static String get lineTerminator => isWindows ? '\r\n' : '\n';
 
   /// Get the name of the current locale.
   static String get localeName => impl.locale;
