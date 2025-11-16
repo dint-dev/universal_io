@@ -24,17 +24,15 @@ abstract mixin class IOSinkBase implements IOSink {
 
   @override
   Future addStream(Stream<List<int>> stream) {
-    return stream
-        .listen(
-          (data) {
-            add(data);
-          },
-          onError: (error, stackTrace) {
-            addError(error, stackTrace);
-          },
-          cancelOnError: true,
-        )
-        .asFuture();
+    return stream.listen(
+      (data) {
+        add(data);
+      },
+      onError: (error, stackTrace) {
+        addError(error, stackTrace);
+      },
+      cancelOnError: true,
+    ).asFuture();
   }
 
   @override

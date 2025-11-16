@@ -419,7 +419,8 @@ void _testHttpClient({required bool isBrowser}) async {
       testOn: '!browser',
     );
 
-    test('TLS connection to a self-signed server succeeds with'
+    test(
+        'TLS connection to a self-signed server succeeds with'
         " the help of 'badCertificateCallback'", () async {
       final client = HttpClient();
       client.badCertificateCallback = (certificate, host, port) {
@@ -500,8 +501,8 @@ Future<HttpClientResponse?> _testClient({
 
   // Close HTTP request
   final response = await httpClientRequest.close().timeout(
-    const Duration(milliseconds: 500),
-  );
+        const Duration(milliseconds: 500),
+      );
   final actualResponseBody = await utf8
       .decodeStream(response.cast<List<int>>())
       .timeout(const Duration(seconds: 5));
@@ -554,13 +555,12 @@ Future _testClientMethodWithoutUri({
   expect(response.statusCode, 200);
 }
 
-typedef OpenUrlFunction =
-    Future<HttpClientRequest> Function(
-      HttpClient client,
-      String host,
-      int port,
-      String path,
-    );
+typedef OpenUrlFunction = Future<HttpClientRequest> Function(
+  HttpClient client,
+  String host,
+  int port,
+  String path,
+);
 
 class _ExpectedResponse {
   final int status;

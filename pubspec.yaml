@@ -1,5 +1,5 @@
 name: universal_io
-version: 2.3.0
+version: 2.3.1
 description: Cross-platform 'dart:io' that adds browser support for HttpClient and some other
   "dart:io" APIs.
 homepage: https://github.com/dart-io-packages/universal_io

@@ -328,7 +328,8 @@ class InternetAddress implements dart_io.InternetAddress {
   static Future<List<InternetAddress>> lookup(
     String host, {
     InternetAddressType type = InternetAddressType.any,
-  }) => throw UnimplementedError();
+  }) =>
+      throw UnimplementedError();
 
   /// Attempts to parse [address] as a numeric address.
   ///

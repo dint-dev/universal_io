@@ -1,3 +1,6 @@
+# 2.3.1
+* Improves documentation.
+
 # 2.3.0
 * Makes BrowserHttpClient WASM compatible by making it use "dart:js_interop" rather than "dart:html".
 * Fixes various bugs.
