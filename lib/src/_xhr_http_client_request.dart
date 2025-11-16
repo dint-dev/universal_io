@@ -71,7 +71,7 @@ final class XhrHttpClientRequest extends BrowserHttpClientRequest
 
   @internal
   XhrHttpClientRequest(this.client, this.method, this.uri)
-    : _supportsBody = _httpMethodSupportsBody(method) {
+      : _supportsBody = _httpMethodSupportsBody(method) {
     // Add "User-Agent" header
     final userAgent = client.userAgent;
     if (userAgent != null) {
@@ -133,17 +133,15 @@ final class XhrHttpClientRequest extends BrowserHttpClientRequest
   @override
   Future<void> addStream(Stream<List<int>> stream) async {
     _checkAddRequirements();
-    final future = stream
-        .listen(
-          (item) {
-            _buffer.addAll(item);
-          },
-          onError: (error) {
-            addError(error);
-          },
-          cancelOnError: true,
-        )
-        .asFuture(null);
+    final future = stream.listen(
+      (item) {
+        _buffer.addAll(item);
+      },
+      onError: (error) {
+        addError(error);
+      },
+      cancelOnError: true,
+    ).asFuture(null);
     _addStreamFuture = future;
     await future;
     _addStreamFuture = null;

@@ -69,8 +69,8 @@ final class HttpHeadersImpl implements HttpHeaders {
     this.protocolVersion, {
     int defaultPortForScheme = HttpClient.defaultHttpPort,
     HttpHeadersImpl? initialHeaders,
-  }) : _headers = HashMap<String, List<String>>(),
-       _defaultPortForScheme = defaultPortForScheme {
+  })  : _headers = HashMap<String, List<String>>(),
+        _defaultPortForScheme = defaultPortForScheme {
     if (initialHeaders != null) {
       initialHeaders._headers.forEach((name, value) => _headers[name] = value);
       _contentLength = initialHeaders._contentLength;

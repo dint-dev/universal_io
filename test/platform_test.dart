@@ -15,13 +15,15 @@
 @TestOn('chrome')
 library;
 
+import 'dart:js_interop';
+
 import 'package:test/test.dart';
 import 'package:universal_io/io.dart';
 import 'package:universal_io/src/js/_xhr.dart';
 
 void main() {
   if (navigator.languages.length > 0) {
-    final locale = navigator.languages[0];
+    final locale = navigator.languages[0].toDart;
     test("Platform.localeName == '$locale'", () {
       expect(Platform.localeName, locale);
     });
